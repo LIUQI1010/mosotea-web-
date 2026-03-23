@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Moso Tea — mosotea.co.nz
+
+A bilingual (English / Traditional Chinese) website for Moso Tea, a New Zealand-based artisan tea experience studio offering immersive, hands-on tea ceremony sessions in Wellington.
+
+Built with Next.js, TypeScript, Tailwind CSS, Supabase, and Resend.
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript (strict mode) |
+| Styling | Tailwind CSS |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth (admin only) |
+| Email | Resend |
+| Deployment | Vercel |
+| Domain & CDN | Cloudflare |
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) v18.18 or later
+- npm (comes with Node.js)
+- A [Supabase](https://supabase.com/) project
+- A [Resend](https://resend.com/) account
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/LIUQI1010/mosotea-web-.git
+cd mosotea-web-
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up environment variables
+
+Copy the example file and fill in your credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key (safe for client) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server only) |
+| `RESEND_API_KEY` | Resend API key for sending emails |
+| `NEXT_PUBLIC_APP_URL` | App URL, e.g. `http://localhost:3000` |
+| `CANCELLATION_TOKEN_SECRET` | Random 32-byte hex string for signing cancel tokens |
+
+> **Note:** `SUPABASE_SERVICE_ROLE_KEY` and `CANCELLATION_TOKEN_SECRET` must never be exposed to the browser.
+
+### 4. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server locally |
+| `npm run lint` | Run ESLint |
 
-## Learn More
+## Git Workflow
 
-To learn more about Next.js, take a look at the following resources:
+```
+main          ← Production (auto-deploys to Vercel)
+  └── develop ← Development branch
+        ├── feature/xxx
+        └── fix/xxx
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- All PRs target `develop`
+- `develop` is merged into `main` at the end of each sprint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── (public)/        ← Public-facing pages
+│   ├── admin/           ← Protected admin dashboard
+│   ├── api/             ← API routes
+│   ├── layout.tsx       ← Root layout
+│   └── globals.css      ← Global styles
+├── components/
+│   ├── ui/              ← Base UI components
+│   └── layout/          ← Layout components (Navbar, Footer)
+├── lib/                 ← Utilities (Supabase clients, email, helpers)
+├── types/               ← Shared TypeScript types
+└── i18n/                ← Translation files (EN, zh-TW)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [LICENSE](LICENSE) for details.
