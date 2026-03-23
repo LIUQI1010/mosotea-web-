@@ -15,10 +15,7 @@ function PageHero() {
                 <h1 className="font-serif text-4xl md:text-5xl font-semibold text-tea-brown mb-4">
                     {t("hero.title")}
                 </h1>
-                <p className="font-serif text-2xl md:text-3xl text-bamboo-green mb-6">
-                    {t("hero.titleZh")}
-                </p>
-                <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed mt-6">
                     {t("hero.description")}
                 </p>
             </div>
@@ -428,10 +425,7 @@ function ContactForm() {
                             <span>{t("form.sending")}</span>
                         </>
                     ) : (
-                        <>
-                            <span>{t("form.submit")}</span>
-                            <span className="text-primary-foreground/80">/ {t("form.submitZh")}</span>
-                        </>
+                        <span>{t("form.submit")}</span>
                     )}
                 </button>
             </form>

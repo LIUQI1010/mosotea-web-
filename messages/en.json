@@ -78,7 +78,7 @@
   "about": {
     "hero": {
       "title": "Our Story",
-      "titleZh": "我們的故事"
+      "subtitle": "Sharing the art of tea since 2021"
     },
     "story": {
       "title": "A Journey of Tea",
@@ -109,7 +109,7 @@
     },
     "host": {
       "name": "Mei Lin Chen",
-      "nameZh": "陳美琳 · 創始人兼茶藝師",
+      "role": "Founder & Tea Master",
       "p1": "Mei Lin's journey with tea began in her grandmother's kitchen in Taiwan, where she learned that tea is more than a beverage — it's a way of life.",
       "p2": "After training for five years in both Chinese gongfu cha and Japanese chanoyu traditions, she moved to New Zealand with a dream of sharing this ancient art with a new audience.",
       "p3": "When not hosting ceremonies, Mei Lin tends to the Moso Tea garden, practices calligraphy, and continues to deepen her understanding of tea culture through ongoing study and travel.",
@@ -254,12 +254,12 @@
     },
     "step1": {
       "title": "Select Your Experience",
-      "titleZh": "選擇您想要的體驗",
+      "description": "Choose the tea experience that speaks to you.",
       "error": "Please select an experience"
     },
     "step2": {
       "title": "Choose Date & Time",
-      "titleZh": "選擇日期和時間",
+      "description": "Pick your preferred date and time slot.",
       "selectDate": "Select a Date",
       "selectTime": "Select a Time",
       "errorDate": "Please select a date",
@@ -267,7 +267,7 @@
     },
     "step3": {
       "title": "Your Details",
-      "titleZh": "填寫您的資料",
+      "description": "Tell us a bit about yourself so we can prepare for your visit.",
       "fullName": "Full Name",
       "fullNameZh": "姓名",
       "fullNamePlaceholder": "Enter your full name",

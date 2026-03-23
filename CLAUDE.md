@@ -269,12 +269,13 @@ const supabase = await createClient()
 - Language toggle in navigation bar on all public pages
 - URL-based locale routing: `/about` (English default), `/zh-TW/about` (Chinese)
 - Locale prefix mode: `as-needed` (English has no prefix, zh-TW has prefix)
+- **Single-language display rule:** Each page must only display content in the current locale. Do NOT show both languages simultaneously (e.g., English title with Chinese subtitle). The language switcher in the navigation bar handles locale changes — users switch languages via the toggle, not by seeing both on screen.
 - **All new public pages must support bilingual switching:**
   1. Place pages under `src/app/[locale]/(public)/`
   2. Use `useTranslations` (client) or `getTranslations` (server) from `next-intl`
   3. Use `Link` from `@/i18n/navigation` instead of `next/link`
   4. Add all user-facing strings to `messages/en.json` and `messages/zh-TW.json`
-  5. Follow the bilingual display pattern: main title in current locale, subtitle in the other language
+  5. Do NOT add `Zh` suffix keys (e.g., `titleZh`, `labelZh`) — each locale has its own complete translation file
 - All public page content, form labels, error messages, and emails must be translated
 - Admin dashboard is **English only** (no locale segment needed)
 - Translation files: `messages/en.json` and `messages/zh-TW.json`
