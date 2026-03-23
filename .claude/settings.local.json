@@ -11,7 +11,12 @@
       "Bash(mkdir -p \"src/app/[locale]\")",
       "Bash(mv \"src/app/\\(public\\)\" \"src/app/[locale]/\\(public\\)\")",
       "Bash(cp -r \"src/app/\\(public\\)\" \"src/app/[locale]/\\(public\\)\")",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(mv tea-image-40-scaled.jpg experience-classic.jpg)",
+      "Bash(mv tea-image-50.jpg experience-matcha.jpg)",
+      "Bash(mv tea-image-45.jpg experience-garden.jpg)",
+      "Bash(mv tea-image-7-2048x1335.jpg about-story.jpg)",
+      "Bash(mv 1-Norlha_Clothing-brands.jpg about-founder.jpg)"
     ]
   }
 }
