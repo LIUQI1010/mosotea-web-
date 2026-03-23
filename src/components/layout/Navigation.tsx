@@ -1,20 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useTranslations, useLocale } from "next-intl"
+import { Link, useRouter, usePathname } from "@/i18n/navigation"
+import type { Locale } from "@/i18n/routing"
 
 export function Navigation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const [language, setLanguage] = useState<"en" | "zh">("en")
+    const t = useTranslations("navigation")
+    const locale = useLocale() as Locale
+    const router = useRouter()
     const pathname = usePathname()
 
     const navLinks = [
-        { href: "/", label: "Home" },
-        { href: "/experiences", label: "Experiences" },
-        { href: "/about", label: "About" },
-        { href: "/contact", label: "Contact" },
+        { href: "/" as const, label: t("home") },
+        { href: "/experiences" as const, label: t("experiences") },
+        { href: "/about" as const, label: t("about") },
+        { href: "/contact" as const, label: t("contact") },
     ]
+
+    const switchLocale = (newLocale: Locale) => {
+        router.replace(pathname, { locale: newLocale })
+    }
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-off-white/95 backdrop-blur-sm border-b border-border">
@@ -45,16 +52,16 @@ export function Navigation() {
                     <div className="hidden md:flex items-center gap-4">
                         <div className="flex items-center gap-1 text-sm">
                             <button
-                                onClick={() => setLanguage("en")}
-                                className={`px-2 py-1 rounded transition-colors ${language === "en" ? "text-tea-brown font-medium" : "text-muted-foreground hover:text-foreground"
+                                onClick={() => switchLocale("en")}
+                                className={`px-2 py-1 transition-colors ${locale === "en" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
                                     }`}
                             >
                                 EN
                             </button>
-                            <span className="text-muted-foreground">/</span>
+                            <span className="text-border">|</span>
                             <button
-                                onClick={() => setLanguage("zh")}
-                                className={`px-2 py-1 rounded transition-colors ${language === "zh" ? "text-tea-brown font-medium" : "text-muted-foreground hover:text-foreground"
+                                onClick={() => switchLocale("zh-TW")}
+                                className={`px-2 py-1 transition-colors ${locale === "zh-TW" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
                                     }`}
                             >
                                 繁中
@@ -64,7 +71,7 @@ export function Navigation() {
                             href="/book"
                             className="bg-tea-brown text-primary-foreground px-5 py-2 text-sm font-medium rounded hover:bg-tea-brown/90 transition-colors"
                         >
-                            Book Now
+                            {t("bookNow")}
                         </Link>
                     </div>
 
@@ -108,18 +115,18 @@ export function Navigation() {
                                     {link.label}
                                 </Link>
                             ))}
-                            <div className="flex items-center gap-2 py-2">
+                            <div className="flex items-center gap-1 py-2">
                                 <button
-                                    onClick={() => setLanguage("en")}
-                                    className={`px-2 py-1 text-sm rounded ${language === "en" ? "text-tea-brown font-medium" : "text-muted-foreground"
+                                    onClick={() => switchLocale("en")}
+                                    className={`px-2 py-1 text-sm transition-colors ${locale === "en" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
                                         }`}
                                 >
                                     EN
                                 </button>
-                                <span className="text-muted-foreground">/</span>
+                                <span className="text-border">|</span>
                                 <button
-                                    onClick={() => setLanguage("zh")}
-                                    className={`px-2 py-1 text-sm rounded ${language === "zh" ? "text-tea-brown font-medium" : "text-muted-foreground"
+                                    onClick={() => switchLocale("zh-TW")}
+                                    className={`px-2 py-1 text-sm transition-colors ${locale === "zh-TW" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
                                         }`}
                                 >
                                     繁中
@@ -130,7 +137,7 @@ export function Navigation() {
                                 className="bg-tea-brown text-primary-foreground px-5 py-2.5 text-sm font-medium rounded text-center hover:bg-tea-brown/90 transition-colors"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                Book Now
+                                {t("bookNow")}
                             </Link>
                         </div>
                     </div>

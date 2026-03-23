@@ -1,23 +1,25 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 
 // Page Hero
 function PageHero() {
+    const t = useTranslations("contact")
+
     return (
         <section className="pt-24 pb-16 px-4 bg-cream">
             <div className="max-w-4xl mx-auto text-center">
                 <h1 className="font-serif text-4xl md:text-5xl font-semibold text-tea-brown mb-4">
-                    Get in Touch
+                    {t("hero.title")}
                 </h1>
                 <p className="font-serif text-2xl md:text-3xl text-bamboo-green mb-6">
-                    聯絡我們
+                    {t("hero.titleZh")}
                 </p>
                 <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-                    We would love to hear from you. Whether you have questions about our experiences,
-                    need help planning a special event, or simply want to say hello.
+                    {t("hero.description")}
                 </p>
             </div>
         </section>
@@ -26,14 +28,16 @@ function PageHero() {
 
 // Contact Information
 function ContactInfo() {
+    const t = useTranslations("contact")
+
     return (
         <div className="space-y-8">
             <div>
                 <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-6">
-                    Contact Information
+                    {t("info.title")}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed mb-8">
-                    Visit us in our peaceful garden studio or reach out through any of the channels below.
+                    {t("info.description")}
                 </p>
             </div>
 
@@ -61,9 +65,9 @@ function ContactInfo() {
                     </svg>
                 </div>
                 <div>
-                    <h3 className="font-medium text-foreground mb-1">Address</h3>
-                    <p className="text-muted-foreground">123 Garden Lane</p>
-                    <p className="text-muted-foreground">Kelburn, Wellington 6012</p>
+                    <h3 className="font-medium text-foreground mb-1">{t("info.address")}</h3>
+                    <p className="text-muted-foreground">69 Crowther Road</p>
+                    <p className="text-muted-foreground">Lower Hutt, Wellington 5373</p>
                     <p className="text-muted-foreground">New Zealand</p>
                 </div>
             </div>
@@ -87,7 +91,7 @@ function ContactInfo() {
                     </svg>
                 </div>
                 <div>
-                    <h3 className="font-medium text-foreground mb-1">Email</h3>
+                    <h3 className="font-medium text-foreground mb-1">{t("info.email")}</h3>
                     <a
                         href="mailto:hello@mosotea.co.nz"
                         className="text-tea-brown hover:underline"
@@ -116,12 +120,12 @@ function ContactInfo() {
                     </svg>
                 </div>
                 <div>
-                    <h3 className="font-medium text-foreground mb-1">Phone</h3>
+                    <h3 className="font-medium text-foreground mb-1">{t("info.phone")}</h3>
                     <a
-                        href="tel:+6441234567"
+                        href="tel:+64274892131"
                         className="text-tea-brown hover:underline"
                     >
-                        +64 4 123 4567
+                        +64 27 489 2131
                     </a>
                 </div>
             </div>
@@ -145,43 +149,27 @@ function ContactInfo() {
                     </svg>
                 </div>
                 <div>
-                    <h3 className="font-medium text-foreground mb-1">Business Hours</h3>
+                    <h3 className="font-medium text-foreground mb-1">{t("info.hours")}</h3>
                     <div className="text-muted-foreground space-y-1">
-                        <p>Tuesday - Friday: 10:00 AM - 6:00 PM</p>
-                        <p>Saturday - Sunday: 9:00 AM - 5:00 PM</p>
-                        <p>Monday: Closed</p>
+                        <p>{t("info.hours1")}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Map Placeholder */}
+            {/* Map */}
             <div className="mt-8">
-                <h3 className="font-medium text-foreground mb-3">Find Us</h3>
-                <div className="aspect-[4/3] bg-cream rounded-lg border border-border overflow-hidden">
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-bamboo-green/10 to-tea-brown/10">
-                        <div className="text-center">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1}
-                                stroke="currentColor"
-                                className="w-12 h-12 text-tea-brown/40 mx-auto mb-2"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z"
-                                />
-                            </svg>
-                            <p className="text-sm text-muted-foreground">
-                                123 Garden Lane, Kelburn
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                Wellington, New Zealand
-                            </p>
-                        </div>
-                    </div>
+                <h3 className="font-medium text-foreground mb-3">{t("info.findUs")}</h3>
+                <div className="aspect-[4/3] rounded-lg border border-border overflow-hidden">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2999.5!2d174.9536!3d-41.2094!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s!2s69+Crowther+Road%2C+Wainuiomata%2C+Lower+Hutt+5373%2C+New+Zealand!5e0!3m2!1sen!2snz"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Moso Tea Location"
+                    />
                 </div>
             </div>
         </div>
@@ -190,9 +178,12 @@ function ContactInfo() {
 
 // Contact Form
 function ContactForm() {
+    const t = useTranslations("contact")
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
+        phone: "",
         message: "",
     })
     const [errors, setErrors] = useState<{
@@ -207,24 +198,26 @@ function ContactForm() {
         const newErrors: typeof errors = {}
 
         if (!formData.name.trim()) {
-            newErrors.name = "Please enter your name"
+            newErrors.name = t("form.errorName")
         }
 
         if (!formData.email.trim()) {
-            newErrors.email = "Please enter your email"
+            newErrors.email = t("form.errorEmail")
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = "Please enter a valid email address"
+            newErrors.email = t("form.errorEmailInvalid")
         }
 
         if (!formData.message.trim()) {
-            newErrors.message = "Please enter your message"
+            newErrors.message = t("form.errorMessage")
         } else if (formData.message.trim().length < 10) {
-            newErrors.message = "Message must be at least 10 characters"
+            newErrors.message = t("form.errorMessageMin")
         }
 
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
+
+    const [submitError, setSubmitError] = useState("")
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -232,12 +225,28 @@ function ContactForm() {
         if (!validateForm()) return
 
         setIsSubmitting(true)
+        setSubmitError("")
 
-        // Simulate form submission
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        try {
+            const res = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            })
 
-        setIsSubmitting(false)
-        setIsSubmitted(true)
+            const data = await res.json()
+
+            if (!data.success) {
+                setSubmitError(data.error || "Something went wrong. Please try again.")
+                return
+            }
+
+            setIsSubmitted(true)
+        } catch {
+            setSubmitError("Failed to send message. Please try again.")
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     if (isSubmitted) {
@@ -260,22 +269,22 @@ function ContactForm() {
                     </svg>
                 </div>
                 <h3 className="font-serif text-2xl font-semibold text-tea-brown mb-3">
-                    Message Sent
+                    {t("form.successTitle")}
                 </h3>
                 <p className="text-muted-foreground mb-2">
-                    Thank you for reaching out to us.
+                    {t("form.successMessage")}
                 </p>
                 <p className="text-muted-foreground mb-6">
-                    We will get back to you within 24-48 hours.
+                    {t("form.successFollowUp")}
                 </p>
                 <button
                     onClick={() => {
                         setIsSubmitted(false)
-                        setFormData({ name: "", email: "", message: "" })
+                        setFormData({ name: "", email: "", phone: "", message: "" })
                     }}
                     className="text-tea-brown hover:underline text-sm"
                 >
-                    Send another message
+                    {t("form.sendAnother")}
                 </button>
             </div>
         )
@@ -284,10 +293,10 @@ function ContactForm() {
     return (
         <div className="bg-card rounded-lg border border-border p-6 md:p-8">
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
-                Send Us a Message
+                {t("form.title")}
             </h2>
             <p className="text-muted-foreground mb-6">
-                Fill out the form below and we will respond as soon as possible.
+                {t("form.description")}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -297,7 +306,7 @@ function ContactForm() {
                         htmlFor="name"
                         className="block text-sm font-medium text-foreground mb-2"
                     >
-                        Full Name <span className="text-tea-brown">*</span>
+                        {t("form.name")} <span className="text-tea-brown">{t("form.required")}</span>
                     </label>
                     <input
                         type="text"
@@ -308,7 +317,7 @@ function ContactForm() {
                         }
                         className={`w-full px-4 py-3 rounded-lg border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors ${errors.name ? "border-red-400" : "border-border"
                             }`}
-                        placeholder="Your name"
+                        placeholder={t("form.namePlaceholder")}
                     />
                     {errors.name && (
                         <p className="mt-1.5 text-sm text-red-500">{errors.name}</p>
@@ -321,7 +330,7 @@ function ContactForm() {
                         htmlFor="email"
                         className="block text-sm font-medium text-foreground mb-2"
                     >
-                        Email Address <span className="text-tea-brown">*</span>
+                        {t("form.email")} <span className="text-tea-brown">{t("form.required")}</span>
                     </label>
                     <input
                         type="email"
@@ -332,11 +341,31 @@ function ContactForm() {
                         }
                         className={`w-full px-4 py-3 rounded-lg border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors ${errors.email ? "border-red-400" : "border-border"
                             }`}
-                        placeholder="your.email@example.com"
+                        placeholder={t("form.emailPlaceholder")}
                     />
                     {errors.email && (
                         <p className="mt-1.5 text-sm text-red-500">{errors.email}</p>
                     )}
+                </div>
+
+                {/* Phone Number (Optional) */}
+                <div>
+                    <label
+                        htmlFor="phone"
+                        className="block text-sm font-medium text-foreground mb-2"
+                    >
+                        {t("form.phone")} <span className="text-muted-foreground text-xs">{t("form.phoneOptional")}</span>
+                    </label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                        }
+                        className="w-full px-4 py-3 rounded-lg border border-border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors"
+                        placeholder={t("form.phonePlaceholder")}
+                    />
                 </div>
 
                 {/* Message */}
@@ -345,7 +374,7 @@ function ContactForm() {
                         htmlFor="message"
                         className="block text-sm font-medium text-foreground mb-2"
                     >
-                        Message <span className="text-tea-brown">*</span>
+                        {t("form.message")} <span className="text-tea-brown">{t("form.required")}</span>
                     </label>
                     <textarea
                         id="message"
@@ -356,12 +385,17 @@ function ContactForm() {
                         }
                         className={`w-full px-4 py-3 rounded-lg border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors resize-none ${errors.message ? "border-red-400" : "border-border"
                             }`}
-                        placeholder="How can we help you?"
+                        placeholder={t("form.messagePlaceholder")}
                     />
                     {errors.message && (
                         <p className="mt-1.5 text-sm text-red-500">{errors.message}</p>
                     )}
                 </div>
+
+                {/* Error Message */}
+                {submitError && (
+                    <p className="text-sm text-red-500 text-center">{submitError}</p>
+                )}
 
                 {/* Submit Button */}
                 <button
@@ -391,12 +425,12 @@ function ContactForm() {
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                 />
                             </svg>
-                            <span>Sending...</span>
+                            <span>{t("form.sending")}</span>
                         </>
                     ) : (
                         <>
-                            <span>Send Message</span>
-                            <span className="text-primary-foreground/80">/ 發送訊息</span>
+                            <span>{t("form.submit")}</span>
+                            <span className="text-primary-foreground/80">/ {t("form.submitZh")}</span>
                         </>
                     )}
                 </button>

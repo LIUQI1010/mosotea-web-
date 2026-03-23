@@ -2,37 +2,21 @@
 
 import { useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import Link from "next/link"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 
-// Experience data
-const experiences = [
-    {
-        id: "classic",
-        title: "Classic Tea Ceremony",
-        titleZh: "經典茶道",
-        duration: "90 minutes",
-        price: 85,
-    },
-    {
-        id: "matcha",
-        title: "Matcha Meditation",
-        titleZh: "抹茶冥想",
-        duration: "60 minutes",
-        price: 65,
-    },
-    {
-        id: "private",
-        title: "Private Garden Session",
-        titleZh: "私人花園體驗",
-        duration: "2 hours",
-        price: 180,
-    },
-]
-
 // Available time slots
 const timeSlots = ["10:00 AM", "11:30 AM", "2:00 PM", "3:30 PM", "5:00 PM"]
+
+// Experience IDs with hardcoded prices
+const experienceIds = ["classic", "matcha", "private"] as const
+const experiencePrices: Record<string, number> = {
+    classic: 85,
+    matcha: 65,
+    private: 180,
+}
 
 // Form data interface
 interface BookingFormData {
@@ -60,18 +44,19 @@ interface FormErrors {
 
 // Page Hero Section
 function PageHero() {
+    const t = useTranslations("book")
+
     return (
         <section className="pt-32 pb-16 px-4 bg-cream">
             <div className="max-w-3xl mx-auto text-center">
                 <h1 className="font-serif text-4xl md:text-5xl font-semibold text-tea-brown mb-3">
-                    Book an Experience
+                    {t("hero.title")}
                 </h1>
                 <p className="font-serif text-2xl text-bamboo-green mb-6">
-                    預約體驗
+                    {t("hero.titleZh")}
                 </p>
                 <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
-                    Select your preferred experience, date, and time. We will confirm your booking
-                    within 24 hours.
+                    {t("hero.description")}
                 </p>
             </div>
         </section>
@@ -80,10 +65,12 @@ function PageHero() {
 
 // Step Indicator Component
 function StepIndicator({ currentStep }: { currentStep: number }) {
+    const t = useTranslations("book")
+
     const steps = [
-        { number: 1, label: "Experience", labelZh: "選擇體驗" },
-        { number: 2, label: "Date & Time", labelZh: "日期時間" },
-        { number: 3, label: "Your Details", labelZh: "個人資料" },
+        { number: 1, label: t("steps.experience"), labelZh: t("steps.experienceZh") },
+        { number: 2, label: t("steps.dateTime"), labelZh: t("steps.dateTimeZh") },
+        { number: 3, label: t("steps.details"), labelZh: t("steps.detailsZh") },
     ]
 
     return (
@@ -134,12 +121,23 @@ function ExperienceSelection({
     onSelect: (id: string) => void
     error?: string
 }) {
+    const t = useTranslations("book")
+    const tExp = useTranslations("home.experiences")
+
+    const experiences = experienceIds.map((id) => ({
+        id,
+        title: tExp(`${id}.title`),
+        titleZh: tExp(`${id}.titleZh`),
+        duration: tExp(`${id}.duration`),
+        price: experiencePrices[id],
+    }))
+
     return (
         <div>
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
-                Select Your Experience
+                {t("step1.title")}
             </h2>
-            <p className="text-muted-foreground mb-6">選擇您想要的體驗</p>
+            <p className="text-muted-foreground mb-6">{t("step1.titleZh")}</p>
 
             <div className="grid gap-4">
                 {experiences.map((exp) => (
@@ -315,17 +313,19 @@ function DateTimeSelection({
     onTimeSelect: (time: string) => void
     errors: FormErrors
 }) {
+    const t = useTranslations("book")
+
     return (
         <div>
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
-                Choose Date & Time
+                {t("step2.title")}
             </h2>
-            <p className="text-muted-foreground mb-6">選擇日期和時間</p>
+            <p className="text-muted-foreground mb-6">{t("step2.titleZh")}</p>
 
             <div className="grid md:grid-cols-2 gap-8">
                 {/* Calendar */}
                 <div>
-                    <h3 className="font-medium text-foreground mb-3">Select a Date</h3>
+                    <h3 className="font-medium text-foreground mb-3">{t("step2.selectDate")}</h3>
                     <Calendar selectedDate={selectedDate} onSelect={onDateSelect} />
                     {errors.date && (
                         <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
@@ -339,7 +339,7 @@ function DateTimeSelection({
 
                 {/* Time Slots */}
                 <div>
-                    <h3 className="font-medium text-foreground mb-3">Select a Time</h3>
+                    <h3 className="font-medium text-foreground mb-3">{t("step2.selectTime")}</h3>
                     <div className="grid grid-cols-2 gap-3">
                         {timeSlots.map((slot) => (
                             <button
@@ -433,49 +433,51 @@ function PersonalDetails({
     onFieldChange: (field: keyof BookingFormData, value: string | number) => void
     errors: FormErrors
 }) {
+    const t = useTranslations("book")
+
     return (
         <div>
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
-                Your Details
+                {t("step3.title")}
             </h2>
-            <p className="text-muted-foreground mb-6">填寫您的資料</p>
+            <p className="text-muted-foreground mb-6">{t("step3.titleZh")}</p>
 
             <div className="space-y-5">
                 <InputField
-                    label="Full Name"
-                    labelZh="姓名"
+                    label={t("step3.fullName")}
+                    labelZh={t("step3.fullNameZh")}
                     value={formData.fullName}
                     onChange={(value) => onFieldChange("fullName", value)}
-                    placeholder="Enter your full name"
+                    placeholder={t("step3.fullNamePlaceholder")}
                     error={errors.fullName}
                     required
                 />
 
                 <InputField
-                    label="Email Address"
-                    labelZh="電郵地址"
+                    label={t("step3.email")}
+                    labelZh={t("step3.emailZh")}
                     type="email"
                     value={formData.email}
                     onChange={(value) => onFieldChange("email", value)}
-                    placeholder="you@example.com"
+                    placeholder={t("step3.emailPlaceholder")}
                     error={errors.email}
                     required
                 />
 
                 <InputField
-                    label="Phone Number"
-                    labelZh="電話號碼"
+                    label={t("step3.phone")}
+                    labelZh={t("step3.phoneZh")}
                     type="tel"
                     value={formData.phone}
                     onChange={(value) => onFieldChange("phone", value)}
-                    placeholder="+64 21 123 4567"
+                    placeholder={t("step3.phonePlaceholder")}
                     error={errors.phone}
                     required
                 />
 
                 <InputField
-                    label="Number of Guests"
-                    labelZh="人數"
+                    label={t("step3.guests")}
+                    labelZh={t("step3.guestsZh")}
                     type="number"
                     value={formData.guests}
                     onChange={(value) => onFieldChange("guests", parseInt(value) || 1)}
@@ -488,13 +490,13 @@ function PersonalDetails({
                 {/* Special Requests */}
                 <div>
                     <label className="block mb-2">
-                        <span className="font-medium text-foreground">Special Requests</span>
-                        <span className="text-sm text-muted-foreground ml-2">特別要求（選填）</span>
+                        <span className="font-medium text-foreground">{t("step3.specialRequests")}</span>
+                        <span className="text-sm text-muted-foreground ml-2">{t("step3.specialRequestsZh")}</span>
                     </label>
                     <textarea
                         value={formData.specialRequests}
                         onChange={(e) => onFieldChange("specialRequests", e.target.value)}
-                        placeholder="Any dietary requirements, accessibility needs, or special occasions..."
+                        placeholder={t("step3.specialRequestsPlaceholder")}
                         rows={3}
                         className="w-full px-4 py-3 rounded-lg border-2 border-border bg-off-white transition-colors focus:outline-none focus:ring-0 focus:border-tea-brown resize-none"
                     />
@@ -503,8 +505,8 @@ function PersonalDetails({
                 {/* Language Preference */}
                 <div>
                     <label className="block mb-3">
-                        <span className="font-medium text-foreground">Preferred Language</span>
-                        <span className="text-sm text-muted-foreground ml-2">語言偏好</span>
+                        <span className="font-medium text-foreground">{t("step3.language")}</span>
+                        <span className="text-sm text-muted-foreground ml-2">{t("step3.languageZh")}</span>
                     </label>
                     <div className="flex gap-3">
                         <button
@@ -534,24 +536,29 @@ function PersonalDetails({
 
 // Booking Summary
 function BookingSummary({ formData }: { formData: BookingFormData }) {
-    const selectedExp = experiences.find((e) => e.id === formData.experience)
-    if (!selectedExp) return null
+    const t = useTranslations("book")
+    const tExp = useTranslations("home.experiences")
 
-    const totalPrice = selectedExp.price * formData.guests
+    const selectedExpId = formData.experience
+    if (!selectedExpId || !experiencePrices[selectedExpId]) return null
+
+    const expTitle = tExp(`${selectedExpId}.title`)
+    const price = experiencePrices[selectedExpId]
+    const totalPrice = price * formData.guests
 
     return (
         <div className="bg-cream rounded-lg p-6 border border-border">
             <h3 className="font-serif text-lg font-semibold text-tea-brown mb-4">
-                Booking Summary
+                {t("summary.title")}
             </h3>
             <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">Experience</span>
-                    <span className="font-medium text-foreground">{selectedExp.title}</span>
+                    <span className="text-muted-foreground">{t("summary.experience")}</span>
+                    <span className="font-medium text-foreground">{expTitle}</span>
                 </div>
                 {formData.date && (
                     <div className="flex justify-between">
-                        <span className="text-muted-foreground">Date</span>
+                        <span className="text-muted-foreground">{t("summary.date")}</span>
                         <span className="font-medium text-foreground">
                             {new Date(formData.date).toLocaleDateString("en-NZ", {
                                 weekday: "short",
@@ -564,16 +571,16 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
                 )}
                 {formData.timeSlot && (
                     <div className="flex justify-between">
-                        <span className="text-muted-foreground">Time</span>
+                        <span className="text-muted-foreground">{t("summary.time")}</span>
                         <span className="font-medium text-foreground">{formData.timeSlot}</span>
                     </div>
                 )}
                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">Guests</span>
+                    <span className="text-muted-foreground">{t("summary.guests")}</span>
                     <span className="font-medium text-foreground">{formData.guests}</span>
                 </div>
                 <div className="pt-3 border-t border-border flex justify-between">
-                    <span className="font-medium text-foreground">Total</span>
+                    <span className="font-medium text-foreground">{t("summary.total")}</span>
                     <span className="font-semibold text-tea-brown text-lg">NZ${totalPrice}</span>
                 </div>
             </div>
@@ -583,6 +590,8 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
 
 // Success Message
 function SuccessMessage() {
+    const t = useTranslations("book")
+
     return (
         <div className="text-center py-12">
             <div className="w-16 h-16 mx-auto mb-6 bg-bamboo-green/10 rounded-full flex items-center justify-center">
@@ -591,18 +600,17 @@ function SuccessMessage() {
                 </svg>
             </div>
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-3">
-                Booking Request Received
+                {t("success.title")}
             </h2>
-            <p className="font-serif text-lg text-bamboo-green mb-4">預約請求已收到</p>
+            <p className="font-serif text-lg text-bamboo-green mb-4">{t("success.titleZh")}</p>
             <p className="text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed">
-                Thank you for your booking request. We will review your request and send a confirmation
-                email within 24 hours.
+                {t("success.description")}
             </p>
             <Link
                 href="/"
                 className="inline-block bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
             >
-                Return Home
+                {t("success.returnHome")}
             </Link>
         </div>
     )
@@ -611,9 +619,10 @@ function SuccessMessage() {
 // Booking Form Component
 function BookingForm() {
     const searchParams = useSearchParams()
+    const t = useTranslations("book")
     const preselectedExperience = searchParams.get("experience") || ""
 
-    const initialExperience = preselectedExperience && experiences.find((e) => e.id === preselectedExperience)
+    const initialExperience = preselectedExperience && experiencePrices[preselectedExperience]
         ? preselectedExperience
         : ""
 
@@ -637,33 +646,33 @@ function BookingForm() {
 
         if (step === 1) {
             if (!formData.experience) {
-                newErrors.experience = "Please select an experience"
+                newErrors.experience = t("step1.error")
             }
         }
 
         if (step === 2) {
             if (!formData.date) {
-                newErrors.date = "Please select a date"
+                newErrors.date = t("step2.errorDate")
             }
             if (!formData.timeSlot) {
-                newErrors.timeSlot = "Please select a time slot"
+                newErrors.timeSlot = t("step2.errorTime")
             }
         }
 
         if (step === 3) {
             if (!formData.fullName.trim()) {
-                newErrors.fullName = "Please enter your name"
+                newErrors.fullName = t("step3.errorName")
             }
             if (!formData.email.trim()) {
-                newErrors.email = "Please enter your email"
+                newErrors.email = t("step3.errorEmail")
             } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-                newErrors.email = "Please enter a valid email address"
+                newErrors.email = t("step3.errorEmailInvalid")
             }
             if (!formData.phone.trim()) {
-                newErrors.phone = "Please enter your phone number"
+                newErrors.phone = t("step3.errorPhone")
             }
             if (formData.guests < 1 || formData.guests > 6) {
-                newErrors.guests = "Please enter 1-6 guests"
+                newErrors.guests = t("step3.errorGuests")
             }
         }
 
@@ -741,7 +750,7 @@ function BookingForm() {
                                 onClick={handleBack}
                                 className="px-6 py-3 rounded font-medium text-muted-foreground hover:text-foreground transition-colors"
                             >
-                                Back
+                                {t("back")}
                             </button>
                         ) : (
                             <div />
@@ -752,14 +761,14 @@ function BookingForm() {
                                 onClick={handleNext}
                                 className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
                             >
-                                Continue
+                                {t("continue")}
                             </button>
                         ) : (
                             <button
                                 onClick={handleSubmit}
                                 className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
                             >
-                                Confirm Booking / 確認預約
+                                {t("confirm")} / {t("confirmZh")}
                             </button>
                         )}
                     </div>
@@ -776,24 +785,26 @@ function BookingForm() {
 
 // What Happens Next Section
 function WhatHappensNext() {
+    const t = useTranslations("book")
+
     const steps = [
         {
             number: 1,
-            title: "Submit Your Request",
-            titleZh: "提交預約",
-            description: "Fill in the form with your preferred experience, date, and contact details.",
+            title: t("whatNext.step1Title"),
+            titleZh: t("whatNext.step1TitleZh"),
+            description: t("whatNext.step1Description"),
         },
         {
             number: 2,
-            title: "Receive Confirmation",
-            titleZh: "收到確認",
-            description: "We'll review your request and send a confirmation email within 24 hours.",
+            title: t("whatNext.step2Title"),
+            titleZh: t("whatNext.step2TitleZh"),
+            description: t("whatNext.step2Description"),
         },
         {
             number: 3,
-            title: "Prepare for Your Visit",
-            titleZh: "準備參加",
-            description: "You'll receive detailed instructions and what to expect before your session.",
+            title: t("whatNext.step3Title"),
+            titleZh: t("whatNext.step3TitleZh"),
+            description: t("whatNext.step3Description"),
         },
     ]
 
@@ -802,9 +813,9 @@ function WhatHappensNext() {
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-10">
                     <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-2">
-                        What Happens Next
+                        {t("whatNext.title")}
                     </h2>
-                    <p className="font-serif text-lg text-bamboo-green">接下來的流程</p>
+                    <p className="font-serif text-lg text-bamboo-green">{t("whatNext.titleZh")}</p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run:*)",
+      "Bash(find /d/MyProjects/mosotea-web-/node_modules/next-intl/dist/types/routing -type f -name *.d.ts)",
+      "Bash(ls -la /d/MyProjects/mosotea-web-/src/app/'\\(public\\)')",
+      "Bash(xargs grep:*)",
+      "Bash(mkdir -p \"src/app/[locale]\")",
+      "Bash(mv \"src/app/\\(public\\)\" \"src/app/[locale]/\\(public\\)\")",
+      "Bash(cp -r \"src/app/\\(public\\)\" \"src/app/[locale]/\\(public\\)\")",
+      "Bash(npx next:*)"
+    ]
+  }
+}
