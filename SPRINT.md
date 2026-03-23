@@ -83,8 +83,8 @@ Each developer answers:
 | Agree on tech stack and architecture | Both | Architecture doc |
 
 **Definition of Done:**
-- [ ] Client has reviewed and signed the PRD
-- [ ] Architecture documented in repo
+- [x] Client has reviewed and signed the PRD
+- [x] Architecture documented in repo
 
 ---
 
@@ -106,7 +106,7 @@ Each developer answers:
 | Present wireframes to client for approval | Both |
 
 **Definition of Done:**
-- [ ] Push to `main` triggers successful Vercel deployment
+- [x] Push to `main` triggers successful Vercel deployment
 - [ ] Client has approved wireframes and design system
 - [ ] README documents local setup steps
 
