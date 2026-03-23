@@ -1,110 +1,9 @@
-import Link from "next/link"
+"use client"
+
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
-
-// Page Hero Section
-function PageHero() {
-    return (
-        <section className="relative pt-16 bg-cream">
-            <div className="relative h-64 sm:h-80 flex items-center justify-center bg-tea-brown/10">
-                <div className="absolute inset-0 bg-gradient-to-b from-tea-brown/5 to-tea-brown/20" />
-                <div className="relative z-10 text-center px-4">
-                    <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold text-tea-brown mb-3">
-                        Our Story
-                    </h1>
-                    <p className="font-serif text-2xl sm:text-3xl text-bamboo-green">
-                        我們的故事
-                    </p>
-                </div>
-            </div>
-        </section>
-    )
-}
-
-// Story Section
-function StorySection() {
-    return (
-        <section className="py-20 sm:py-28 px-4 bg-off-white">
-            <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    {/* Image */}
-                    <div className="order-2 lg:order-1">
-                        <div className="aspect-[4/5] overflow-hidden rounded-lg">
-                            <img
-                                src="/images/about-story.jpg"
-                                alt="Moso Tea ceremony space interior"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="order-1 lg:order-2">
-                        <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-6">
-                            A Journey of Tea
-                        </h2>
-                        <div className="space-y-5 text-muted-foreground leading-relaxed">
-                            <p>
-                                Moso Tea was born from a simple yet profound love for the art of tea ceremony.
-                                Founded in 2018, our studio has become a sanctuary for those seeking moments of
-                                stillness in the heart of Wellington.
-                            </p>
-                            <p>
-                                The name &ldquo;Moso&rdquo; comes from the moso bamboo, known for its remarkable patience
-                                and growth. Just as the bamboo spends years developing strong roots before its
-                                spectacular emergence, we believe in the power of quiet cultivation and
-                                mindful presence.
-                            </p>
-                            <p>
-                                What began as a small gathering of tea enthusiasts has grown into a beloved
-                                community space where people from all walks of life come together to experience
-                                the meditative beauty of tea culture.
-                            </p>
-                            <p>
-                                Our garden studio, nestled in the hills of Kelburn, offers a rare opportunity
-                                to step away from the everyday and immerse yourself in an ancient tradition
-                                that celebrates the simple act of preparing and sharing tea.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    )
-}
-
-// Philosophy Section
-function PhilosophySection() {
-    return (
-        <section className="py-20 sm:py-28 px-4 bg-cream">
-            <div className="max-w-3xl mx-auto text-center">
-                {/* Decorative Element */}
-                <div className="flex items-center justify-center gap-4 mb-10">
-                    <div className="h-px w-16 bg-tea-brown/30" />
-                    <TeaLeafIcon className="w-6 h-6 text-tea-brown" />
-                    <div className="h-px w-16 bg-tea-brown/30" />
-                </div>
-
-                <blockquote className="font-serif text-2xl sm:text-3xl text-tea-brown leading-relaxed mb-8 italic">
-                    &ldquo;In the simple act of making tea, we find a path to presence.
-                    Each cup is an invitation to slow down, to breathe,
-                    and to connect with the moment.&rdquo;
-                </blockquote>
-
-                <p className="font-serif text-lg text-bamboo-green mb-4">
-                    「在泡茶的簡單動作中，我們找到了通往當下的道路。每一杯茶都是一份邀請，讓我們放慢腳步，深呼吸，與當下連結。」
-                </p>
-
-                {/* Decorative Element */}
-                <div className="flex items-center justify-center gap-4 mt-10">
-                    <div className="h-px w-16 bg-tea-brown/30" />
-                    <div className="w-2 h-2 rounded-full bg-tea-brown/40" />
-                    <div className="h-px w-16 bg-tea-brown/30" />
-                </div>
-            </div>
-        </section>
-    )
-}
 
 // Icon Components
 function TeaLeafIcon({ className }: { className?: string }) {
@@ -210,32 +109,125 @@ function DurationIcon({ className }: { className?: string }) {
     )
 }
 
+// Page Hero Section
+function PageHero() {
+    const t = useTranslations("about")
+
+    return (
+        <section className="relative pt-16 bg-cream">
+            <div className="relative h-64 sm:h-80 flex items-center justify-center bg-tea-brown/10">
+                <div className="absolute inset-0 bg-gradient-to-b from-tea-brown/5 to-tea-brown/20" />
+                <div className="relative z-10 text-center px-4">
+                    <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold text-tea-brown mb-3">
+                        {t("hero.title")}
+                    </h1>
+                    <p className="font-serif text-2xl sm:text-3xl text-bamboo-green">
+                        {t("hero.titleZh")}
+                    </p>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+// Story Section
+function StorySection() {
+    const t = useTranslations("about")
+
+    return (
+        <section className="py-20 sm:py-28 px-4 bg-off-white">
+            <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    {/* Image */}
+                    <div className="order-2 lg:order-1">
+                        <div className="aspect-[4/5] overflow-hidden rounded-lg">
+                            <img
+                                src="/images/about-story.jpg"
+                                alt="Moso Tea ceremony space interior"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="order-1 lg:order-2">
+                        <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-6">
+                            {t("story.title")}
+                        </h2>
+                        <div className="space-y-5 text-muted-foreground leading-relaxed">
+                            <p>{t("story.p1")}</p>
+                            <p>{t("story.p2")}</p>
+                            <p>{t("story.p3")}</p>
+                            <p>{t("story.p4")}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+// Philosophy Section
+function PhilosophySection() {
+    const t = useTranslations("about")
+
+    return (
+        <section className="py-20 sm:py-28 px-4 bg-cream">
+            <div className="max-w-3xl mx-auto text-center">
+                {/* Decorative Element */}
+                <div className="flex items-center justify-center gap-4 mb-10">
+                    <div className="h-px w-16 bg-tea-brown/30" />
+                    <TeaLeafIcon className="w-6 h-6 text-tea-brown" />
+                    <div className="h-px w-16 bg-tea-brown/30" />
+                </div>
+
+                <blockquote className="font-serif text-2xl sm:text-3xl text-tea-brown leading-relaxed mb-8 italic">
+                    {t("philosophy.quote")}
+                </blockquote>
+
+                <p className="font-serif text-lg text-bamboo-green mb-4">
+                    {t("philosophy.quoteZh")}
+                </p>
+
+                {/* Decorative Element */}
+                <div className="flex items-center justify-center gap-4 mt-10">
+                    <div className="h-px w-16 bg-tea-brown/30" />
+                    <div className="w-2 h-2 rounded-full bg-tea-brown/40" />
+                    <div className="h-px w-16 bg-tea-brown/30" />
+                </div>
+            </div>
+        </section>
+    )
+}
+
 // What to Expect Section
 function WhatToExpectSection() {
+    const t = useTranslations("about")
+
     const expectations = [
         {
             icon: ExpertIcon,
-            title: "Guided by an Expert",
-            titleZh: "專家引導",
-            description: "Our certified tea masters bring years of training and deep cultural knowledge to every session.",
+            titleKey: "expect.item1Title" as const,
+            titleZhKey: "expect.item1TitleZh" as const,
+            descriptionKey: "expect.item1Description" as const,
         },
         {
             icon: IntimateIcon,
-            title: "Intimate Setting",
-            titleZh: "私密環境",
-            description: "Maximum 6 guests ensures a personal, unhurried experience with meaningful interaction.",
+            titleKey: "expect.item2Title" as const,
+            titleZhKey: "expect.item2TitleZh" as const,
+            descriptionKey: "expect.item2Description" as const,
         },
         {
             icon: MaterialsIcon,
-            title: "All Materials Provided",
-            titleZh: "提供所有材料",
-            description: "Premium teas, traditional utensils, and light refreshments are included in every experience.",
+            titleKey: "expect.item3Title" as const,
+            titleZhKey: "expect.item3TitleZh" as const,
+            descriptionKey: "expect.item3Description" as const,
         },
         {
             icon: DurationIcon,
-            title: "Unhurried Pace",
-            titleZh: "從容不迫",
-            description: "Our sessions are designed to give you time to fully absorb and appreciate each moment.",
+            titleKey: "expect.item4Title" as const,
+            titleZhKey: "expect.item4TitleZh" as const,
+            descriptionKey: "expect.item4Description" as const,
         },
     ]
 
@@ -244,9 +236,9 @@ function WhatToExpectSection() {
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16">
                     <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-3">
-                        What to Expect
+                        {t("expect.title")}
                     </h2>
-                    <p className="font-serif text-xl text-bamboo-green">體驗流程</p>
+                    <p className="font-serif text-xl text-bamboo-green">{t("expect.titleZh")}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -256,10 +248,10 @@ function WhatToExpectSection() {
                                 <item.icon className="w-7 h-7 text-tea-brown" />
                             </div>
                             <h3 className="font-serif text-lg font-semibold text-foreground mb-1">
-                                {item.title}
+                                {t(item.titleKey)}
                             </h3>
-                            <p className="text-sm text-bamboo-green mb-3">{item.titleZh}</p>
-                            <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                            <p className="text-sm text-bamboo-green mb-3">{t(item.titleZhKey)}</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descriptionKey)}</p>
                         </div>
                     ))}
                 </div>
@@ -270,6 +262,8 @@ function WhatToExpectSection() {
 
 // Host Introduction Section
 function HostSection() {
+    const t = useTranslations("about")
+
     return (
         <section className="py-20 sm:py-28 px-4 bg-cream">
             <div className="max-w-5xl mx-auto">
@@ -288,31 +282,19 @@ function HostSection() {
                     {/* Bio */}
                     <div>
                         <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-2">
-                            Mei Lin Chen
+                            {t("host.name")}
                         </h2>
-                        <p className="font-serif text-lg text-bamboo-green mb-6">陳美琳 · 創始人兼茶藝師</p>
+                        <p className="font-serif text-lg text-bamboo-green mb-6">{t("host.nameZh")}</p>
 
                         <div className="space-y-4 text-muted-foreground leading-relaxed">
-                            <p>
-                                Mei Lin&apos;s journey with tea began in her grandmother&apos;s kitchen in Taiwan,
-                                where she learned that tea is more than a beverage — it&apos;s a way of life.
-                            </p>
-                            <p>
-                                After training for five years in both Chinese gongfu cha and Japanese
-                                chanoyu traditions, she moved to New Zealand with a dream of sharing
-                                this ancient art with a new audience.
-                            </p>
-                            <p>
-                                When not hosting ceremonies, Mei Lin tends to the Moso Tea garden,
-                                practices calligraphy, and continues to deepen her understanding of
-                                tea culture through ongoing study and travel.
-                            </p>
+                            <p>{t("host.p1")}</p>
+                            <p>{t("host.p2")}</p>
+                            <p>{t("host.p3")}</p>
                         </div>
 
                         <div className="mt-8 pt-6 border-t border-tea-brown/20">
                             <p className="text-sm text-muted-foreground italic">
-                                &ldquo;My greatest joy is watching guests discover the peace that tea can bring.
-                                Each ceremony is a gift I&apos;m honored to share.&rdquo;
+                                {t("host.quote")}
                             </p>
                         </div>
                     </div>
@@ -324,6 +306,8 @@ function HostSection() {
 
 // Gallery Section
 function GallerySection() {
+    const t = useTranslations("about")
+
     const galleryImages = [
         { src: "/images/gallery-1.jpg", alt: "Traditional tea ceremony utensils" },
         { src: "/images/gallery-2.jpg", alt: "Zen garden corner" },
@@ -338,9 +322,9 @@ function GallerySection() {
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
                     <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-3">
-                        Our Space
+                        {t("gallery.title")}
                     </h2>
-                    <p className="font-serif text-xl text-bamboo-green">我們的空間</p>
+                    <p className="font-serif text-xl text-bamboo-green">{t("gallery.titleZh")}</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
@@ -365,24 +349,25 @@ function GallerySection() {
 
 // CTA Section
 function CTASection() {
+    const t = useTranslations("about")
+
     return (
         <section className="py-20 sm:py-28 px-4 bg-tea-brown">
             <div className="max-w-3xl mx-auto text-center">
                 <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-off-white mb-4">
-                    Ready to Experience Tea?
+                    {t("cta.title")}
                 </h2>
                 <p className="font-serif text-xl text-off-white/80 mb-4">
-                    準備好體驗茶道了嗎？
+                    {t("cta.titleZh")}
                 </p>
                 <p className="text-off-white/70 mb-10 max-w-xl mx-auto leading-relaxed">
-                    Join us for an unforgettable journey into the art of tea ceremony.
-                    Book your experience today and discover the tranquility that awaits.
+                    {t("cta.description")}
                 </p>
                 <Link
                     href="/book"
                     className="inline-block bg-off-white text-tea-brown px-10 py-4 text-base font-medium rounded hover:bg-cream transition-colors"
                 >
-                    Book Now
+                    {t("cta.button")}
                 </Link>
             </div>
         </section>

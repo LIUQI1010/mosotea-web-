@@ -1,6 +1,10 @@
-import Link from "next/link"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 export function Footer() {
+    const t = useTranslations("footer")
+    const tNav = useTranslations("navigation")
+
     return (
         <footer className="bg-tea-brown text-primary-foreground py-16 px-4">
             <div className="max-w-6xl mx-auto">
@@ -9,39 +13,38 @@ export function Footer() {
                     <div className="md:col-span-2">
                         <h3 className="font-serif text-2xl font-semibold mb-4">Moso Tea</h3>
                         <p className="text-primary-foreground/80 leading-relaxed max-w-md">
-                            Bringing the ancient art of tea ceremony to Wellington.
-                            Experience tranquility, mindfulness, and the beauty of tea culture.
+                            {t("description")}
                         </p>
                     </div>
 
                     {/* Navigation */}
                     <div>
-                        <h4 className="font-semibold mb-4">Navigation</h4>
+                        <h4 className="font-semibold mb-4">{t("navigation")}</h4>
                         <nav className="flex flex-col gap-2">
                             <Link href="/" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                                Home
+                                {tNav("home")}
                             </Link>
                             <Link href="/experiences" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                                Experiences
+                                {tNav("experiences")}
                             </Link>
                             <Link href="/about" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                                About
+                                {tNav("about")}
                             </Link>
                             <Link href="/contact" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-                                Contact
+                                {tNav("contact")}
                             </Link>
                         </nav>
                     </div>
 
                     {/* Contact Info */}
                     <div>
-                        <h4 className="font-semibold mb-4">Contact</h4>
+                        <h4 className="font-semibold mb-4">{t("contact")}</h4>
                         <div className="flex flex-col gap-2 text-primary-foreground/80">
-                            <p>123 Garden Lane</p>
-                            <p>Kelburn, Wellington 6012</p>
-                            <p>New Zealand</p>
-                            <p className="mt-2">hello@mosotea.co.nz</p>
-                            <p>+64 4 123 4567</p>
+                            <p>{t("address1")}</p>
+                            <p>{t("address2")}</p>
+                            <p>{t("address3")}</p>
+                            <p className="mt-2">{t("email")}</p>
+                            <p>{t("phone")}</p>
                         </div>
                     </div>
                 </div>
@@ -49,17 +52,22 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-primary-foreground/20 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-sm text-primary-foreground/60">
-                        © {new Date().getFullYear()} Moso Tea. All rights reserved.
+                        {t("copyright", { year: new Date().getFullYear() })}
                     </p>
                     <div className="flex gap-6 text-sm">
                         <Link href="/privacy" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-                            Privacy Policy
+                            {t("privacy")}
                         </Link>
                         <Link href="/terms" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-                            Terms of Service
+                            {t("terms")}
                         </Link>
                     </div>
                 </div>
+
+                {/* Credit */}
+                <p className="text-center text-xs text-primary-foreground/40 mt-6">
+                    Built with care by <a href="https://qi.lqtechgroup.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 underline underline-offset-2 hover:text-primary-foreground transition-colors">QI</a> & Qingyi
+                </p>
             </div>
         </footer>
     )

@@ -107,8 +107,8 @@ Each developer answers:
 
 **Definition of Done:**
 - [x] Push to `main` triggers successful Vercel deployment
-- [ ] Client has approved wireframes and design system
-- [ ] README documents local setup steps
+- [x] Client has approved wireframes and design system
+- [x] README documents local setup steps
 
 ---
 
@@ -133,9 +133,9 @@ Each developer answers:
 
 **Definition of Done:**
 - [ ] All pages render correctly on mobile, tablet, and desktop
-- [ ] Language toggle switches all content between English and Traditional Chinese
-- [ ] Contact form successfully sends email via Resend
-- [ ] All pages have correct SEO metadata
+- [x] Language toggle switches all content between English and Traditional Chinese
+- [x] Contact form successfully sends email via Resend
+- [x] All pages have correct SEO metadata
 
 ---
 

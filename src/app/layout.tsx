@@ -14,9 +14,6 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Moso Tea | Traditional Tea Ceremony Experiences in Wellington',
-  description: 'Experience the art of tea at Moso Tea. Authentic tea ceremony experiences in an intimate Wellington garden setting.',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
@@ -42,10 +39,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="font-sans antialiased">
-        {children}
-      </body>
+    <html className={`${cormorant.variable} ${inter.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }

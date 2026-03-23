@@ -1,9 +1,14 @@
-import Link from "next/link"
+"use client"
+
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 
 // Hero Section
 function HeroSection() {
+  const t = useTranslations("home.hero")
+
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-cream">
       {/* Background Image */}
@@ -19,20 +24,19 @@ function HeroSection() {
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-off-white mb-4 text-balance leading-tight">
-          Experience the Art of Tea
+          {t("title")}
         </h1>
         <p className="font-serif text-2xl sm:text-3xl md:text-4xl text-off-white/90 mb-6">
-          體驗茶道之美
+          {t("titleZh")}
         </p>
         <p className="text-lg sm:text-xl text-off-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-          Discover the ancient traditions of tea ceremony in the heart of Wellington,
-          where every cup tells a story of mindfulness and connection.
+          {t("description")}
         </p>
         <Link
           href="/book"
           className="inline-block bg-off-white text-tea-brown px-8 py-4 text-base font-medium rounded hover:bg-cream transition-colors"
         >
-          Book an Experience
+          {t("cta")}
         </Link>
       </div>
     </section>
@@ -113,24 +117,26 @@ function GardenIcon({ className }: { className?: string }) {
 
 // Introduction Section
 function IntroductionSection() {
+  const t = useTranslations("home.intro")
+
   const features = [
     {
       icon: TeaLeafIcon,
-      title: "Authentic Experience",
-      titleZh: "正宗體驗",
-      description: "Traditional tea ceremonies guided by certified tea masters trained in classical techniques.",
+      title: t("feature1Title"),
+      titleZh: t("feature1TitleZh"),
+      description: t("feature1Description"),
     },
     {
       icon: UsersIcon,
-      title: "Small Intimate Groups",
-      titleZh: "私密小組",
-      description: "Maximum 6 guests per session ensures personalized attention and meaningful connection.",
+      title: t("feature2Title"),
+      titleZh: t("feature2TitleZh"),
+      description: t("feature2Description"),
     },
     {
       icon: GardenIcon,
-      title: "Wellington Garden Setting",
-      titleZh: "威靈頓花園",
-      description: "Our serene garden space offers a peaceful retreat from the bustling city life.",
+      title: t("feature3Title"),
+      titleZh: t("feature3TitleZh"),
+      description: t("feature3Description"),
     },
   ]
 
@@ -139,11 +145,10 @@ function IntroductionSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
-            Why Moso Tea
+            {t("title")}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            We bring the ancient art of tea ceremony to New Zealand, creating moments of peace
-            and connection in our carefully curated space.
+            {t("description")}
           </p>
         </div>
 
@@ -168,29 +173,31 @@ function IntroductionSection() {
 
 // Featured Experiences Section
 function FeaturedExperiences() {
+  const t = useTranslations("home.experiences")
+
   const experiences = [
     {
-      title: "Classic Tea Ceremony",
-      titleZh: "經典茶道",
-      duration: "90 minutes",
+      title: t("classic.title"),
+      titleZh: t("classic.titleZh"),
+      duration: t("classic.duration"),
       price: 85,
-      description: "A complete introduction to the art of tea, including traditional brewing techniques and tea appreciation.",
+      description: t("classic.description"),
       image: "/images/experience-classic.jpg",
     },
     {
-      title: "Matcha Meditation",
-      titleZh: "抹茶冥想",
-      duration: "60 minutes",
+      title: t("matcha.title"),
+      titleZh: t("matcha.titleZh"),
+      duration: t("matcha.duration"),
       price: 65,
-      description: "Combine mindfulness meditation with the ceremonial preparation of Japanese matcha green tea.",
+      description: t("matcha.description"),
       image: "/images/experience-matcha.jpg",
     },
     {
-      title: "Private Garden Session",
-      titleZh: "私人花園體驗",
-      duration: "2 hours",
+      title: t("private.title"),
+      titleZh: t("private.titleZh"),
+      duration: t("private.duration"),
       price: 180,
-      description: "An exclusive tea ceremony experience for up to 4 guests in our private garden pavilion.",
+      description: t("private.description"),
       image: "/images/experience-garden.jpg",
     },
   ]
@@ -200,16 +207,16 @@ function FeaturedExperiences() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
-            Our Experiences
+            {t("title")}
           </h2>
-          <p className="font-serif text-xl text-bamboo-green">我們的體驗</p>
+          <p className="font-serif text-xl text-bamboo-green">{t("titleZh")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {experiences.map((experience, index) => (
             <div
               key={index}
-              className="bg-off-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              className="bg-off-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
             >
               {/* Experience Image */}
               <div className="aspect-[4/3] overflow-hidden">
@@ -220,12 +227,12 @@ function FeaturedExperiences() {
                 />
               </div>
 
-              <div className="p-6">
+              <div className="p-6 flex flex-col flex-1">
                 <h3 className="font-serif text-xl font-semibold text-foreground mb-1">
                   {experience.title}
                 </h3>
                 <p className="text-sm text-bamboo-green mb-3">{experience.titleZh}</p>
-                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                <p className="text-muted-foreground text-sm mb-4 leading-relaxed flex-1">
                   {experience.description}
                 </p>
                 <div className="flex items-center justify-between mb-4">
@@ -249,24 +256,23 @@ function FeaturedExperiences() {
 
 // Testimonials Section
 function TestimonialsSection() {
+  const t = useTranslations("home.testimonials")
+
   const testimonials = [
     {
-      quote:
-        "A truly transformative experience. The attention to detail and the peaceful atmosphere made me feel like I was transported to another world.",
-      name: "Sarah Chen",
-      location: "Wellington",
+      quote: t("quote1"),
+      name: t("name1"),
+      location: t("location1"),
     },
     {
-      quote:
-        "The perfect escape from city life. I've attended three sessions now and each one brings new insights and a sense of calm.",
-      name: "Michael Thompson",
-      location: "Auckland",
+      quote: t("quote2"),
+      name: t("name2"),
+      location: t("location2"),
     },
     {
-      quote:
-        "An authentic and beautifully curated tea ceremony. The tea master's knowledge and gentle guidance made it accessible for beginners like me.",
-      name: "Emma Williams",
-      location: "Christchurch",
+      quote: t("quote3"),
+      name: t("name3"),
+      location: t("location3"),
     },
   ]
 
@@ -275,9 +281,9 @@ function TestimonialsSection() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
-            Guest Reflections
+            {t("title")}
           </h2>
-          <p className="font-serif text-xl text-bamboo-green">賓客感言</p>
+          <p className="font-serif text-xl text-bamboo-green">{t("titleZh")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
