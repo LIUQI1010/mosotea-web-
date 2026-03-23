@@ -43,22 +43,22 @@
       "title": "我們的體驗",
       "titleZh": "Our Experiences",
       "classic": {
-        "title": "經典茶道",
-        "titleZh": "Classic Tea Ceremony",
+        "title": "正宗茶道儀式",
+        "titleZh": "The Authentic Tea Ceremony",
         "duration": "90 分鐘",
-        "description": "全面介紹茶道藝術，包括傳統沖泡技術和品茶鑑賞。"
+        "description": "觀賞完整的台灣茶道過程，由茶藝師在旁引導並講述茶道的歷史與文化。"
       },
       "matcha": {
-        "title": "抹茶冥想",
-        "titleZh": "Matcha Meditation",
+        "title": "傳統泡茶之道",
+        "titleZh": "The Tradition of Tea Brewing",
         "duration": "60 分鐘",
-        "description": "將正念冥想與日本抹茶的儀式性製作相結合。"
+        "description": "提供更多親身實踐的機會，讓您學習如何自己沖泡茶葉。"
       },
       "private": {
-        "title": "私人花園體驗",
-        "titleZh": "Private Garden Session",
+        "title": "製茶藝術（含導覽）",
+        "titleZh": "The Art of Tea Making (Tour Included)",
         "duration": "2 小時",
-        "description": "在我們私人花園涼亭中為最多4位賓客提供的專屬茶道體驗。"
+        "description": "帶您參觀茶園，了解茶樹的樣貌、種植方式以及製茶的完整過程。"
       }
     },
     "testimonials": {
@@ -108,12 +108,22 @@
       "item4Description": "我們的課程旨在給您充足的時間，充分吸收和欣賞每一個時刻。"
     },
     "host": {
-      "name": "陳美琳",
-      "role": "創始人兼茶藝師",
-      "p1": "美琳的茶道之旅始於她在台灣祖母的廚房，在那裡她學到茶不僅僅是一種飲料——它是一種生活方式。",
-      "p2": "在中國功夫茶和日本茶道兩種傳統中訓練了五年之後，她帶著與新觀眾分享這門古老藝術的夢想移居紐西蘭。",
-      "p3": "不主持茶道時，美琳會照料Moso Tea的花園，練習書法，並通過持續的學習和旅行深化她對茶文化的理解。",
-      "quote": "我最大的快樂是看到賓客發現茶能帶來的寧靜。每一次茶道都是我榮幸分享的禮物。"
+      "title": "認識我們的創始人",
+      "founder1": {
+        "name": "Joyce Peng",
+        "role": "共同創辦人",
+        "description": "Joyce 對台灣茶文化懷抱深厚的熱情，為 Moso Tea 的每一場茶道帶來溫暖與正宗的體驗。"
+      },
+      "founder2": {
+        "name": "Jenson Lin",
+        "role": "共同創辦人",
+        "description": "Jenson 對茶的熱愛始於台灣的山間。他致力於將泡茶藝術與威靈頓社區分享。"
+      },
+      "founder3": {
+        "name": "Liyin Lin",
+        "role": "共同創辦人",
+        "description": "Liyin 結合園藝背景與對茶的終生熱愛，負責 Moso Tea 的茶園與製茶體驗。"
+      }
     },
     "gallery": {
       "title": "我們的空間",
@@ -133,23 +143,23 @@
       "description": "Moso Tea 的每一次體驗都旨在引導您進入一種當下和感恩的狀態。無論您尋求放鬆、學習還是連結，這裡都有適合您的茶道旅程。"
     },
     "classic": {
-      "title": "經典茶道",
-      "titleZh": "Classic Tea Ceremony",
-      "description": "沉浸在永恆的傳統茶道藝術中。學習優雅的動作、正確的技術，以及茶道每一步背後的哲學。這個基礎體驗適合初學者和茶道愛好者。",
+      "title": "正宗茶道儀式",
+      "titleZh": "The Authentic Tea Ceremony",
+      "description": "觀賞完整的台灣茶道過程，由經驗豐富的茶藝師引導您了解每一步的歷史與文化意義。",
       "duration": "90 分鐘",
       "groupSize": "1-6 位賓客"
     },
     "matcha": {
-      "title": "抹茶冥想",
-      "titleZh": "Matcha Meditation",
-      "description": "將冥想的沉思練習與日本抹茶的儀式性製作相結合。從引導呼吸練習開始，然後在平靜的覺知狀態中用心地準備和品嚐鮮綠的抹茶。",
+      "title": "傳統泡茶之道",
+      "titleZh": "The Tradition of Tea Brewing",
+      "description": "親身實踐的體驗，讓您學習自己沖泡茶葉的藝術。在專業指導下掌握水溫、浸泡時間和茶葉選擇的技巧。",
       "duration": "60 分鐘",
       "groupSize": "1-4 位賓客"
     },
     "private": {
-      "title": "私人花園體驗",
-      "titleZh": "Private Garden Session",
-      "description": "在我們私人花園涼亭中的專屬茶道體驗。適合生日、紀念日、團隊聚會或任何特殊慶典。包括精選優質茶葉和季節性點心。",
+      "title": "製茶藝術（含導覽）",
+      "titleZh": "The Art of Tea Making (Tour Included)",
+      "description": "探索我們的茶園，了解茶樹的樣貌、種植方式，以及從茶葉到茶杯的完整製茶過程。結合自然與傳統的獨特沉浸式體驗。",
       "duration": "2 小時",
       "groupSize": "2-4 位賓客"
     },

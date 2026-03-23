@@ -250,44 +250,58 @@ function WhatToExpectSection() {
     )
 }
 
-// Host Introduction Section
+// Founders Section
 function HostSection() {
     const t = useTranslations("about")
 
+    const founders = [
+        {
+            nameKey: "host.founder1.name" as const,
+            roleKey: "host.founder1.role" as const,
+            descriptionKey: "host.founder1.description" as const,
+        },
+        {
+            nameKey: "host.founder2.name" as const,
+            roleKey: "host.founder2.role" as const,
+            descriptionKey: "host.founder2.description" as const,
+        },
+        {
+            nameKey: "host.founder3.name" as const,
+            roleKey: "host.founder3.role" as const,
+            descriptionKey: "host.founder3.description" as const,
+        },
+    ]
+
     return (
         <section className="py-20 sm:py-28 px-4 bg-cream">
-            <div className="max-w-5xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    {/* Photo */}
-                    <div className="flex justify-center md:justify-end">
-                        <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden">
-                            <img
-                                src="/images/about-founder.jpg"
-                                alt="Mei Lin Chen, founder and tea master"
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    </div>
+            <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-16">
+                    <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown">
+                        {t("host.title")}
+                    </h2>
+                </div>
 
-                    {/* Bio */}
-                    <div>
-                        <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-2">
-                            {t("host.name")}
-                        </h2>
-                        <p className="font-serif text-lg text-bamboo-green mb-6">{t("host.role")}</p>
-
-                        <div className="space-y-4 text-muted-foreground leading-relaxed">
-                            <p>{t("host.p1")}</p>
-                            <p>{t("host.p2")}</p>
-                            <p>{t("host.p3")}</p>
-                        </div>
-
-                        <div className="mt-8 pt-6 border-t border-tea-brown/20">
-                            <p className="text-sm text-muted-foreground italic">
-                                {t("host.quote")}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+                    {founders.map((founder, index) => (
+                        <div key={index} className="text-center">
+                            <div className="w-48 h-48 sm:w-56 sm:h-56 mx-auto rounded-full overflow-hidden mb-6">
+                                <img
+                                    src="/images/about-founder.jpg"
+                                    alt={t(founder.nameKey)}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <h3 className="font-serif text-2xl font-semibold text-tea-brown mb-1">
+                                {t(founder.nameKey)}
+                            </h3>
+                            <p className="font-serif text-base text-bamboo-green mb-4">
+                                {t(founder.roleKey)}
+                            </p>
+                            <p className="text-muted-foreground leading-relaxed text-sm">
+                                {t(founder.descriptionKey)}
                             </p>
                         </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </section>
@@ -316,12 +330,11 @@ function GallerySection() {
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     {galleryImages.map((image, index) => (
                         <div
                             key={index}
-                            className={`overflow-hidden rounded-lg ${index === 0 || index === 5 ? "aspect-[4/5]" : "aspect-square"
-                                }`}
+                            className="aspect-[4/3] overflow-hidden rounded-lg"
                         >
                             <img
                                 src={image.src}

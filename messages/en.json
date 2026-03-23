@@ -43,22 +43,22 @@
       "title": "Our Experiences",
       "titleZh": "我們的體驗",
       "classic": {
-        "title": "Classic Tea Ceremony",
-        "titleZh": "經典茶道",
+        "title": "The Authentic Tea Ceremony",
+        "titleZh": "正宗茶道儀式",
         "duration": "90 minutes",
-        "description": "A complete introduction to the art of tea, including traditional brewing techniques and tea appreciation."
+        "description": "Customers watch the full process of a Taiwanese Tea ceremony, with someone in the background facilitating and telling the history of the ceremony."
       },
       "matcha": {
-        "title": "Matcha Meditation",
-        "titleZh": "抹茶冥想",
+        "title": "The Tradition of Tea Brewing",
+        "titleZh": "傳統泡茶之道",
         "duration": "60 minutes",
-        "description": "Combine mindfulness meditation with the ceremonial preparation of Japanese matcha green tea."
+        "description": "This offers a more hands-on approach for customers to learn how to brew the tea themselves."
       },
       "private": {
-        "title": "Private Garden Session",
-        "titleZh": "私人花園體驗",
+        "title": "The Art of Tea Making (Tour Included)",
+        "titleZh": "製茶藝術（含導覽）",
         "duration": "2 hours",
-        "description": "An exclusive tea ceremony experience for up to 4 guests in our private garden pavilion."
+        "description": "Shows customers around the tea garden, what the tea plant looks like, and how it's grown and the process of making tea."
       }
     },
     "testimonials": {
@@ -108,12 +108,22 @@
       "item4Description": "Our sessions are designed to give you time to fully absorb and appreciate each moment."
     },
     "host": {
-      "name": "Mei Lin Chen",
-      "role": "Founder & Tea Master",
-      "p1": "Mei Lin's journey with tea began in her grandmother's kitchen in Taiwan, where she learned that tea is more than a beverage — it's a way of life.",
-      "p2": "After training for five years in both Chinese gongfu cha and Japanese chanoyu traditions, she moved to New Zealand with a dream of sharing this ancient art with a new audience.",
-      "p3": "When not hosting ceremonies, Mei Lin tends to the Moso Tea garden, practices calligraphy, and continues to deepen her understanding of tea culture through ongoing study and travel.",
-      "quote": "My greatest joy is watching guests discover the peace that tea can bring. Each ceremony is a gift I'm honored to share."
+      "title": "Meet Our Founders",
+      "founder1": {
+        "name": "Joyce Peng",
+        "role": "Co-Founder",
+        "description": "With a deep passion for Taiwanese tea culture, Joyce brings warmth and authenticity to every ceremony at Moso Tea."
+      },
+      "founder2": {
+        "name": "Jenson Lin",
+        "role": "Co-Founder",
+        "description": "Jenson's love for tea began in the mountains of Taiwan. He is dedicated to sharing the art of tea brewing with the Wellington community."
+      },
+      "founder3": {
+        "name": "Liyin Lin",
+        "role": "Co-Founder",
+        "description": "Liyin combines her background in horticulture with a lifelong appreciation for tea, overseeing Moso Tea's garden and tea-making experiences."
+      }
     },
     "gallery": {
       "title": "Our Space",
@@ -133,23 +143,23 @@
       "description": "Each experience at Moso Tea is crafted to guide you into a state of presence and appreciation. Whether you seek relaxation, learning, or connection, there is a tea journey for you."
     },
     "classic": {
-      "title": "Classic Tea Ceremony",
-      "titleZh": "經典茶道",
-      "description": "Immerse yourself in the timeless art of traditional tea preparation. Learn the graceful movements, proper techniques, and philosophy behind each step of the ceremony. This foundational experience is perfect for beginners and tea enthusiasts alike.",
+      "title": "The Authentic Tea Ceremony",
+      "titleZh": "正宗茶道儀式",
+      "description": "Watch the full process of a Taiwanese Tea ceremony, with an experienced facilitator guiding you through the history and cultural significance of each step.",
       "duration": "90 minutes",
       "groupSize": "1-6 guests"
     },
     "matcha": {
-      "title": "Matcha Meditation",
-      "titleZh": "抹茶冥想",
-      "description": "Combine the contemplative practice of meditation with the ceremonial preparation of Japanese matcha. Begin with guided breathing exercises, then mindfully prepare and savour vibrant green matcha in a state of calm awareness.",
+      "title": "The Tradition of Tea Brewing",
+      "titleZh": "傳統泡茶之道",
+      "description": "A hands-on experience where you learn the art of brewing tea yourself. Master the techniques of water temperature, steeping time, and tea selection under expert guidance.",
       "duration": "60 minutes",
       "groupSize": "1-4 guests"
     },
     "private": {
-      "title": "Private Garden Session",
-      "titleZh": "私人花園體驗",
-      "description": "An exclusive tea ceremony experience in our private garden pavilion. Ideal for special occasions, intimate gatherings, or those seeking a deeply personal tea journey. Includes a curated selection of premium teas and seasonal treats.",
+      "title": "The Art of Tea Making (Tour Included)",
+      "titleZh": "製茶藝術（含導覽）",
+      "description": "Explore our tea garden and discover what the tea plant looks like, how it's grown, and the full process of making tea from leaf to cup. A unique immersive experience combining nature and tradition.",
       "duration": "2 hours",
       "groupSize": "2-4 guests"
     },
