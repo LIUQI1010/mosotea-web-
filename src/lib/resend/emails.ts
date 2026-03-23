@@ -1,7 +1,12 @@
 import { Resend } from 'resend'
 import type { BookingWithDetails } from '@/types'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResendClient() {
+    if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+    return new Resend(process.env.RESEND_API_KEY)
+}
 
 const FROM_EMAIL = 'Moso Tea <noreply@mosotea.co.nz>'
 const OWNER_EMAIL = process.env.OWNER_EMAIL || 'hello@mosotea.co.nz'
@@ -13,7 +18,7 @@ export async function sendBookingConfirmation(
 ) {
     const isZh = booking.preferred_language === 'zh-TW'
 
-    await resend.emails.send({
+    await getResendClient().emails.send({
         from: FROM_EMAIL,
         to: booking.customer_email,
         subject: isZh ? '預約確認 — Moso Tea' : 'Booking Confirmation — Moso Tea',
@@ -52,7 +57,7 @@ export async function sendBookingConfirmation(
 
 // 发给老板的新预约通知
 export async function sendBookingNotification(booking: BookingWithDetails) {
-    await resend.emails.send({
+    await getResendClient().emails.send({
         from: FROM_EMAIL,
         to: OWNER_EMAIL,
         subject: `New Booking — ${booking.service.name_en}`,
@@ -99,7 +104,7 @@ export async function sendBookingNotification(booking: BookingWithDetails) {
 export async function sendCancellationConfirmation(booking: BookingWithDetails) {
     const isZh = booking.preferred_language === 'zh-TW'
 
-    await resend.emails.send({
+    await getResendClient().emails.send({
         from: FROM_EMAIL,
         to: booking.customer_email,
         subject: isZh ? '預約已取消 — Moso Tea' : 'Booking Cancelled — Moso Tea',
@@ -117,7 +122,7 @@ export async function sendCancellationConfirmation(booking: BookingWithDetails) 
 
 // 发给老板的取消通知
 export async function sendCancellationNotice(booking: BookingWithDetails) {
-    await resend.emails.send({
+    await getResendClient().emails.send({
         from: FROM_EMAIL,
         to: OWNER_EMAIL,
         subject: `Booking Cancelled — ${booking.service.name_en}`,

@@ -16,10 +16,7 @@ function PageHero() {
                 <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-tea-brown mb-4">
                     {t("hero.title")}
                 </h1>
-                <p className="font-serif text-2xl md:text-3xl text-bamboo-green mb-6">
-                    {t("hero.titleZh")}
-                </p>
-                <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed mt-6">
                     {t("hero.description")}
                 </p>
             </div>
@@ -32,7 +29,6 @@ function ExperienceCard({ experience }: {
     experience: {
         id: string
         title: string
-        titleZh: string
         description: string
         duration: string
         groupSize: string
@@ -56,12 +52,9 @@ function ExperienceCard({ experience }: {
             {/* Content */}
             <div className="p-6 md:p-8">
                 {/* Title */}
-                <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-1">
+                <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-4">
                     {experience.title}
                 </h2>
-                <p className="font-serif text-lg text-bamboo-green mb-4">
-                    {experience.titleZh}
-                </p>
 
                 {/* Description */}
                 <p className="text-foreground/80 leading-relaxed mb-6">
@@ -113,7 +106,6 @@ function ExperienceCards() {
         {
             id: "classic",
             title: t("classic.title"),
-            titleZh: t("classic.titleZh"),
             description: t("classic.description"),
             duration: t("classic.duration"),
             groupSize: t("classic.groupSize"),
@@ -123,7 +115,6 @@ function ExperienceCards() {
         {
             id: "matcha",
             title: t("matcha.title"),
-            titleZh: t("matcha.titleZh"),
             description: t("matcha.description"),
             duration: t("matcha.duration"),
             groupSize: t("matcha.groupSize"),
@@ -133,7 +124,6 @@ function ExperienceCards() {
         {
             id: "private",
             title: t("private.title"),
-            titleZh: t("private.titleZh"),
             description: t("private.description"),
             duration: t("private.duration"),
             groupSize: t("private.groupSize"),
@@ -167,7 +157,6 @@ function WhatsIncluded() {
                 </svg>
             ),
             title: t("included.item1Title"),
-            titleZh: t("included.item1TitleZh"),
             description: t("included.item1Description"),
         },
         {
@@ -178,7 +167,6 @@ function WhatsIncluded() {
                 </svg>
             ),
             title: t("included.item2Title"),
-            titleZh: t("included.item2TitleZh"),
             description: t("included.item2Description"),
         },
         {
@@ -188,7 +176,6 @@ function WhatsIncluded() {
                 </svg>
             ),
             title: t("included.item3Title"),
-            titleZh: t("included.item3TitleZh"),
             description: t("included.item3Description"),
         },
         {
@@ -198,7 +185,6 @@ function WhatsIncluded() {
                 </svg>
             ),
             title: t("included.item4Title"),
-            titleZh: t("included.item4TitleZh"),
             description: t("included.item4Description"),
         },
     ]
@@ -210,9 +196,6 @@ function WhatsIncluded() {
                     <h2 className="font-serif text-3xl md:text-4xl font-semibold text-tea-brown mb-2">
                         {t("included.title")}
                     </h2>
-                    <p className="font-serif text-xl text-bamboo-green">
-                        {t("included.titleZh")}
-                    </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -224,10 +207,9 @@ function WhatsIncluded() {
                             <div className="w-12 h-12 mx-auto mb-4 bg-tea-brown/10 rounded-full flex items-center justify-center text-tea-brown">
                                 {item.icon}
                             </div>
-                            <h3 className="font-serif text-lg font-semibold text-tea-brown mb-1">
+                            <h3 className="font-serif text-lg font-semibold text-tea-brown mb-3">
                                 {item.title}
                             </h3>
-                            <p className="text-sm text-bamboo-green mb-3">{item.titleZh}</p>
                             <p className="text-sm text-muted-foreground leading-relaxed">
                                 {item.description}
                             </p>

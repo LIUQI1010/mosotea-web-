@@ -26,9 +26,6 @@ function HeroSection() {
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-off-white mb-4 text-balance leading-tight">
           {t("title")}
         </h1>
-        <p className="font-serif text-2xl sm:text-3xl md:text-4xl text-off-white/90 mb-6">
-          {t("titleZh")}
-        </p>
         <p className="text-lg sm:text-xl text-off-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
           {t("description")}
         </p>
@@ -123,19 +120,16 @@ function IntroductionSection() {
     {
       icon: TeaLeafIcon,
       title: t("feature1Title"),
-      titleZh: t("feature1TitleZh"),
       description: t("feature1Description"),
     },
     {
       icon: UsersIcon,
       title: t("feature2Title"),
-      titleZh: t("feature2TitleZh"),
       description: t("feature2Description"),
     },
     {
       icon: GardenIcon,
       title: t("feature3Title"),
-      titleZh: t("feature3TitleZh"),
       description: t("feature3Description"),
     },
   ]
@@ -158,10 +152,9 @@ function IntroductionSection() {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cream mb-6 group-hover:bg-tea-brown/10 transition-colors">
                 <feature.icon className="w-8 h-8 text-tea-brown" />
               </div>
-              <h3 className="font-serif text-xl font-semibold text-foreground mb-1">
+              <h3 className="font-serif text-xl font-semibold text-foreground mb-3">
                 {feature.title}
               </h3>
-              <p className="text-sm text-bamboo-green mb-3">{feature.titleZh}</p>
               <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
             </div>
           ))}
@@ -178,7 +171,6 @@ function FeaturedExperiences() {
   const experiences = [
     {
       title: t("classic.title"),
-      titleZh: t("classic.titleZh"),
       duration: t("classic.duration"),
       price: 85,
       description: t("classic.description"),
@@ -186,7 +178,6 @@ function FeaturedExperiences() {
     },
     {
       title: t("matcha.title"),
-      titleZh: t("matcha.titleZh"),
       duration: t("matcha.duration"),
       price: 65,
       description: t("matcha.description"),
@@ -194,7 +185,6 @@ function FeaturedExperiences() {
     },
     {
       title: t("private.title"),
-      titleZh: t("private.titleZh"),
       duration: t("private.duration"),
       price: 180,
       description: t("private.description"),
@@ -209,7 +199,6 @@ function FeaturedExperiences() {
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
             {t("title")}
           </h2>
-          <p className="font-serif text-xl text-bamboo-green">{t("titleZh")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
@@ -228,10 +217,9 @@ function FeaturedExperiences() {
               </div>
 
               <div className="p-6 flex flex-col flex-1">
-                <h3 className="font-serif text-xl font-semibold text-foreground mb-1">
+                <h3 className="font-serif text-xl font-semibold text-foreground mb-3">
                   {experience.title}
                 </h3>
-                <p className="text-sm text-bamboo-green mb-3">{experience.titleZh}</p>
                 <p className="text-muted-foreground text-sm mb-4 leading-relaxed flex-1">
                   {experience.description}
                 </p>
@@ -283,7 +271,6 @@ function TestimonialsSection() {
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
             {t("title")}
           </h2>
-          <p className="font-serif text-xl text-bamboo-green">{t("titleZh")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

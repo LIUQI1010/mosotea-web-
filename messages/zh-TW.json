@@ -78,7 +78,7 @@
   "about": {
     "hero": {
       "title": "我們的故事",
-      "titleZh": "Our Story"
+      "subtitle": "自2021年起分享茶道藝術"
     },
     "story": {
       "title": "茶的旅程",
@@ -109,7 +109,7 @@
     },
     "host": {
       "name": "陳美琳",
-      "nameZh": "Mei Lin Chen · Founder & Tea Master",
+      "role": "創始人兼茶藝師",
       "p1": "美琳的茶道之旅始於她在台灣祖母的廚房，在那裡她學到茶不僅僅是一種飲料——它是一種生活方式。",
       "p2": "在中國功夫茶和日本茶道兩種傳統中訓練了五年之後，她帶著與新觀眾分享這門古老藝術的夢想移居紐西蘭。",
       "p3": "不主持茶道時，美琳會照料Moso Tea的花園，練習書法，並通過持續的學習和旅行深化她對茶文化的理解。",
@@ -254,12 +254,12 @@
     },
     "step1": {
       "title": "選擇您想要的體驗",
-      "titleZh": "Select Your Experience",
+      "description": "選擇適合您的茶道體驗。",
       "error": "請選擇一個體驗"
     },
     "step2": {
       "title": "選擇日期和時間",
-      "titleZh": "Choose Date & Time",
+      "description": "選擇您偏好的日期和時段。",
       "selectDate": "選擇日期",
       "selectTime": "選擇時間",
       "errorDate": "請選擇日期",
@@ -267,7 +267,7 @@
     },
     "step3": {
       "title": "填寫您的資料",
-      "titleZh": "Your Details",
+      "description": "請告訴我們一些關於您的資訊，以便我們為您的到訪做好準備。",
       "fullName": "姓名",
       "fullNameZh": "Full Name",
       "fullNamePlaceholder": "請輸入您的全名",

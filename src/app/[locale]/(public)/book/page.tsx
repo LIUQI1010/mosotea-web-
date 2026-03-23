@@ -52,10 +52,7 @@ function PageHero() {
                 <h1 className="font-serif text-4xl md:text-5xl font-semibold text-tea-brown mb-3">
                     {t("hero.title")}
                 </h1>
-                <p className="font-serif text-2xl text-bamboo-green mb-6">
-                    {t("hero.titleZh")}
-                </p>
-                <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed mt-6">
                     {t("hero.description")}
                 </p>
             </div>
@@ -68,9 +65,9 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
     const t = useTranslations("book")
 
     const steps = [
-        { number: 1, label: t("steps.experience"), labelZh: t("steps.experienceZh") },
-        { number: 2, label: t("steps.dateTime"), labelZh: t("steps.dateTimeZh") },
-        { number: 3, label: t("steps.details"), labelZh: t("steps.detailsZh") },
+        { number: 1, label: t("steps.experience") },
+        { number: 2, label: t("steps.dateTime") },
+        { number: 3, label: t("steps.details") },
     ]
 
     return (
@@ -96,7 +93,6 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                             <p className={`text-xs font-medium ${currentStep >= step.number ? "text-tea-brown" : "text-muted-foreground"}`}>
                                 {step.label}
                             </p>
-                            <p className="text-xs text-muted-foreground">{step.labelZh}</p>
                         </div>
                     </div>
                     {index < steps.length - 1 && (
@@ -127,7 +123,6 @@ function ExperienceSelection({
     const experiences = experienceIds.map((id) => ({
         id,
         title: tExp(`${id}.title`),
-        titleZh: tExp(`${id}.titleZh`),
         duration: tExp(`${id}.duration`),
         price: experiencePrices[id],
     }))
@@ -137,7 +132,7 @@ function ExperienceSelection({
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
                 {t("step1.title")}
             </h2>
-            <p className="text-muted-foreground mb-6">{t("step1.titleZh")}</p>
+            <p className="text-muted-foreground mb-6">{t("step1.description")}</p>
 
             <div className="grid gap-4">
                 {experiences.map((exp) => (
@@ -154,7 +149,6 @@ function ExperienceSelection({
                                 <h3 className="font-serif text-lg font-semibold text-foreground">
                                     {exp.title}
                                 </h3>
-                                <p className="text-sm text-bamboo-green">{exp.titleZh}</p>
                                 <p className="text-sm text-muted-foreground mt-1">{exp.duration}</p>
                             </div>
                             <div className="flex items-center gap-3">
@@ -320,7 +314,7 @@ function DateTimeSelection({
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
                 {t("step2.title")}
             </h2>
-            <p className="text-muted-foreground mb-6">{t("step2.titleZh")}</p>
+            <p className="text-muted-foreground mb-6">{t("step2.description")}</p>
 
             <div className="grid md:grid-cols-2 gap-8">
                 {/* Calendar */}
@@ -371,7 +365,6 @@ function DateTimeSelection({
 // Input Field Component
 function InputField({
     label,
-    labelZh,
     type = "text",
     value,
     onChange,
@@ -382,7 +375,6 @@ function InputField({
     max,
 }: {
     label: string
-    labelZh: string
     type?: string
     value: string | number
     onChange: (value: string) => void
@@ -396,7 +388,6 @@ function InputField({
         <div>
             <label className="block mb-2">
                 <span className="font-medium text-foreground">{label}</span>
-                <span className="text-sm text-muted-foreground ml-2">{labelZh}</span>
                 {required && <span className="text-red-500 ml-1">*</span>}
             </label>
             <input
@@ -440,12 +431,11 @@ function PersonalDetails({
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
                 {t("step3.title")}
             </h2>
-            <p className="text-muted-foreground mb-6">{t("step3.titleZh")}</p>
+            <p className="text-muted-foreground mb-6">{t("step3.description")}</p>
 
             <div className="space-y-5">
                 <InputField
                     label={t("step3.fullName")}
-                    labelZh={t("step3.fullNameZh")}
                     value={formData.fullName}
                     onChange={(value) => onFieldChange("fullName", value)}
                     placeholder={t("step3.fullNamePlaceholder")}
@@ -455,7 +445,6 @@ function PersonalDetails({
 
                 <InputField
                     label={t("step3.email")}
-                    labelZh={t("step3.emailZh")}
                     type="email"
                     value={formData.email}
                     onChange={(value) => onFieldChange("email", value)}
@@ -466,7 +455,6 @@ function PersonalDetails({
 
                 <InputField
                     label={t("step3.phone")}
-                    labelZh={t("step3.phoneZh")}
                     type="tel"
                     value={formData.phone}
                     onChange={(value) => onFieldChange("phone", value)}
@@ -477,7 +465,6 @@ function PersonalDetails({
 
                 <InputField
                     label={t("step3.guests")}
-                    labelZh={t("step3.guestsZh")}
                     type="number"
                     value={formData.guests}
                     onChange={(value) => onFieldChange("guests", parseInt(value) || 1)}
@@ -491,7 +478,6 @@ function PersonalDetails({
                 <div>
                     <label className="block mb-2">
                         <span className="font-medium text-foreground">{t("step3.specialRequests")}</span>
-                        <span className="text-sm text-muted-foreground ml-2">{t("step3.specialRequestsZh")}</span>
                     </label>
                     <textarea
                         value={formData.specialRequests}
@@ -506,7 +492,6 @@ function PersonalDetails({
                 <div>
                     <label className="block mb-3">
                         <span className="font-medium text-foreground">{t("step3.language")}</span>
-                        <span className="text-sm text-muted-foreground ml-2">{t("step3.languageZh")}</span>
                     </label>
                     <div className="flex gap-3">
                         <button
@@ -602,8 +587,7 @@ function SuccessMessage() {
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-3">
                 {t("success.title")}
             </h2>
-            <p className="font-serif text-lg text-bamboo-green mb-4">{t("success.titleZh")}</p>
-            <p className="text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed">
+            <p className="text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed mt-4">
                 {t("success.description")}
             </p>
             <Link
@@ -768,7 +752,7 @@ function BookingForm() {
                                 onClick={handleSubmit}
                                 className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
                             >
-                                {t("confirm")} / {t("confirmZh")}
+                                {t("confirm")}
                             </button>
                         )}
                     </div>
@@ -791,19 +775,16 @@ function WhatHappensNext() {
         {
             number: 1,
             title: t("whatNext.step1Title"),
-            titleZh: t("whatNext.step1TitleZh"),
             description: t("whatNext.step1Description"),
         },
         {
             number: 2,
             title: t("whatNext.step2Title"),
-            titleZh: t("whatNext.step2TitleZh"),
             description: t("whatNext.step2Description"),
         },
         {
             number: 3,
             title: t("whatNext.step3Title"),
-            titleZh: t("whatNext.step3TitleZh"),
             description: t("whatNext.step3Description"),
         },
     ]
@@ -812,10 +793,9 @@ function WhatHappensNext() {
         <section className="py-16 px-4 bg-cream">
             <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-10">
-                    <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-2">
+                    <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown">
                         {t("whatNext.title")}
                     </h2>
-                    <p className="font-serif text-lg text-bamboo-green">{t("whatNext.titleZh")}</p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">
@@ -824,10 +804,9 @@ function WhatHappensNext() {
                             <div className="w-12 h-12 mx-auto mb-4 bg-tea-brown text-primary-foreground rounded-full flex items-center justify-center font-semibold">
                                 {step.number}
                             </div>
-                            <h3 className="font-serif text-lg font-semibold text-tea-brown mb-1">
+                            <h3 className="font-serif text-lg font-semibold text-tea-brown mb-2">
                                 {step.title}
                             </h3>
-                            <p className="text-sm text-bamboo-green mb-2">{step.titleZh}</p>
                             <p className="text-sm text-muted-foreground leading-relaxed">
                                 {step.description}
                             </p>

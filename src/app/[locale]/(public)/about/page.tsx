@@ -121,8 +121,8 @@ function PageHero() {
                     <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold text-tea-brown mb-3">
                         {t("hero.title")}
                     </h1>
-                    <p className="font-serif text-2xl sm:text-3xl text-bamboo-green">
-                        {t("hero.titleZh")}
+                    <p className="font-serif text-xl text-bamboo-green">
+                        {t("hero.subtitle")}
                     </p>
                 </div>
             </div>
@@ -185,10 +185,6 @@ function PhilosophySection() {
                     {t("philosophy.quote")}
                 </blockquote>
 
-                <p className="font-serif text-lg text-bamboo-green mb-4">
-                    {t("philosophy.quoteZh")}
-                </p>
-
                 {/* Decorative Element */}
                 <div className="flex items-center justify-center gap-4 mt-10">
                     <div className="h-px w-16 bg-tea-brown/30" />
@@ -208,25 +204,21 @@ function WhatToExpectSection() {
         {
             icon: ExpertIcon,
             titleKey: "expect.item1Title" as const,
-            titleZhKey: "expect.item1TitleZh" as const,
             descriptionKey: "expect.item1Description" as const,
         },
         {
             icon: IntimateIcon,
             titleKey: "expect.item2Title" as const,
-            titleZhKey: "expect.item2TitleZh" as const,
             descriptionKey: "expect.item2Description" as const,
         },
         {
             icon: MaterialsIcon,
             titleKey: "expect.item3Title" as const,
-            titleZhKey: "expect.item3TitleZh" as const,
             descriptionKey: "expect.item3Description" as const,
         },
         {
             icon: DurationIcon,
             titleKey: "expect.item4Title" as const,
-            titleZhKey: "expect.item4TitleZh" as const,
             descriptionKey: "expect.item4Description" as const,
         },
     ]
@@ -238,7 +230,6 @@ function WhatToExpectSection() {
                     <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-3">
                         {t("expect.title")}
                     </h2>
-                    <p className="font-serif text-xl text-bamboo-green">{t("expect.titleZh")}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -247,10 +238,9 @@ function WhatToExpectSection() {
                             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-cream mb-5">
                                 <item.icon className="w-7 h-7 text-tea-brown" />
                             </div>
-                            <h3 className="font-serif text-lg font-semibold text-foreground mb-1">
+                            <h3 className="font-serif text-lg font-semibold text-foreground mb-3">
                                 {t(item.titleKey)}
                             </h3>
-                            <p className="text-sm text-bamboo-green mb-3">{t(item.titleZhKey)}</p>
                             <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descriptionKey)}</p>
                         </div>
                     ))}
@@ -284,7 +274,7 @@ function HostSection() {
                         <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-2">
                             {t("host.name")}
                         </h2>
-                        <p className="font-serif text-lg text-bamboo-green mb-6">{t("host.nameZh")}</p>
+                        <p className="font-serif text-lg text-bamboo-green mb-6">{t("host.role")}</p>
 
                         <div className="space-y-4 text-muted-foreground leading-relaxed">
                             <p>{t("host.p1")}</p>
@@ -324,7 +314,6 @@ function GallerySection() {
                     <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-3">
                         {t("gallery.title")}
                     </h2>
-                    <p className="font-serif text-xl text-bamboo-green">{t("gallery.titleZh")}</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
@@ -357,9 +346,6 @@ function CTASection() {
                 <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-off-white mb-4">
                     {t("cta.title")}
                 </h2>
-                <p className="font-serif text-xl text-off-white/80 mb-4">
-                    {t("cta.titleZh")}
-                </p>
                 <p className="text-off-white/70 mb-10 max-w-xl mx-auto leading-relaxed">
                     {t("cta.description")}
                 </p>
