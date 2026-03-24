@@ -55,6 +55,7 @@ cp .env.example .env.local
 | `RESEND_API_KEY` | Resend API key for sending emails |
 | `NEXT_PUBLIC_APP_URL` | App URL, e.g. `http://localhost:3000` |
 | `CANCELLATION_TOKEN_SECRET` | Random 32-byte hex string for signing cancel tokens |
+| `OWNER_EMAIL` | Business owner email for booking notifications |
 
 > **Note:** `SUPABASE_SERVICE_ROLE_KEY` and `CANCELLATION_TOKEN_SECRET` must never be exposed to the browser.
 
@@ -92,17 +93,22 @@ main          ← Production (auto-deploys to Vercel)
 ```
 src/
 ├── app/
-│   ├── (public)/        ← Public-facing pages
-│   ├── admin/           ← Protected admin dashboard
-│   ├── api/             ← API routes
-│   ├── layout.tsx       ← Root layout
-│   └── globals.css      ← Global styles
+│   ├── [locale]/(public)/  ← Public-facing pages (locale-aware routing)
+│   ├── admin/              ← Protected admin dashboard (English only)
+│   ├── api/                ← API routes
+│   ├── not-found.tsx       ← Custom 404 page
+│   ├── layout.tsx          ← Root layout (fonts, icons)
+│   └── globals.css         ← Global styles + Tailwind v4 config
 ├── components/
-│   ├── ui/              ← Base UI components
-│   └── layout/          ← Layout components (Navbar, Footer)
-├── lib/                 ← Utilities (Supabase clients, email, helpers)
-├── types/               ← Shared TypeScript types
-└── i18n/                ← Translation files (EN, zh-TW)
+│   └── layout/             ← Layout components (Navigation, Footer)
+├── lib/
+│   ├── supabase/           ← Supabase clients (browser + server)
+│   └── resend/             ← Email sending functions
+├── types/                  ← Shared TypeScript types
+└── i18n/                   ← i18n config (routing, navigation, request)
+messages/
+├── en.json                 ← English translations
+└── zh-TW.json              ← Traditional Chinese translations
 ```
 
 ## License

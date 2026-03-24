@@ -16,7 +16,12 @@
       "Bash(mv tea-image-50.jpg experience-matcha.jpg)",
       "Bash(mv tea-image-45.jpg experience-garden.jpg)",
       "Bash(mv tea-image-7-2048x1335.jpg about-story.jpg)",
-      "Bash(mv 1-Norlha_Clothing-brands.jpg about-founder.jpg)"
+      "Bash(mv 1-Norlha_Clothing-brands.jpg about-founder.jpg)",
+      "Bash(wc -l d:/MyProjects/mosotea-web-/messages/*.json)",
+      "Bash(grep -r booking /d/MyProjects/mosotea-web-/src/app/api --include=*.ts)",
+      "Bash(grep -n \"handleSubmit\\\\|submit\\\\|POST\\\\|fetch\" /d/MyProjects/mosotea-web-/src/app/[locale]/\\\\\\(public\\\\\\)/book/page.tsx)",
+      "Bash(grep -l \"book\\\\|booking\" /d/MyProjects/mosotea-web-/messages/*.json)",
+      "Bash(node -e \":*)"
     ]
   }
 }

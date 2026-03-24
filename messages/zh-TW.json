@@ -273,7 +273,8 @@
       "selectDate": "選擇日期",
       "selectTime": "選擇時間",
       "errorDate": "請選擇日期",
-      "errorTime": "請選擇時間"
+      "errorTime": "請選擇時間",
+      "selectDateFirst": "請先選擇日期以查看可用時段"
     },
     "step3": {
       "title": "填寫您的資料",
@@ -288,6 +289,7 @@
       "phoneZh": "Phone Number",
       "phonePlaceholder": "+64 21 123 4567",
       "guests": "人數",
+      "guestsMax": "（最多 6 人）",
       "guestsZh": "Number of Guests",
       "specialRequests": "特別要求",
       "specialRequestsZh": "Special Requests (optional)",
@@ -312,6 +314,15 @@
     "continue": "繼續",
     "confirm": "確認預約",
     "confirmZh": "Confirm Booking",
+    "submitting": "提交中...",
+    "error": {
+      "title": "出現了問題",
+      "description": "我們無法處理您的預約請求。請重試或直接聯繫我們。",
+      "retry": "重試",
+      "contact": "聯繫我們",
+      "network": "無法連接伺服器，請檢查網路連線後重試。",
+      "unknown": "發生了未知錯誤，請稍後重試。"
+    },
     "success": {
       "title": "預約請求已收到",
       "titleZh": "Booking Request Received",

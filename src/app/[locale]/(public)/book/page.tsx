@@ -331,32 +331,40 @@ function DateTimeSelection({
                     )}
                 </div>
 
-                {/* Time Slots */}
-                <div>
-                    <h3 className="font-medium text-foreground mb-3">{t("step2.selectTime")}</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                        {timeSlots.map((slot) => (
-                            <button
-                                key={slot}
-                                onClick={() => onTimeSelect(slot)}
-                                className={`py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${selectedTimeSlot === slot
-                                        ? "border-tea-brown bg-tea-brown text-primary-foreground"
-                                        : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
-                                    }`}
-                            >
-                                {slot}
-                            </button>
-                        ))}
+                {/* Time Slots - only shown after a date is selected */}
+                {selectedDate ? (
+                    <div>
+                        <h3 className="font-medium text-foreground mb-3">{t("step2.selectTime")}</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            {timeSlots.map((slot) => (
+                                <button
+                                    key={slot}
+                                    onClick={() => onTimeSelect(slot)}
+                                    className={`py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${selectedTimeSlot === slot
+                                            ? "border-tea-brown bg-tea-brown text-primary-foreground"
+                                            : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
+                                        }`}
+                                >
+                                    {slot}
+                                </button>
+                            ))}
+                        </div>
+                        {errors.timeSlot && (
+                            <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                                </svg>
+                                {errors.timeSlot}
+                            </p>
+                        )}
                     </div>
-                    {errors.timeSlot && (
-                        <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                            </svg>
-                            {errors.timeSlot}
+                ) : (
+                    <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-border p-8">
+                        <p className="text-muted-foreground text-sm text-center">
+                            {t("step2.selectDateFirst")}
                         </p>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     )
@@ -463,16 +471,55 @@ function PersonalDetails({
                     required
                 />
 
-                <InputField
-                    label={t("step3.guests")}
-                    type="number"
-                    value={formData.guests}
-                    onChange={(value) => onFieldChange("guests", parseInt(value) || 1)}
-                    min={1}
-                    max={6}
-                    error={errors.guests}
-                    required
-                />
+                {/* Guest Count */}
+                <div>
+                    <label className="block mb-2">
+                        <span className="font-medium text-foreground">{t("step3.guests")}</span>
+                        <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (formData.guests > 1) onFieldChange("guests", formData.guests - 1)
+                            }}
+                            disabled={formData.guests <= 1}
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests <= 1
+                                    ? "border-border text-muted-foreground/40 cursor-not-allowed"
+                                    : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
+                                }`}
+                        >
+                            −
+                        </button>
+                        <span className="w-12 text-center text-2xl font-semibold text-foreground tabular-nums">
+                            {formData.guests}
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (formData.guests < 6) onFieldChange("guests", formData.guests + 1)
+                            }}
+                            disabled={formData.guests >= 6}
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 6
+                                    ? "border-border text-muted-foreground/40 cursor-not-allowed"
+                                    : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
+                                }`}
+                        >
+                            +
+                        </button>
+                        <span className="text-sm text-muted-foreground ml-1">
+                            {t("step3.guestsMax")}
+                        </span>
+                    </div>
+                    {errors.guests && (
+                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            {errors.guests}
+                        </p>
+                    )}
+                </div>
 
                 {/* Special Requests */}
                 <div>
@@ -600,6 +647,44 @@ function SuccessMessage() {
     )
 }
 
+// Error Message
+function ErrorMessage({ errorMessage, onRetry }: { errorMessage: string; onRetry: () => void }) {
+    const t = useTranslations("book")
+
+    return (
+        <div className="text-center py-12">
+            <div className="w-16 h-16 mx-auto mb-6 bg-red-50 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-red-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-3">
+                {t("error.title")}
+            </h2>
+            <p className="text-muted-foreground max-w-md mx-auto mb-4 leading-relaxed mt-4">
+                {t("error.description")}
+            </p>
+            {errorMessage && (
+                <p className="text-sm text-red-600 mb-8">{errorMessage}</p>
+            )}
+            <div className="flex items-center justify-center gap-4">
+                <button
+                    onClick={onRetry}
+                    className="inline-block bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
+                >
+                    {t("error.retry")}
+                </button>
+                <Link
+                    href="/contact"
+                    className="inline-block border-2 border-tea-brown text-tea-brown px-8 py-3 font-medium rounded hover:bg-tea-brown/5 transition-colors"
+                >
+                    {t("error.contact")}
+                </Link>
+            </div>
+        </div>
+    )
+}
+
 // Booking Form Component
 function BookingForm() {
     const searchParams = useSearchParams()
@@ -612,6 +697,8 @@ function BookingForm() {
 
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitted, setIsSubmitted] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [submitError, setSubmitError] = useState("")
     const [formData, setFormData] = useState<BookingFormData>({
         experience: initialExperience,
         date: "",
@@ -675,10 +762,31 @@ function BookingForm() {
         setErrors({})
     }
 
-    const handleSubmit = () => {
-        if (validateStep(3)) {
-            // In a real app, this would submit to an API
+    const handleSubmit = async () => {
+        if (!validateStep(3)) return
+
+        setIsSubmitting(true)
+        setSubmitError("")
+
+        try {
+            const res = await fetch("/api/booking", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok || !data.success) {
+                setSubmitError(data.error || t("error.unknown"))
+                return
+            }
+
             setIsSubmitted(true)
+        } catch {
+            setSubmitError(t("error.network"))
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -692,6 +800,10 @@ function BookingForm() {
 
     if (isSubmitted) {
         return <SuccessMessage />
+    }
+
+    if (submitError && !isSubmitting) {
+        return <ErrorMessage errorMessage={submitError} onRetry={() => setSubmitError("")} />
     }
 
     return (
@@ -750,9 +862,16 @@ function BookingForm() {
                         ) : (
                             <button
                                 onClick={handleSubmit}
-                                className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
+                                disabled={isSubmitting}
+                                className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                {t("confirm")}
+                                {isSubmitting && (
+                                    <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                )}
+                                {isSubmitting ? t("submitting") : t("confirm")}
                             </button>
                         )}
                     </div>

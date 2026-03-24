@@ -132,7 +132,7 @@ Each developer answers:
 | Responsive testing on mobile, tablet, and desktop | Both |
 
 **Definition of Done:**
-- [ ] All pages render correctly on mobile, tablet, and desktop
+- [x] All pages render correctly on mobile, tablet, and desktop
 - [x] Language toggle switches all content between English and Traditional Chinese
 - [x] Contact form successfully sends email via Resend
 - [x] All pages have correct SEO metadata
@@ -143,20 +143,20 @@ Each developer answers:
 
 > **Goal:** End-to-end booking flow works — customers can select a time slot, submit a booking, and receive a confirmation email with a cancellation link.
 
-| Task | Owner |
-|---|---|
-| Create database tables: `bookings`, `services`, `time_slots` | Developer 1 |
-| Write Supabase Row Level Security (RLS) policies | Developer 1 |
-| Develop Booking page UI layout | Developer 2 |
-| Build service selection component | Developer 2 |
-| Build time slot picker component (available slots only) | Developer 2 |
-| Build booking form (name, email, phone, guests, requests) | Developer 2 |
-| Implement booking submission API Route | Developer 1 |
-| Implement time slot conflict detection logic | Developer 1 |
-| Generate unique cancellation token per booking | Developer 1 |
-| Send confirmation email with cancellation link to customer | Developer 1 |
-| Send booking notification email to business owner | Developer 1 |
-| Develop booking success and error pages | Developer 2 |
+| Task | Owner | Status |
+|---|---|---|
+| Create database tables: `bookings`, `services`, `time_slots` | Developer 1 | ✅ Done |
+| Write Supabase Row Level Security (RLS) policies | Developer 1 | ⏳ Pending |
+| Develop Booking page UI layout | Developer 2 | ✅ Done |
+| Build service selection component | Developer 2 | ✅ Done |
+| Build time slot picker component (available slots only) | Developer 2 | 🔄 Partial — calendar done, time slots hardcoded (pending DB integration) |
+| Build booking form (name, email, phone, guests, requests) | Developer 2 | ✅ Done |
+| Implement booking submission API Route | Developer 1 | ⏳ Pending |
+| Implement time slot conflict detection logic | Developer 1 | ⏳ Pending |
+| Generate unique cancellation token per booking | Developer 1 | ⏳ Pending |
+| Send confirmation email with cancellation link to customer | Developer 1 | 🔄 Partial — email template done, token generation pending |
+| Send booking notification email to business owner | Developer 1 | ✅ Done |
+| Develop booking success and error pages | Developer 2 | ✅ Done |
 
 **Definition of Done:**
 - [ ] Complete booking flow works end-to-end

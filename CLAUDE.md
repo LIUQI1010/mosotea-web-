@@ -384,8 +384,8 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Sprint | Focus | Status |
 |---|---|---|
 | Pre-Sprint | PRD, requirements, client sign-off | ✅ Done |
-| Sprint 0 | Project setup, DB schema, Figma wireframes | 🔄 In Progress |
-| Sprint 1 | Core information pages + i18n | ⏳ Up Next |
-| Sprint 2 | Booking system + cancellation emails | ⏳ Pending |
+| Sprint 0 | Project setup, DB schema, Figma wireframes | ✅ Done |
+| Sprint 1 | Core information pages + i18n | ✅ Done |
+| Sprint 2 | Booking system + cancellation emails | 🔄 In Progress |
 | Sprint 3 | Admin dashboard + self-cancellation | ⏳ Pending |
 | Sprint 4 | Testing, performance, launch | ⏳ Pending |
