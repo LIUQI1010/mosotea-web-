@@ -164,78 +164,83 @@ function IntroductionSection() {
   )
 }
 
-// Featured Experiences Section
+// Featured Experience Section
 function FeaturedExperiences() {
   const t = useTranslations("home.experiences")
 
-  const experiences = [
-    {
-      title: t("classic.title"),
-      duration: t("classic.duration"),
-      price: 85,
-      description: t("classic.description"),
-      image: "/images/experience-classic.jpg",
-    },
-    {
-      title: t("matcha.title"),
-      duration: t("matcha.duration"),
-      price: 65,
-      description: t("matcha.description"),
-      image: "/images/experience-matcha.jpg",
-    },
-    {
-      title: t("private.title"),
-      duration: t("private.duration"),
-      price: 180,
-      description: t("private.description"),
-      image: "/images/experience-garden.jpg",
-    },
-  ]
-
   return (
     <section className="py-20 sm:py-28 px-4 bg-cream">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
+        {/* Title & Subtitle */}
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
             {t("title")}
           </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            {t("subtitle")}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {experiences.map((experience, index) => (
-            <div
-              key={index}
-              className="bg-off-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
-            >
-              {/* Experience Image */}
-              <div className="aspect-[4/3] overflow-hidden">
-                <img
-                  src={experience.image}
-                  alt={experience.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="font-serif text-xl font-semibold text-foreground mb-3">
-                  {experience.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4 leading-relaxed flex-1">
-                  {experience.description}
-                </p>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-muted-foreground">{experience.duration}</span>
-                  <span className="font-semibold text-tea-brown">NZD ${experience.price}</span>
-                </div>
-                <Link
-                  href="/book"
-                  className="block w-full text-center bg-tea-brown text-primary-foreground py-2.5 text-sm font-medium rounded hover:bg-tea-brown/90 transition-colors"
-                >
-                  Book Now
-                </Link>
-              </div>
+        {/* Two Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-10">
+          {/* Tea Journey */}
+          <div className="bg-off-white rounded-lg overflow-hidden border border-border">
+            <div className="aspect-[4/3] overflow-hidden">
+              <img
+                src="/images/experience-classic.jpg"
+                alt="Tea Journey"
+                className="w-full h-full object-cover"
+              />
             </div>
-          ))}
+            <div className="p-8">
+              <h3 className="font-serif text-xl font-semibold text-tea-brown mb-3">
+                {t("teaJourney.title")}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {t("teaJourney.description")}
+              </p>
+            </div>
+          </div>
+
+          {/* Hands-on Experience */}
+          <div className="bg-off-white rounded-lg overflow-hidden border border-border">
+            <div className="aspect-[4/3] overflow-hidden">
+              <img
+                src="/images/experience-garden.jpg"
+                alt="Hands-on Experience"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-8">
+              <h3 className="font-serif text-xl font-semibold text-tea-brown mb-3">
+                {t("handsOn.title")}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {t("handsOn.description")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <p className="text-center text-sm font-medium text-muted-foreground tracking-wide mb-8">
+          {t("stats")}
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/workshop"
+            className="inline-block px-8 py-3 text-base font-medium rounded border-2 border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground transition-colors"
+          >
+            {t("learnMore")}
+          </Link>
+          <Link
+            href="/book"
+            className="inline-block px-8 py-3 text-base font-medium rounded bg-tea-brown text-primary-foreground hover:bg-tea-brown/90 transition-colors"
+          >
+            {t("bookNow")}
+          </Link>
         </div>
       </div>
     </section>

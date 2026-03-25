@@ -1,28 +1,27 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 
-// Available time slots
-const timeSlots = ["10:00 AM", "11:30 AM", "2:00 PM", "3:30 PM", "5:00 PM"]
+// Fixed workshop price
+const PRICE_PER_PERSON = 75
 
-// Experience IDs with hardcoded prices
-const experienceIds = ["classic", "matcha", "private"] as const
-const experiencePrices: Record<string, number> = {
-    classic: 85,
-    matcha: 65,
-    private: 180,
+// Available time slot from API
+interface AvailableSlot {
+    id: string
+    start_time: string
+    end_time: string
+    remaining: number
 }
 
 // Form data interface
 interface BookingFormData {
-    experience: string
     date: string
-    timeSlot: string
+    timeSlotId: string
+    timeSlotLabel: string
     fullName: string
     email: string
     phone: string
@@ -33,7 +32,6 @@ interface BookingFormData {
 
 // Form errors interface
 interface FormErrors {
-    experience?: string
     date?: string
     timeSlot?: string
     fullName?: string
@@ -65,9 +63,8 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
     const t = useTranslations("book")
 
     const steps = [
-        { number: 1, label: t("steps.experience") },
-        { number: 2, label: t("steps.dateTime") },
-        { number: 3, label: t("steps.details") },
+        { number: 1, label: t("steps.dateTime") },
+        { number: 2, label: t("steps.details") },
     ]
 
     return (
@@ -103,84 +100,6 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                     )}
                 </div>
             ))}
-        </div>
-    )
-}
-
-// Step 1: Experience Selection
-function ExperienceSelection({
-    selectedExperience,
-    onSelect,
-    error,
-}: {
-    selectedExperience: string
-    onSelect: (id: string) => void
-    error?: string
-}) {
-    const t = useTranslations("book")
-    const tExp = useTranslations("home.experiences")
-
-    const experiences = experienceIds.map((id) => ({
-        id,
-        title: tExp(`${id}.title`),
-        duration: tExp(`${id}.duration`),
-        price: experiencePrices[id],
-    }))
-
-    return (
-        <div>
-            <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
-                {t("step1.title")}
-            </h2>
-            <p className="text-muted-foreground mb-6">{t("step1.description")}</p>
-
-            <div className="grid gap-4">
-                {experiences.map((exp) => (
-                    <button
-                        key={exp.id}
-                        onClick={() => onSelect(exp.id)}
-                        className={`p-5 rounded-lg border-2 text-left transition-all ${selectedExperience === exp.id
-                                ? "border-tea-brown bg-tea-brown/5"
-                                : "border-border hover:border-tea-brown/50 bg-off-white"
-                            }`}
-                    >
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <div>
-                                <h3 className="font-serif text-lg font-semibold text-foreground">
-                                    {exp.title}
-                                </h3>
-                                <p className="text-sm text-muted-foreground mt-1">{exp.duration}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <span className="text-lg font-semibold text-tea-brown">
-                                    NZ${exp.price}
-                                </span>
-                                <div
-                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${selectedExperience === exp.id
-                                            ? "border-tea-brown bg-tea-brown"
-                                            : "border-muted-foreground"
-                                        }`}
-                                >
-                                    {selectedExperience === exp.id && (
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 text-primary-foreground">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                        </svg>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </button>
-                ))}
-            </div>
-
-            {error && (
-                <p className="mt-3 text-sm text-red-600 flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                    </svg>
-                    {error}
-                </p>
-            )}
         </div>
     )
 }
@@ -293,21 +212,55 @@ function Calendar({
     )
 }
 
-// Step 2: Date & Time Selection
+// Format a time slot's start/end into a readable label
+function formatSlotLabel(startTime: string, endTime: string): string {
+    const fmt = (iso: string) => {
+        const d = new Date(iso)
+        const h = d.getHours()
+        const m = d.getMinutes()
+        const ampm = h >= 12 ? "PM" : "AM"
+        const h12 = h % 12 || 12
+        return `${h12}:${String(m).padStart(2, "0")} ${ampm}`
+    }
+    return `${fmt(startTime)} - ${fmt(endTime)}`
+}
+
+// Step 1: Date & Time Selection
 function DateTimeSelection({
     selectedDate,
-    selectedTimeSlot,
+    selectedSlotId,
     onDateSelect,
-    onTimeSelect,
+    onSlotSelect,
     errors,
 }: {
     selectedDate: string
-    selectedTimeSlot: string
+    selectedSlotId: string
     onDateSelect: (date: string) => void
-    onTimeSelect: (time: string) => void
+    onSlotSelect: (slotId: string, label: string) => void
     errors: FormErrors
 }) {
     const t = useTranslations("book")
+    const [slots, setSlots] = useState<AvailableSlot[]>([])
+    const [loadingSlots, setLoadingSlots] = useState(false)
+    const [fetchedDate, setFetchedDate] = useState("")
+
+    // Fetch slots when date changes
+    if (selectedDate !== fetchedDate) {
+        setFetchedDate(selectedDate)
+        if (!selectedDate) {
+            setSlots([])
+            setLoadingSlots(false)
+        } else {
+            setLoadingSlots(true)
+            fetch(`/api/time-slots?date=${selectedDate}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setSlots(data.success ? data.data : [])
+                })
+                .catch(() => setSlots([]))
+                .finally(() => setLoadingSlots(false))
+        }
+    }
 
     return (
         <div>
@@ -335,20 +288,40 @@ function DateTimeSelection({
                 {selectedDate ? (
                     <div>
                         <h3 className="font-medium text-foreground mb-3">{t("step2.selectTime")}</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {timeSlots.map((slot) => (
-                                <button
-                                    key={slot}
-                                    onClick={() => onTimeSelect(slot)}
-                                    className={`py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${selectedTimeSlot === slot
-                                            ? "border-tea-brown bg-tea-brown text-primary-foreground"
-                                            : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
-                                        }`}
-                                >
-                                    {slot}
-                                </button>
-                            ))}
-                        </div>
+                        {loadingSlots ? (
+                            <div className="grid grid-cols-1 gap-3">
+                                {[1, 2].map((i) => (
+                                    <div key={i} className="h-12 rounded-lg bg-border animate-pulse" />
+                                ))}
+                            </div>
+                        ) : slots.length > 0 ? (
+                            <div className="grid grid-cols-1 gap-3">
+                                {slots.map((slot) => {
+                                    const label = formatSlotLabel(slot.start_time, slot.end_time)
+                                    return (
+                                        <button
+                                            key={slot.id}
+                                            onClick={() => onSlotSelect(slot.id, label)}
+                                            className={`py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${selectedSlotId === slot.id
+                                                    ? "border-tea-brown bg-tea-brown text-primary-foreground"
+                                                    : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
+                                                }`}
+                                        >
+                                            <span>{label}</span>
+                                            <span className="ml-2 text-xs opacity-70">
+                                                ({slot.remaining} spots)
+                                            </span>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-border p-8">
+                                <p className="text-muted-foreground text-sm text-center">
+                                    No available time slots for this date
+                                </p>
+                            </div>
+                        )}
                         {errors.timeSlot && (
                             <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -379,8 +352,6 @@ function InputField({
     placeholder,
     error,
     required = false,
-    min,
-    max,
 }: {
     label: string
     type?: string
@@ -389,8 +360,6 @@ function InputField({
     placeholder?: string
     error?: string
     required?: boolean
-    min?: number
-    max?: number
 }) {
     return (
         <div>
@@ -403,8 +372,6 @@ function InputField({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                min={min}
-                max={max}
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-off-white transition-colors focus:outline-none focus:ring-0 ${error
                         ? "border-red-400 focus:border-red-500"
                         : "border-border focus:border-tea-brown"
@@ -422,7 +389,7 @@ function InputField({
     )
 }
 
-// Step 3: Personal Details
+// Step 2: Personal Details
 function PersonalDetails({
     formData,
     onFieldChange,
@@ -497,10 +464,10 @@ function PersonalDetails({
                         <button
                             type="button"
                             onClick={() => {
-                                if (formData.guests < 6) onFieldChange("guests", formData.guests + 1)
+                                if (formData.guests < 8) onFieldChange("guests", formData.guests + 1)
                             }}
-                            disabled={formData.guests >= 6}
-                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 6
+                            disabled={formData.guests >= 8}
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 8
                                     ? "border-border text-muted-foreground/40 cursor-not-allowed"
                                     : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
                                 }`}
@@ -557,7 +524,7 @@ function PersonalDetails({
                                     : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
                                 }`}
                         >
-                            繁體中文
+                            中文
                         </button>
                     </div>
                 </div>
@@ -569,14 +536,8 @@ function PersonalDetails({
 // Booking Summary
 function BookingSummary({ formData }: { formData: BookingFormData }) {
     const t = useTranslations("book")
-    const tExp = useTranslations("home.experiences")
 
-    const selectedExpId = formData.experience
-    if (!selectedExpId || !experiencePrices[selectedExpId]) return null
-
-    const expTitle = tExp(`${selectedExpId}.title`)
-    const price = experiencePrices[selectedExpId]
-    const totalPrice = price * formData.guests
+    const totalPrice = PRICE_PER_PERSON * formData.guests
 
     return (
         <div className="bg-cream rounded-lg p-6 border border-border">
@@ -586,7 +547,7 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
             <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("summary.experience")}</span>
-                    <span className="font-medium text-foreground">{expTitle}</span>
+                    <span className="font-medium text-foreground">{t("summary.workshopName")}</span>
                 </div>
                 {formData.date && (
                     <div className="flex justify-between">
@@ -601,15 +562,19 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
                         </span>
                     </div>
                 )}
-                {formData.timeSlot && (
+                {formData.timeSlotLabel && (
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">{t("summary.time")}</span>
-                        <span className="font-medium text-foreground">{formData.timeSlot}</span>
+                        <span className="font-medium text-foreground">{formData.timeSlotLabel}</span>
                     </div>
                 )}
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("summary.guests")}</span>
                     <span className="font-medium text-foreground">{formData.guests}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t("summary.price")}</span>
+                    <span className="font-medium text-foreground">NZ${PRICE_PER_PERSON} / person</span>
                 </div>
                 <div className="pt-3 border-t border-border flex justify-between">
                     <span className="font-medium text-foreground">{t("summary.total")}</span>
@@ -687,22 +652,16 @@ function ErrorMessage({ errorMessage, onRetry }: { errorMessage: string; onRetry
 
 // Booking Form Component
 function BookingForm() {
-    const searchParams = useSearchParams()
     const t = useTranslations("book")
-    const preselectedExperience = searchParams.get("experience") || ""
-
-    const initialExperience = preselectedExperience && experiencePrices[preselectedExperience]
-        ? preselectedExperience
-        : ""
 
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitError, setSubmitError] = useState("")
     const [formData, setFormData] = useState<BookingFormData>({
-        experience: initialExperience,
         date: "",
-        timeSlot: "",
+        timeSlotId: "",
+        timeSlotLabel: "",
         fullName: "",
         email: "",
         phone: "",
@@ -716,21 +675,15 @@ function BookingForm() {
         const newErrors: FormErrors = {}
 
         if (step === 1) {
-            if (!formData.experience) {
-                newErrors.experience = t("step1.error")
-            }
-        }
-
-        if (step === 2) {
             if (!formData.date) {
                 newErrors.date = t("step2.errorDate")
             }
-            if (!formData.timeSlot) {
+            if (!formData.timeSlotId) {
                 newErrors.timeSlot = t("step2.errorTime")
             }
         }
 
-        if (step === 3) {
+        if (step === 2) {
             if (!formData.fullName.trim()) {
                 newErrors.fullName = t("step3.errorName")
             }
@@ -742,7 +695,7 @@ function BookingForm() {
             if (!formData.phone.trim()) {
                 newErrors.phone = t("step3.errorPhone")
             }
-            if (formData.guests < 1 || formData.guests > 6) {
+            if (formData.guests < 1 || formData.guests > 8) {
                 newErrors.guests = t("step3.errorGuests")
             }
         }
@@ -763,7 +716,7 @@ function BookingForm() {
     }
 
     const handleSubmit = async () => {
-        if (!validateStep(3)) return
+        if (!validateStep(2)) return
 
         setIsSubmitting(true)
         setSubmitError("")
@@ -772,7 +725,15 @@ function BookingForm() {
             const res = await fetch("/api/booking", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    timeSlotId: formData.timeSlotId,
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    phone: formData.phone,
+                    guests: formData.guests,
+                    specialRequests: formData.specialRequests,
+                    preferredLanguage: formData.preferredLanguage,
+                }),
             })
 
             const data = await res.json()
@@ -814,24 +775,25 @@ function BookingForm() {
                 {/* Form */}
                 <div className="lg:col-span-2 bg-card rounded-lg border border-border p-6 md:p-8">
                     {currentStep === 1 && (
-                        <ExperienceSelection
-                            selectedExperience={formData.experience}
-                            onSelect={(id) => handleFieldChange("experience", id)}
-                            error={errors.experience}
-                        />
-                    )}
-
-                    {currentStep === 2 && (
                         <DateTimeSelection
                             selectedDate={formData.date}
-                            selectedTimeSlot={formData.timeSlot}
-                            onDateSelect={(date) => handleFieldChange("date", date)}
-                            onTimeSelect={(time) => handleFieldChange("timeSlot", time)}
+                            selectedSlotId={formData.timeSlotId}
+                            onDateSelect={(date) => {
+                                handleFieldChange("date", date)
+                                // Reset time slot when date changes
+                                setFormData((prev) => ({ ...prev, date, timeSlotId: "", timeSlotLabel: "" }))
+                            }}
+                            onSlotSelect={(slotId, label) => {
+                                setFormData((prev) => ({ ...prev, timeSlotId: slotId, timeSlotLabel: label }))
+                                if (errors.timeSlot) {
+                                    setErrors((prev) => ({ ...prev, timeSlot: undefined }))
+                                }
+                            }}
                             errors={errors}
                         />
                     )}
 
-                    {currentStep === 3 && (
+                    {currentStep === 2 && (
                         <PersonalDetails
                             formData={formData}
                             onFieldChange={handleFieldChange}
@@ -852,7 +814,7 @@ function BookingForm() {
                             <div />
                         )}
 
-                        {currentStep < 3 ? (
+                        {currentStep < 2 ? (
                             <button
                                 onClick={handleNext}
                                 className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
@@ -877,9 +839,9 @@ function BookingForm() {
                     </div>
                 </div>
 
-                {/* Summary Sidebar */}
+                {/* Summary Sidebar - always visible */}
                 <div className="lg:col-span-1">
-                    {formData.experience && <BookingSummary formData={formData} />}
+                    <BookingSummary formData={formData} />
                 </div>
             </div>
         </div>
@@ -942,10 +904,10 @@ function BookingFormSkeleton() {
     return (
         <div className="animate-pulse">
             <div className="flex items-center justify-center mb-10 gap-4">
-                {[1, 2, 3].map((i) => (
+                {[1, 2].map((i) => (
                     <div key={i} className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-border rounded-full" />
-                        {i < 3 && <div className="w-12 sm:w-20 h-0.5 bg-border" />}
+                        {i < 2 && <div className="w-12 sm:w-20 h-0.5 bg-border" />}
                     </div>
                 ))}
             </div>

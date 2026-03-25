@@ -1,24 +1,9 @@
-export type ServiceStatus = 'active' | 'inactive'
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled'
 export type CancelledBy = 'customer' | 'admin'
 export type Language = 'en' | 'zh-TW'
 
-export interface Service {
-    id: string
-    name_en: string
-    name_zh: string
-    description_en: string | null
-    description_zh: string | null
-    duration_minutes: number
-    max_guests: number
-    price_nzd: number
-    is_active: boolean
-    created_at: string
-}
-
 export interface TimeSlot {
     id: string
-    service_id: string
     start_time: string
     end_time: string
     max_guests: number
@@ -29,7 +14,6 @@ export interface TimeSlot {
 
 export interface Booking {
     id: string
-    service_id: string
     time_slot_id: string
     customer_name: string
     customer_email: string
@@ -45,8 +29,14 @@ export interface Booking {
     updated_at: string
 }
 
-// 带关联数据的类型
-export interface BookingWithDetails extends Booking {
-    service: Service
+export interface BookingWithTimeSlot extends Booking {
     time_slot: TimeSlot
+}
+
+export interface Gallery {
+    id: string
+    url: string
+    filename: string
+    caption: string | null
+    uploaded_at: string
 }

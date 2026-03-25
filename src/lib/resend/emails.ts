@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import type { BookingWithDetails } from '@/types'
+import type { BookingWithTimeSlot } from '@/types'
 
 function getResendClient() {
     if (!process.env.RESEND_API_KEY) {
@@ -11,12 +11,24 @@ function getResendClient() {
 const FROM_EMAIL = 'Moso Tea <noreply@mosotea.co.nz>'
 const OWNER_EMAIL = process.env.OWNER_EMAIL || 'hello@mosotea.co.nz'
 
+function formatDateTime(isoString: string, locale: string): string {
+    return new Date(isoString).toLocaleString(locale === 'zh-TW' ? 'zh-TW' : 'en-NZ', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    })
+}
+
 // 发给客户的预约确认邮件
 export async function sendBookingConfirmation(
-    booking: BookingWithDetails,
+    booking: BookingWithTimeSlot,
     cancellationUrl: string
 ) {
     const isZh = booking.preferred_language === 'zh-TW'
+    const dateStr = formatDateTime(booking.time_slot.start_time, booking.preferred_language)
 
     await getResendClient().emails.send({
         from: FROM_EMAIL,
@@ -27,19 +39,23 @@ export async function sendBookingConfirmation(
         <h1 style="color: #7C5C3E;">${isZh ? '預約確認' : 'Booking Confirmed'}</h1>
         <p>${isZh ? '親愛的' : 'Dear'} ${booking.customer_name},</p>
         <p>${isZh ? '感謝您的預約！以下是您的預約詳情：' : 'Thank you for your booking! Here are your details:'}</p>
-        
+
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '體驗' : 'Experience'}</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${isZh ? booking.service.name_zh : booking.service.name_en}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${isZh ? '茶道工作坊' : 'The Workshop'}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '日期時間' : 'Date & Time'}</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${new Date(booking.time_slot.start_time).toLocaleString()}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${dateStr}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '賓客人數' : 'Guests'}</strong></td>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.guest_count}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '總價' : 'Total'}</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">NZ$${booking.guest_count * 75}</td>
           </tr>
         </table>
 
@@ -56,15 +72,17 @@ export async function sendBookingConfirmation(
 }
 
 // 发给老板的新预约通知
-export async function sendBookingNotification(booking: BookingWithDetails) {
+export async function sendBookingNotification(booking: BookingWithTimeSlot) {
+    const dateStr = formatDateTime(booking.time_slot.start_time, 'en')
+
     await getResendClient().emails.send({
         from: FROM_EMAIL,
         to: OWNER_EMAIL,
-        subject: `New Booking — ${booking.service.name_en}`,
+        subject: 'New Booking — The Workshop',
         html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
         <h1 style="color: #7C5C3E;">New Booking Received</h1>
-        
+
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Customer</strong></td>
@@ -79,16 +97,20 @@ export async function sendBookingNotification(booking: BookingWithDetails) {
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.customer_phone}</td>
           </tr>
           <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Experience</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.service.name_en}</td>
-          </tr>
-          <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Date & Time</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${new Date(booking.time_slot.start_time).toLocaleString()}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${dateStr}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Guests</strong></td>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.guest_count}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Total</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">NZ$${booking.guest_count * 75}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Language</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.preferred_language === 'zh-TW' ? '繁體中文' : 'English'}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Special Requests</strong></td>
@@ -101,7 +123,7 @@ export async function sendBookingNotification(booking: BookingWithDetails) {
 }
 
 // 发给客户的取消确认邮件
-export async function sendCancellationConfirmation(booking: BookingWithDetails) {
+export async function sendCancellationConfirmation(booking: BookingWithTimeSlot) {
     const isZh = booking.preferred_language === 'zh-TW'
 
     await getResendClient().emails.send({
@@ -121,11 +143,13 @@ export async function sendCancellationConfirmation(booking: BookingWithDetails) 
 }
 
 // 发给老板的取消通知
-export async function sendCancellationNotice(booking: BookingWithDetails) {
+export async function sendCancellationNotice(booking: BookingWithTimeSlot) {
+    const dateStr = formatDateTime(booking.time_slot.start_time, 'en')
+
     await getResendClient().emails.send({
         from: FROM_EMAIL,
         to: OWNER_EMAIL,
-        subject: `Booking Cancelled — ${booking.service.name_en}`,
+        subject: 'Booking Cancelled — The Workshop',
         html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
         <h1 style="color: #7C5C3E;">Booking Cancelled by Customer</h1>
@@ -135,12 +159,8 @@ export async function sendCancellationNotice(booking: BookingWithDetails) {
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.customer_name}</td>
           </tr>
           <tr>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Experience</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.service.name_en}</td>
-          </tr>
-          <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Date & Time</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${new Date(booking.time_slot.start_time).toLocaleString()}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${dateStr}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Guests</strong></td>

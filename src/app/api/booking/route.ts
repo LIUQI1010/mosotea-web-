@@ -1,0 +1,149 @@
+import { z } from 'zod/v4'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { generateCancellationToken } from '@/lib/token'
+import { sendBookingConfirmation, sendBookingNotification } from '@/lib/resend/emails'
+import type { BookingWithTimeSlot } from '@/types'
+
+const bookingSchema = z.object({
+    timeSlotId: z.string().uuid('Invalid time slot'),
+    fullName: z.string().min(1, 'Name is required'),
+    email: z.email('Invalid email address'),
+    phone: z.string().min(1, 'Phone number is required'),
+    guests: z.number().int().min(1).max(8, 'Maximum 8 guests'),
+    specialRequests: z.string().optional().default(''),
+    preferredLanguage: z.enum(['en', 'zh']),
+})
+
+export async function POST(request: Request) {
+    try {
+        const body = await request.json()
+        const result = bookingSchema.safeParse(body)
+
+        if (!result.success) {
+            return Response.json(
+                { success: false, error: result.error.issues[0].message },
+                { status: 400 }
+            )
+        }
+
+        const { timeSlotId, fullName, email, phone, guests, specialRequests, preferredLanguage } = result.data
+        const supabase = createAdminClient()
+
+        // 1. Check the time slot exists and has capacity
+        const { data: slot, error: slotError } = await supabase
+            .from('time_slots')
+            .select('*')
+            .eq('id', timeSlotId)
+            .single()
+
+        if (slotError || !slot) {
+            return Response.json(
+                { success: false, error: 'Time slot not found' },
+                { status: 404 }
+            )
+        }
+
+        if (!slot.is_available) {
+            return Response.json(
+                { success: false, error: 'This time slot is no longer available' },
+                { status: 400 }
+            )
+        }
+
+        if (slot.booked_guests + guests > slot.max_guests) {
+            return Response.json(
+                { success: false, error: `Only ${slot.max_guests - slot.booked_guests} spots remaining for this time slot` },
+                { status: 400 }
+            )
+        }
+
+        // Check the slot is in the future
+        if (new Date(slot.start_time) <= new Date()) {
+            return Response.json(
+                { success: false, error: 'Cannot book a time slot in the past' },
+                { status: 400 }
+            )
+        }
+
+        // 2. Map preferred language: frontend sends "zh", database stores "zh-TW"
+        const dbLanguage = preferredLanguage === 'zh' ? 'zh-TW' : 'en'
+
+        // 3. Insert booking (trigger will update booked_guests)
+        const { data: booking, error: bookingError } = await supabase
+            .from('bookings')
+            .insert({
+                time_slot_id: timeSlotId,
+                customer_name: fullName,
+                customer_email: email,
+                customer_phone: phone,
+                guest_count: guests,
+                special_requests: specialRequests || null,
+                preferred_language: dbLanguage,
+                status: 'pending',
+            })
+            .select()
+            .single()
+
+        if (bookingError) {
+            // The trigger may reject if capacity exceeded (race condition safety)
+            if (bookingError.message?.includes('capacity') || bookingError.message?.includes('guests')) {
+                return Response.json(
+                    { success: false, error: 'This time slot is now fully booked. Please choose another slot.' },
+                    { status: 400 }
+                )
+            }
+            return Response.json(
+                { success: false, error: 'Failed to create booking' },
+                { status: 500 }
+            )
+        }
+
+        // 4. Generate cancellation token and update booking
+        const cancellationToken = generateCancellationToken(booking.id)
+        const tokenExpiresAt = slot.start_time // Token expires when the session starts
+
+        const { error: tokenError } = await supabase
+            .from('bookings')
+            .update({
+                cancellation_token: cancellationToken,
+                cancellation_token_expires_at: tokenExpiresAt,
+            })
+            .eq('id', booking.id)
+
+        if (tokenError) {
+            console.error('Failed to set cancellation token:', tokenError)
+        }
+
+        // 5. Build booking with time slot for email templates
+        const bookingWithSlot: BookingWithTimeSlot = {
+            ...booking,
+            preferred_language: dbLanguage,
+            cancellation_token: cancellationToken,
+            cancellation_token_expires_at: tokenExpiresAt,
+            time_slot: slot,
+        }
+
+        // 6. Send emails (non-blocking — don't fail the booking if email fails)
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        const cancellationUrl = `${appUrl}/cancel/${cancellationToken}`
+
+        try {
+            await Promise.all([
+                sendBookingConfirmation(bookingWithSlot, cancellationUrl),
+                sendBookingNotification(bookingWithSlot),
+            ])
+        } catch (emailError) {
+            console.error('Failed to send booking emails:', emailError)
+        }
+
+        return Response.json({
+            success: true,
+            data: { bookingId: booking.id },
+        })
+    } catch {
+        return Response.json(
+            { success: false, error: 'Internal server error' },
+            { status: 500 }
+        )
+    }
+}

@@ -14,7 +14,7 @@ export function Navigation() {
 
     const navLinks = [
         { href: "/" as const, label: t("home") },
-        { href: "/experiences" as const, label: t("experiences") },
+        { href: "/workshop" as const, label: t("experiences") },
         { href: "/about" as const, label: t("about") },
         { href: "/contact" as const, label: t("contact") },
     ]

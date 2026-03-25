@@ -38,12 +38,12 @@ learn about the experiences offered and submit booking requests online.
 mosotea-web-/
 ├── src/
 │   ├── app/
-│   │   ├── (public)/               ← Public-facing pages (grouped route, no URL prefix)
+│   │   ├── [locale]/(public)/      ← Public pages with i18n locale routing
 │   │   │   ├── page.tsx            ← Home page (/)
 │   │   │   ├── about/
 │   │   │   │   └── page.tsx        ← About Us (/about)
-│   │   │   ├── experiences/
-│   │   │   │   └── page.tsx        ← Tea experiences (/experiences)
+│   │   │   ├── workshop/
+│   │   │   │   └── page.tsx        ← Workshop details (/workshop)
 │   │   │   ├── book/
 │   │   │   │   └── page.tsx        ← Booking form (/book)
 │   │   │   ├── contact/
@@ -51,7 +51,9 @@ mosotea-web-/
 │   │   │   └── cancel/
 │   │   │       └── [token]/
 │   │   │           └── page.tsx    ← Customer self-cancellation (/cancel/[token])
-│   │   ├── admin/                  ← Protected admin dashboard
+│   │   ├── [locale]/
+│   │   │   └── not-found.tsx       ← 404 Not Found page
+│   │   ├── admin/                  ← Protected admin dashboard (English only, no locale)
 │   │   │   ├── page.tsx            ← Booking list (/admin)
 │   │   │   ├── login/
 │   │   │   │   └── page.tsx        ← Admin login (/admin/login)
@@ -63,11 +65,13 @@ mosotea-web-/
 │   │   ├── api/                    ← API Routes (server-side only)
 │   │   │   ├── booking/
 │   │   │   │   └── route.ts        ← POST: submit booking
+│   │   │   ├── time-slots/
+│   │   │   │   └── route.ts        ← GET: available time slots by date
 │   │   │   ├── cancel/
 │   │   │   │   └── route.ts        ← POST: cancel booking via token
 │   │   │   ├── contact/
 │   │   │   │   └── route.ts        ← POST: contact form submission
-│   │   │   └── admin/
+│   │   │   └── admin/              ← (Sprint 3 — not yet implemented)
 │   │   │       ├── bookings/
 │   │   │       │   └── route.ts    ← GET: list bookings, PATCH: confirm/cancel
 │   │   │       └── slots/
@@ -81,14 +85,20 @@ mosotea-web-/
 │   ├── lib/
 │   │   ├── supabase/
 │   │   │   ├── client.ts           ← Browser Supabase client (use in Client Components)
-│   │   │   └── server.ts           ← Server Supabase client (use in Server Components + API Routes)
-│   │   └── resend/
-│   │       └── emails.ts           ← All email sending functions
+│   │   │   ├── server.ts           ← Server Supabase client (use in Server Components)
+│   │   │   └── admin.ts            ← Service role Supabase client (use in API Routes, bypasses RLS)
+│   │   ├── resend/
+│   │   │   └── emails.ts           ← All email sending functions (4 types)
+│   │   └── token.ts                ← Cancellation token generation & verification (HMAC-SHA256)
 │   ├── types/
-│   │   └── index.ts                ← Shared TypeScript types and interfaces
-│   └── i18n/                       ← Translation files (to be created)
-│       ├── en.json                 ← English translations
-│       └── zh-TW.json             ← Traditional Chinese translations
+│   │   └── index.ts                ← Shared TypeScript types (TimeSlot, Booking, Gallery, etc.)
+│   └── i18n/
+│       ├── routing.ts              ← Locale routing config (en, zh-TW)
+│       ├── request.ts              ← Message loading per locale
+│       └── navigation.ts           ← Locale-aware Link, useRouter, etc.
+├── messages/
+│   ├── en.json                     ← English translations
+│   └── zh-TW.json                  ← Traditional Chinese translations
 ├── public/                         ← Static assets (images, icons, fonts)
 ├── .env.local                      ← Local environment variables (never commit)
 ├── .env.example                    ← Environment variable template (commit this)
@@ -147,27 +157,21 @@ CANCELLATION_TOKEN_SECRET=        # Random 32-byte hex string for signing cancel
 
 ## Database Schema
 
-### Table: `services`
-```sql
-create table services (
-  id uuid primary key default gen_random_uuid(),
-  name_en text not null,
-  name_zh text not null,
-  description_en text,
-  description_zh text,
-  duration_minutes int not null,
-  max_guests int not null,
-  price_nzd decimal(10,2) not null,
-  is_active boolean default true,
-  created_at timestamptz default now()
-);
-```
+### Overview
+
+| Table | Purpose |
+|---|---|
+| `time_slots` | Stores bookable time slots |
+| `bookings` | Stores customer booking records |
+| `gallery` | Stores image metadata (files in Supabase Storage) |
 
 ### Table: `time_slots`
+
+Stores time slots set by the owner. Two fixed slots per day, batch-generated from the admin dashboard.
+
 ```sql
 create table time_slots (
   id uuid primary key default gen_random_uuid(),
-  service_id uuid references services(id) on delete cascade,
   start_time timestamptz not null,
   end_time timestamptz not null,
   max_guests int not null default 8,
@@ -177,11 +181,18 @@ create table time_slots (
 );
 ```
 
+**Time slot rules:**
+- Two fixed slots per day: **10:00–11:30** and **14:00–15:30**
+- Admin dashboard provides a "Generate Next 30 Days" button to batch-create slots
+- A slot is unavailable when: `is_available = false` OR `booked_guests >= max_guests`
+
 ### Table: `bookings`
+
+Stores all customer booking submissions.
+
 ```sql
 create table bookings (
   id uuid primary key default gen_random_uuid(),
-  service_id uuid references services(id),
   time_slot_id uuid references time_slots(id),
   customer_name text not null,
   customer_email text not null,
@@ -198,6 +209,43 @@ create table bookings (
 );
 ```
 
+**Status values:**
+
+| `status` | Meaning |
+|---|---|
+| `pending` | Submitted, awaiting owner confirmation |
+| `confirmed` | Owner confirmed |
+| `cancelled` | Cancelled |
+
+**`cancelled_by` values:**
+
+| Value | Meaning |
+|---|---|
+| `customer` | Customer self-cancelled via cancellation link |
+| `admin` | Owner cancelled from admin dashboard |
+
+### Table: `gallery`
+
+Stores image metadata. Actual image files are stored in Supabase Storage.
+
+```sql
+create table gallery (
+  id uuid primary key default gen_random_uuid(),
+  url text not null,
+  filename text not null,
+  caption text,
+  uploaded_at timestamptz default now()
+);
+```
+
+### Table Relationships
+
+```
+time_slots ──── bookings
+  One slot        can have multiple bookings
+                  total guests cannot exceed max_guests (8)
+```
+
 ### Database Triggers
 
 | Trigger | Table | When | Action |
@@ -206,11 +254,24 @@ create table bookings (
 | `bookings_check_guests` | bookings | Before insert | Check capacity, update `booked_guests` |
 | `bookings_release_guests` | bookings | After update | Release `booked_guests` on cancellation |
 
+### RLS (Row Level Security) Policies
+
+| Table | Operation | Access |
+|---|---|---|
+| `time_slots` | SELECT | All users (anon) |
+| `time_slots` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
+| `bookings` | INSERT | All users (anon) |
+| `bookings` | SELECT / UPDATE | Authenticated only (admin) |
+| `gallery` | SELECT | All users (anon) |
+| `gallery` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
+
 ---
 
 ## Key Business Rules
 
 ### Booking Rules
+- Only one experience offered: **The Workshop** (90 min, NZD $75/person, max 8 guests)
+- Two time slots per day: **10:00–11:30 AM** and **2:00–3:30 PM**
 - A time slot supports up to **8 guests total** across multiple bookings
 - `booked_guests` is automatically updated via database trigger on insert
 - After submission, status is `pending` until admin confirms
@@ -225,12 +286,14 @@ create table bookings (
 - Each token is single-use only
 - When cancelled, `booked_guests` is released via database trigger
 - Both customer and admin receive cancellation notification emails
+- `cancelled_by` records the source: `customer` or `admin`
 
 ### Admin Rules
 - Admin dashboard only accessible to authenticated users (Supabase Auth)
 - Unauthenticated users redirected to `/admin/login`
 - Admin can confirm, cancel, and view all bookings
 - Admin can add, remove, and toggle availability of time slots
+- Admin can generate next 30 days of time slots in bulk
 
 ---
 
@@ -254,10 +317,114 @@ All emails respect `preferred_language` — English or Traditional Chinese (zh-T
 import { createClient } from '@/lib/supabase/client'
 const supabase = createClient()
 
-// In Server Components and API Routes
+// In Server Components (respects RLS, uses anon key)
 import { createClient } from '@/lib/supabase/server'
 const supabase = await createClient()
+
+// In API Routes that need to bypass RLS (service role key)
+import { createAdminClient } from '@/lib/supabase/admin'
+const supabase = createAdminClient()
 ```
+
+---
+
+## API Routes
+
+### `GET /api/time-slots?date=YYYY-MM-DD`
+
+Returns available time slots for a given date.
+
+**Query params:** `date` (required, format `YYYY-MM-DD`)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    { "id": "uuid", "start_time": "iso", "end_time": "iso", "remaining": 6 }
+  ]
+}
+```
+
+- Filters out slots where `is_available = false` or `booked_guests >= max_guests`
+- Uses admin client (service role) to bypass RLS
+
+### `POST /api/booking`
+
+Submits a new booking request.
+
+**Request body:**
+```json
+{
+  "timeSlotId": "uuid",
+  "fullName": "string",
+  "email": "string",
+  "phone": "string",
+  "guests": 1,
+  "specialRequests": "string (optional)",
+  "preferredLanguage": "en | zh"
+}
+```
+
+**Response:** `{ "success": true, "data": { "bookingId": "uuid" } }`
+
+**Flow:**
+1. Validate input with Zod
+2. Check time slot exists, is available, and has capacity
+3. Check slot is in the future
+4. Insert booking (DB trigger updates `booked_guests`)
+5. Generate HMAC cancellation token, store on booking
+6. Send confirmation email to customer + notification to owner
+7. Emails are non-blocking — booking succeeds even if email fails
+
+### `POST /api/cancel`
+
+Cancels a booking via cancellation token.
+
+**Request body:** `{ "token": "string" }`
+
+**Response:** `{ "success": true }`
+
+**Flow:**
+1. Find booking by `cancellation_token`
+2. Check booking is not already cancelled
+3. Check token hasn't expired (expires at session start time)
+4. Check 24-hour cutoff (must be >24h before session)
+5. Update status to `cancelled`, set `cancelled_by = 'customer'`, clear token
+6. DB trigger releases `booked_guests`
+7. Send cancellation emails to customer + owner
+
+**Error responses include `tooLate: true`** when within 24 hours — frontend can show a "contact us" message.
+
+### `POST /api/contact`
+
+Sends a contact form message to the owner via email.
+
+**Request body:**
+```json
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string (optional)",
+  "message": "string (min 10 chars)"
+}
+```
+
+### Admin API Routes (Sprint 3 — not yet implemented)
+
+- `GET/PATCH /api/admin/bookings` — List and manage bookings
+- `GET/POST/DELETE /api/admin/slots` — Manage time slots
+
+---
+
+## Cancellation Token (src/lib/token.ts)
+
+- **Algorithm:** HMAC-SHA256 signed with `CANCELLATION_TOKEN_SECRET`
+- **Format:** `base64url(bookingId:random:hmac)`
+- **Single-use:** Token is cleared after successful cancellation
+- **Expiry:** Token expires at session start time (stored in `cancellation_token_expires_at`)
+- `generateCancellationToken(bookingId)` — creates a new token
+- `verifyCancellationToken(token)` — returns `{ valid, bookingId }` (structural check only, DB lookup needed for full validation)
 
 ---
 
