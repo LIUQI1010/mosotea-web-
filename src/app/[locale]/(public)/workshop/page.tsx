@@ -24,121 +24,90 @@ function PageHero() {
     )
 }
 
-// Experience Card Component
-function ExperienceCard({ experience }: {
-    experience: {
-        id: string
-        title: string
-        description: string
-        duration: string
-        groupSize: string
-        price: number
-        image: string
-    }
-}) {
+// Two-Part Experience Section
+function ExperienceParts() {
     const t = useTranslations("experiences")
-
-    return (
-        <article className="bg-card rounded-lg overflow-hidden border border-border shadow-sm">
-            {/* Image */}
-            <div className="aspect-[16/10] overflow-hidden">
-                <img
-                    src={experience.image}
-                    alt={experience.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
-            </div>
-
-            {/* Content */}
-            <div className="p-6 md:p-8">
-                {/* Title */}
-                <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-4">
-                    {experience.title}
-                </h2>
-
-                {/* Description */}
-                <p className="text-foreground/80 leading-relaxed mb-6">
-                    {experience.description}
-                </p>
-
-                {/* Details */}
-                <div className="flex flex-wrap gap-4 mb-6 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>{experience.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                        </svg>
-                        <span>{experience.groupSize}</span>
-                    </div>
-                </div>
-
-                {/* Price & CTA */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t border-border">
-                    <div>
-                        <span className="text-sm text-muted-foreground">{t("from")}</span>
-                        <p className="text-2xl font-semibold text-tea-brown">
-                            NZ${experience.price}
-                            <span className="text-sm font-normal text-muted-foreground"> / {t("perPerson")}</span>
-                        </p>
-                    </div>
-                    <Link
-                        href={`/book?experience=${experience.id}`}
-                        className="bg-tea-brown text-primary-foreground px-6 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors text-center"
-                    >
-                        {t("bookButton")}
-                    </Link>
-                </div>
-            </div>
-        </article>
-    )
-}
-
-// Experience Cards Section
-function ExperienceCards() {
-    const t = useTranslations("experiences")
-
-    const experiences = [
-        {
-            id: "classic",
-            title: t("classic.title"),
-            description: t("classic.description"),
-            duration: t("classic.duration"),
-            groupSize: t("classic.groupSize"),
-            price: 85,
-            image: "/images/experience-classic.jpg",
-        },
-        {
-            id: "matcha",
-            title: t("matcha.title"),
-            description: t("matcha.description"),
-            duration: t("matcha.duration"),
-            groupSize: t("matcha.groupSize"),
-            price: 65,
-            image: "/images/experience-matcha.jpg",
-        },
-        {
-            id: "private",
-            title: t("private.title"),
-            description: t("private.description"),
-            duration: t("private.duration"),
-            groupSize: t("private.groupSize"),
-            price: 180,
-            image: "/images/experience-garden.jpg",
-        },
-    ]
 
     return (
         <section className="py-20 px-4 bg-off-white">
             <div className="max-w-5xl mx-auto">
                 <div className="flex flex-col gap-12">
-                    {experiences.map((experience) => (
-                        <ExperienceCard key={experience.id} experience={experience} />
-                    ))}
+                    {/* Part 01: Tea Journey */}
+                    <div className="bg-card rounded-lg overflow-hidden border border-border">
+                        <div className="aspect-[16/9] overflow-hidden">
+                            <img
+                                src="/images/experience-classic.jpg"
+                                alt="Tea Journey"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div className="p-8 md:p-10">
+                            <span className="inline-block text-xs font-semibold tracking-widest uppercase text-bamboo-green mb-4">
+                                {t("part01")}
+                            </span>
+                            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-6">
+                                {t("teaJourney.title")}
+                            </h2>
+                            <ul className="space-y-4">
+                                {(["1", "2", "3"] as const).map((key) => (
+                                    <li key={key} className="flex items-start gap-3">
+                                        <div className="flex-shrink-0 w-6 h-6 mt-0.5 rounded-full bg-tea-brown/10 flex items-center justify-center">
+                                            <div className="w-2 h-2 rounded-full bg-tea-brown" />
+                                        </div>
+                                        <span className="text-foreground/80 leading-relaxed">
+                                            {t(`teaJourney.items.${key}`)}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Part 02: Hands-on Experience */}
+                    <div className="bg-card rounded-lg overflow-hidden border border-border">
+                        <div className="aspect-[16/9] overflow-hidden">
+                            <img
+                                src="/images/experience-garden.jpg"
+                                alt="Hands-on Experience"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <div className="p-8 md:p-10">
+                            <span className="inline-block text-xs font-semibold tracking-widest uppercase text-bamboo-green mb-4">
+                                {t("part02")}
+                            </span>
+                            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-tea-brown mb-6">
+                                {t("handsOn.title")}
+                            </h2>
+                            <ul className="space-y-4">
+                                {(["1", "2", "3", "4"] as const).map((key) => (
+                                    <li key={key} className="flex items-start gap-3">
+                                        <div className="flex-shrink-0 w-6 h-6 mt-0.5 rounded-full bg-tea-brown/10 flex items-center justify-center">
+                                            <div className="w-2 h-2 rounded-full bg-tea-brown" />
+                                        </div>
+                                        <span className="text-foreground/80 leading-relaxed">
+                                            {t(`handsOn.items.${key}`)}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Stats */}
+                <p className="text-center text-sm font-medium text-muted-foreground tracking-wide mt-12 mb-8">
+                    {t("stats")}
+                </p>
+
+                {/* Book Now Button */}
+                <div className="flex justify-center">
+                    <Link
+                        href="/book"
+                        className="inline-block bg-tea-brown text-primary-foreground px-10 py-4 text-base font-medium rounded hover:bg-tea-brown/90 transition-colors"
+                    >
+                        {t("bookNow")}
+                    </Link>
                 </div>
             </div>
         </section>
@@ -153,7 +122,7 @@ function WhatsIncluded() {
         {
             icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.87c1.355 0 2.697.055 4.024.165C17.155 8.51 18 9.473 18 10.608v2.513m-3-4.87v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.38a48.474 48.474 0 00-6-.37c-2.032 0-4.034.125-6 .37m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.17c0 .62-.504 1.124-1.125 1.124H4.125A1.125 1.125 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M12.265 3.11a.375.375 0 11-.53 0L12 2.845l.265.265zm-3 0a.375.375 0 11-.53 0L9 2.845l.265.265zm6 0a.375.375 0 11-.53 0L15 2.845l.265.265z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
                 </svg>
             ),
             title: t("included.item1Title"),
@@ -162,8 +131,7 @@ function WhatsIncluded() {
         {
             icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
                 </svg>
             ),
             title: t("included.item2Title"),
@@ -172,7 +140,8 @@ function WhatsIncluded() {
         {
             icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
                 </svg>
             ),
             title: t("included.item3Title"),
@@ -274,6 +243,7 @@ function FAQSection() {
         { question: t("faq.q3"), answer: t("faq.a3") },
         { question: t("faq.q4"), answer: t("faq.a4") },
         { question: t("faq.q5"), answer: t("faq.a5") },
+        { question: t("faq.q6"), answer: t("faq.a6") },
     ]
 
     return (
@@ -325,12 +295,12 @@ function CTASection() {
 }
 
 // Main Page
-export default function ExperiencesPage() {
+export default function WorkshopPage() {
     return (
         <main className="min-h-screen bg-off-white">
             <Navigation />
             <PageHero />
-            <ExperienceCards />
+            <ExperienceParts />
             <WhatsIncluded />
             <FAQSection />
             <CTASection />

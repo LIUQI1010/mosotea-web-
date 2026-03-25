@@ -24,7 +24,7 @@ export function Footer() {
                             <Link href="/" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                                 {tNav("home")}
                             </Link>
-                            <Link href="/experiences" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                            <Link href="/workshop" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                                 {tNav("experiences")}
                             </Link>
                             <Link href="/about" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
@@ -44,7 +44,6 @@ export function Footer() {
                             <p>{t("address2")}</p>
                             <p>{t("address3")}</p>
                             <p className="mt-2">{t("email")}</p>
-                            <p>{t("phone")}</p>
                         </div>
                     </div>
                 </div>

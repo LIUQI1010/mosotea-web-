@@ -16,7 +16,16 @@
       "Bash(mv tea-image-50.jpg experience-matcha.jpg)",
       "Bash(mv tea-image-45.jpg experience-garden.jpg)",
       "Bash(mv tea-image-7-2048x1335.jpg about-story.jpg)",
-      "Bash(mv 1-Norlha_Clothing-brands.jpg about-founder.jpg)"
+      "Bash(mv 1-Norlha_Clothing-brands.jpg about-founder.jpg)",
+      "Bash(wc -l d:/MyProjects/mosotea-web-/messages/*.json)",
+      "Bash(grep -r booking /d/MyProjects/mosotea-web-/src/app/api --include=*.ts)",
+      "Bash(grep -n \"handleSubmit\\\\|submit\\\\|POST\\\\|fetch\" /d/MyProjects/mosotea-web-/src/app/[locale]/\\\\\\(public\\\\\\)/book/page.tsx)",
+      "Bash(grep -l \"book\\\\|booking\" /d/MyProjects/mosotea-web-/messages/*.json)",
+      "Bash(node -e \":*)",
+      "Bash(curl -s \"https://rwimtiyhiwhwqpvgpovs.supabase.co/rest/v1/services?select=*\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\")",
+      "Bash(curl -s \"https://rwimtiyhiwhwqpvgpovs.supabase.co/rest/v1/time_slots?select=*\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\")",
+      "Bash(curl -s \"https://rwimtiyhiwhwqpvgpovs.supabase.co/rest/v1/bookings?select=*\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\")",
+      "Bash(curl -s \"https://rwimtiyhiwhwqpvgpovs.supabase.co/rest/v1/\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3aW10aXloaXdod3Fwdmdwb3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDIxNTc4MSwiZXhwIjoyMDg5NzkxNzgxfQ.W0PMIUDI89FE0VPfR79uDo7f6atEhgZSrZvW55-EZSw\")"
     ]
   }
 }

@@ -1,7 +1,7 @@
 {
   "navigation": {
     "home": "首頁",
-    "experiences": "體驗",
+    "experiences": "工作坊",
     "about": "關於我們",
     "contact": "聯絡我們",
     "bookNow": "立即預約"
@@ -14,7 +14,6 @@
     "address2": "Lower Hutt, Wellington 5373",
     "address3": "New Zealand",
     "email": "hello@mosotea.co.nz",
-    "phone": "+64 27 489 2131",
     "copyright": "© {year} Moso Tea. 版權所有。",
     "privacy": "隱私政策",
     "terms": "服務條款"
@@ -29,37 +28,27 @@
     "intro": {
       "title": "為什麼選擇 Moso Tea",
       "description": "我們將古老的茶道藝術帶到紐西蘭，在精心策劃的空間中創造寧靜與連結的時刻。",
-      "feature1Title": "正宗體驗",
-      "feature1TitleZh": "Authentic Experience",
-      "feature1Description": "由受過古典技藝訓練的認證茶藝師引導的傳統茶道。",
-      "feature2Title": "私密小組",
-      "feature2TitleZh": "Small Intimate Groups",
-      "feature2Description": "每場最多8位賓客，確保個人化關注和有意義的交流。",
-      "feature3Title": "威靈頓花園",
-      "feature3TitleZh": "Wellington Garden Setting",
-      "feature3Description": "我們寧靜的花園空間為您提供遠離喧囂城市生活的寧靜港灣。"
+      "feature1Title": "茶文化",
+      "feature1Description": "植根於數百年的傳統，我們將茶道的藝術與哲學帶入生活——每一杯，都是一次正念的相遇。",
+      "feature2Title": "茶空間",
+      "feature2Description": "隱於 Wainuiomata 的山丘之間，我們的農場工作室是一個讓時間放慢、讓世界悄然退遠的地方。",
+      "feature3Title": "茶體驗",
+      "feature3Description": "從第一縷茶香到最後一口回甘，每一場體驗都是從容的、私密的，也是屬於你自己的。"
     },
     "experiences": {
       "title": "我們的體驗",
-      "titleZh": "Our Experiences",
-      "classic": {
-        "title": "經典茶道",
-        "titleZh": "Classic Tea Ceremony",
-        "duration": "90 分鐘",
-        "description": "全面介紹茶道藝術，包括傳統沖泡技術和品茶鑑賞。"
+      "subtitle": "一段從容的茶世界之旅——有引導、有參與，屬於你自己。",
+      "teaJourney": {
+        "title": "茶道導覽",
+        "description": "由主人引導，了解茶的故事——茶文化、茶樹，以及泡茶的藝術。"
       },
-      "matcha": {
-        "title": "抹茶冥想",
-        "titleZh": "Matcha Meditation",
-        "duration": "60 分鐘",
-        "description": "將正念冥想與日本抹茶的儀式性製作相結合。"
+      "handsOn": {
+        "title": "親手體驗",
+        "description": "採茶、製茶、泡茶、分享——親手走完一片茶葉的完整旅程。"
       },
-      "private": {
-        "title": "私人花園體驗",
-        "titleZh": "Private Garden Session",
-        "duration": "2 小時",
-        "description": "在我們私人花園涼亭中為最多4位賓客提供的專屬茶道體驗。"
-      }
+      "stats": "90 分鐘  ·  最多 8 位賓客  ·  NZD $75 / 人",
+      "learnMore": "了解更多",
+      "bookNow": "立即預約"
     },
     "testimonials": {
       "title": "賓客感言",
@@ -82,10 +71,10 @@
     },
     "story": {
       "title": "茶的旅程",
-      "p1": "Moso Tea 源自對茶道藝術簡單而深刻的熱愛。自2021年成立以來，我們的工作室已成為那些在威靈頓尋求片刻寧靜的人們的避風港。",
-      "p2": "「Moso」之名來自毛竹，以其非凡的耐心和生長而聞名。正如竹子在壯觀的破土而出之前花費數年發展強壯的根系，我們相信靜默修養和正念存在的力量。",
-      "p3": "從一個小型茶葉愛好者聚會開始，已發展成為一個深受喜愛的社區空間，來自各行各業的人們在這裡共同體驗茶文化的冥想之美。",
-      "p4": "我們位於Wainuiomata的生活農場工作室，提供了一個難得的機會，讓您暫別日常，沉浸在這個慶祝泡茶和分享茶的簡單行為的古老傳統中。"
+      "p1": "Moso Tea 誕生於對茶道藝術簡單而深刻的熱愛。我們的工作室於2021年創立，坐落在威靈頓的 Wainuiomata，成為了那些尋求片刻寧靜之人的心靈歸所。",
+      "p2": "「Moso」這個名字，藏著兩層安靜的含義。在台灣話裡，moso 是「慢」的意思——一份邀請，邀請你放慢腳步，呼吸，回到當下。它同時也是孟宗竹的名字，一種我們深深欣賞的植物。我們喜愛它，不是因為它驚人的爆發，而是它的沉靜與堅韌。竹子在四季中靜靜佇立，紮根大地，從不急躁。我們的茶樹，也是在一個偶然的機緣下與竹子一同來到我們的生活——一份意外的禮物，悄悄改變了一切。",
+      "p3": "從最初一小群茶愛好者的聚會，這裡逐漸成為了一個溫暖的空間，讓來自各地的人們相聚，共同感受茶文化那份靜謐的美好。",
+      "p4": "我們位於 Wainuiomata 的生活農場工作室，提供了一個難得的機會，讓你從日常的節奏中抽身，沉浸在這門古老的傳統之中——一份關於慢慢泡茶、靜靜分享的藝術。"
     },
     "philosophy": {
       "quote": "在泡茶的簡單動作中，我們找到了通往當下的道路。每一杯茶都是一份邀請，讓我們放慢腳步，深呼吸，與當下連結。",
@@ -97,9 +86,9 @@
       "item1Title": "專家引導",
       "item1TitleZh": "Guided by an Expert",
       "item1Description": "我們的認證茶藝師為每次課程帶來多年的訓練和深厚的文化知識。",
-      "item2Title": "私密環境",
-      "item2TitleZh": "Intimate Setting",
-      "item2Description": "最多8位賓客確保個人化、從容不迫的體驗和有意義的互動。",
+      "item2Title": "安靜環境",
+      "item2TitleZh": "Tranquil Setting",
+      "item2Description": "一個安靜、平和的空間，讓你放慢腳步，專注當下，享受一場從容不迫的茶體驗。",
       "item3Title": "提供所有材料",
       "item3TitleZh": "All Materials Provided",
       "item3Description": "每次體驗都包含優質茶葉、傳統器具和精緻茶點。",
@@ -108,12 +97,22 @@
       "item4Description": "我們的課程旨在給您充足的時間，充分吸收和欣賞每一個時刻。"
     },
     "host": {
-      "name": "陳美琳",
-      "role": "創始人兼茶藝師",
-      "p1": "美琳的茶道之旅始於她在台灣祖母的廚房，在那裡她學到茶不僅僅是一種飲料——它是一種生活方式。",
-      "p2": "在中國功夫茶和日本茶道兩種傳統中訓練了五年之後，她帶著與新觀眾分享這門古老藝術的夢想移居紐西蘭。",
-      "p3": "不主持茶道時，美琳會照料Moso Tea的花園，練習書法，並通過持續的學習和旅行深化她對茶文化的理解。",
-      "quote": "我最大的快樂是看到賓客發現茶能帶來的寧靜。每一次茶道都是我榮幸分享的禮物。"
+      "title": "Moso Tea 背後的人們",
+      "founder1": {
+        "name": "Joyce Peng",
+        "role": "共同創辦人",
+        "description": "Joyce 是每一場茶道儀式的靈魂。來自台灣的她，將一生對茶文化的熱愛帶入每一次體驗——她的溫暖與細心引導，讓每位賓客從第一杯茶起，便感到賓至如歸。"
+      },
+      "founder2": {
+        "name": "Jenson Lin",
+        "role": "共同創辦人",
+        "description": "Jenson 照料茶園，也掌管每一片茶葉的製作。他對土地與工藝的默默投入，是 Moso Tea 得以紮根的力量——字面意義上，也是精神意義上。"
+      },
+      "founder3": {
+        "name": "Liyin Lin",
+        "role": "共同創辦人",
+        "description": "Liyin 從小在茶香中長大。如今她用自己的語言將這個世界分享給每一位賓客，搭起文化之間的橋梁，讓茶道的藝術變得親切、生動而真實。"
+      }
     },
     "gallery": {
       "title": "我們的空間",
@@ -128,71 +127,58 @@
   },
   "experiences": {
     "hero": {
-      "title": "我們的體驗",
-      "titleZh": "Our Experiences",
-      "description": "Moso Tea 的每一次體驗都旨在引導您進入一種當下和感恩的狀態。無論您尋求放鬆、學習還是連結，這裡都有適合您的茶道旅程。"
+      "title": "茶道工作坊",
+      "description": "一場體驗，兩個篇章，一段完整的茶世界之旅。"
     },
-    "classic": {
-      "title": "經典茶道",
-      "titleZh": "Classic Tea Ceremony",
-      "description": "沉浸在永恆的傳統茶道藝術中。學習優雅的動作、正確的技術，以及茶道每一步背後的哲學。這個基礎體驗適合初學者和茶道愛好者。",
-      "duration": "90 分鐘",
-      "groupSize": "1-6 位賓客"
+    "part01": "第一篇章",
+    "part02": "第二篇章",
+    "teaJourney": {
+      "title": "茶道導覽",
+      "items": {
+        "1": "茶文化的故事與哲學",
+        "2": "認識茶樹——品種、季節與風土",
+        "3": "泡茶的藝術——水溫、時機與手法"
+      }
     },
-    "matcha": {
-      "title": "抹茶冥想",
-      "titleZh": "Matcha Meditation",
-      "description": "將冥想的沉思練習與日本抹茶的儀式性製作相結合。從引導呼吸練習開始，然後在平靜的覺知狀態中用心地準備和品嚐鮮綠的抹茶。",
-      "duration": "60 分鐘",
-      "groupSize": "1-4 位賓客"
+    "handsOn": {
+      "title": "親手體驗",
+      "items": {
+        "1": "漫步茶園，親手採摘新鮮茶葉",
+        "2": "學習從零開始的傳統製茶工序",
+        "3": "親手沖泡並品嚐自己製作的茶",
+        "4": "與同伴共享最後的茶道儀式"
+      }
     },
-    "private": {
-      "title": "私人花園體驗",
-      "titleZh": "Private Garden Session",
-      "description": "在我們私人花園涼亭中的專屬茶道體驗。適合生日、紀念日、團隊聚會或任何特殊慶典。包括精選優質茶葉和季節性點心。",
-      "duration": "2 小時",
-      "groupSize": "2-4 位賓客"
-    },
-    "bookButton": "預約此體驗",
-    "from": "起",
-    "perPerson": "/ 每人",
+    "stats": "90 分鐘  ·  最多 8 位賓客  ·  NZD $75 / 人",
+    "bookNow": "立即預約",
     "included": {
       "title": "每次體驗包含",
-      "titleZh": "What's Included",
-      "item1Title": "精選茶葉",
-      "item1TitleZh": "Premium Tea Selection",
-      "item1Description": "從著名茶區精心挑選的高品質散葉茶。",
-      "item2Title": "器具齊備",
-      "item2TitleZh": "All Materials Provided",
-      "item2Description": "傳統茶具、器皿和茶道體驗所需的所有材料。",
-      "item3Title": "專業指導",
-      "item3TitleZh": "Expert Guidance",
-      "item3Description": "我們經驗豐富的茶藝師在整個課程中提供個人指導。",
-      "item4Title": "時令點心",
-      "item4TitleZh": "Seasonal Treats",
-      "item4Description": "精心製作的甜點，隨季節變化，與您的茶相得益彰。"
+      "item1Title": "專業引導",
+      "item1Description": "由主人引導每一步，分享多年實踐積累的知識。",
+      "item2Title": "茶樹體驗",
+      "item2Description": "走入我們的茶園，學會辨葉，親手採摘。",
+      "item3Title": "製茶之旅",
+      "item3Description": "將你親採的鮮葉製成成品茶——循傳統之道，由你親手完成。",
+      "item4Title": "器具齊備",
+      "item4Description": "茶道體驗所需的一切器具都已為你備好。"
     },
     "faq": {
       "title": "常見問題",
-      "titleZh": "Common Questions",
       "q1": "需要有茶道經驗嗎？",
-      "q1Zh": "Do I need any prior experience?",
-      "a1": "完全不需要！我們的體驗適合所有程度，從完全的初學者到經驗豐富的茶道愛好者。我們的茶藝師會引導您完成每一步，確保您在整個過程中感到舒適和投入。",
+      "a1": "完全不需要！我們的體驗適合所有程度，從完全的初學者到經驗豐富的茶道愛好者。主人會引導您完成每一步，確保您在整個過程中感到舒適和投入。",
       "q2": "參加茶道應該穿什麼？",
-      "q2Zh": "What should I wear?",
-      "a2": "我們建議穿著舒適、端莊的素色衣物。您將坐在地板上的坐墊上，所以寬鬆的褲子或長裙比較合適。進入茶室時請脫鞋。",
+      "a2": "我們建議穿著舒適、端莊的素色衣物。您將坐在地板上的坐墊上，所以寬鬆的褲子或長裙比較合適。進入茶室時請脫鞋。由於我們的體驗包含在茶園中漫步，我們也建議穿著舒適的包頭鞋，適合在戶外輕鬆行走。",
       "q3": "可以預約特殊場合嗎？",
-      "q3Zh": "Can I book for a special occasion?",
-      "a3": "當然可以！我們的私人花園體驗非常適合生日、紀念日、團隊聚會或任何特殊慶典。請聯絡我們討論客製化安排，包括延長課程或餐飲選項。",
+      "a3": "當然可以！我們的工作坊非常適合生日、紀念日、團隊聚會或任何特殊慶典。請聯絡我們討論客製化安排。",
       "q4": "場地是否方便輪椅進出？",
-      "q4Zh": "Is the space wheelchair accessible?",
       "a4": "我們的主茶室可通過地面入口進入。我們也可以為可能難以坐在地板上的賓客安排座椅。預約時請告知我們您的需求。",
       "q5": "取消政策是什麼？",
-      "q5Zh": "What is your cancellation policy?",
-      "a5": "在預定課程前至少48小時取消可獲全額退款。48小時內取消可視情況改期。如果您對預約有任何疑問，請聯絡我們。"
+      "a5": "在預定課程前至少24小時取消可獲全額退款。24小時內取消可視情況改期。如果您對預約有任何疑問，請聯絡我們。",
+      "q6": "請問需要避免噴香水嗎？",
+      "a6": "是的，我們誠摯地請求所有賓客避免噴香水或使用氣味濃烈的香氛產品。茶葉細緻的香氣是體驗的核心，濃烈的香味可能會影響大家的感受。"
     },
-    "ctaTitle": "不確定選擇哪個體驗？",
-    "ctaDescription": "我們很樂意幫助您找到完美的茶道旅程。請聯繫我們，我們將根據您的興趣、團體大小和場合為您推薦。",
+    "ctaTitle": "準備好開始你的茶道之旅了嗎？",
+    "ctaDescription": "加入我們這場難忘的工作坊，讓茶文化在你手中鮮活起來。預約你的場次，發現等待你的那份寧靜。",
     "ctaButton": "聯絡我們"
   },
   "contact": {
@@ -208,7 +194,7 @@
       "email": "電郵",
       "phone": "電話",
       "hours": "營業時間",
-      "hours1": "每天：上午 9:00 - 下午 4:00",
+      "hours1": "每天：上午 10:00 - 11:30 & 下午 2:00 - 3:30",
       "findUs": "尋找我們"
     },
     "form": {
@@ -241,21 +227,11 @@
   "book": {
     "hero": {
       "title": "預約體驗",
-      "titleZh": "Book an Experience",
-      "description": "選擇您喜歡的體驗、日期和時間。我們將在 24 小時內確認您的預約。"
+      "description": "一場體驗。預留你的位置，其餘的交給我們。"
     },
     "steps": {
-      "experience": "選擇體驗",
-      "experienceZh": "Experience",
       "dateTime": "日期時間",
-      "dateTimeZh": "Date & Time",
-      "details": "個人資料",
-      "detailsZh": "Your Details"
-    },
-    "step1": {
-      "title": "選擇您想要的體驗",
-      "description": "選擇適合您的茶道體驗。",
-      "error": "請選擇一個體驗"
+      "details": "個人資料"
     },
     "step2": {
       "title": "選擇日期和時間",
@@ -263,62 +239,63 @@
       "selectDate": "選擇日期",
       "selectTime": "選擇時間",
       "errorDate": "請選擇日期",
-      "errorTime": "請選擇時間"
+      "errorTime": "請選擇時間",
+      "selectDateFirst": "請先選擇日期以查看可用時段"
     },
     "step3": {
       "title": "填寫您的資料",
       "description": "請告訴我們一些關於您的資訊，以便我們為您的到訪做好準備。",
       "fullName": "姓名",
-      "fullNameZh": "Full Name",
       "fullNamePlaceholder": "請輸入您的全名",
       "email": "電郵地址",
-      "emailZh": "Email Address",
       "emailPlaceholder": "you@example.com",
       "phone": "電話號碼",
-      "phoneZh": "Phone Number",
       "phonePlaceholder": "+64 21 123 4567",
       "guests": "人數",
-      "guestsZh": "Number of Guests",
+      "guestsMax": "（最多 8 人）",
       "specialRequests": "特別要求",
-      "specialRequestsZh": "Special Requests (optional)",
       "specialRequestsPlaceholder": "任何飲食需求、無障礙需求或特殊場合...",
       "language": "語言偏好",
-      "languageZh": "Preferred Language",
       "errorName": "請輸入您的姓名",
       "errorEmail": "請輸入您的電郵",
       "errorEmailInvalid": "請輸入有效的電郵地址",
       "errorPhone": "請輸入您的電話號碼",
-      "errorGuests": "請輸入 1-6 位賓客"
+      "errorGuests": "請輸入 1-8 位賓客"
     },
     "summary": {
       "title": "預約摘要",
       "experience": "體驗",
+      "workshopName": "茶道工作坊",
       "date": "日期",
       "time": "時間",
       "guests": "人數",
+      "price": "價格",
       "total": "總計"
     },
     "back": "返回",
     "continue": "繼續",
     "confirm": "確認預約",
-    "confirmZh": "Confirm Booking",
+    "submitting": "提交中...",
+    "error": {
+      "title": "出現了問題",
+      "description": "我們無法處理您的預約請求。請重試或直接聯繫我們。",
+      "retry": "重試",
+      "contact": "聯繫我們",
+      "network": "無法連接伺服器，請檢查網路連線後重試。",
+      "unknown": "發生了未知錯誤，請稍後重試。"
+    },
     "success": {
       "title": "預約請求已收到",
-      "titleZh": "Booking Request Received",
       "description": "感謝您的預約請求。我們將審核您的請求並在 24 小時內發送確認電郵。",
       "returnHome": "返回首頁"
     },
     "whatNext": {
       "title": "接下來的流程",
-      "titleZh": "What Happens Next",
       "step1Title": "提交預約",
-      "step1TitleZh": "Submit Your Request",
-      "step1Description": "填寫您喜歡的體驗、日期和聯絡資料。",
+      "step1Description": "填寫您喜歡的日期和聯絡資料。",
       "step2Title": "收到確認",
-      "step2TitleZh": "Receive Confirmation",
       "step2Description": "我們將審核您的請求並在 24 小時內發送確認電郵。",
       "step3Title": "準備參加",
-      "step3TitleZh": "Prepare for Your Visit",
       "step3Description": "您將在課程前收到詳細的說明和注意事項。"
     }
   }
