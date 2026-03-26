@@ -252,7 +252,7 @@
       "phone": "Phone Number",
       "phonePlaceholder": "+64 21 123 4567",
       "guests": "Number of Guests",
-      "guestsMax": "(max 8)",
+      "guestsMax": "(max {max})",
       "specialRequests": "Special Requests",
       "specialRequestsPlaceholder": "Any dietary requirements, accessibility needs, or special occasions...",
       "language": "Preferred Language",
@@ -298,5 +298,31 @@
       "step3Title": "Prepare for Your Visit",
       "step3Description": "You'll receive detailed instructions and what to expect before your session."
     }
+  },
+  "cancel": {
+    "title": "Cancel Booking",
+    "loading": "Loading booking details...",
+    "bookingDetails": "Booking Details",
+    "experience": "Experience",
+    "workshopName": "The Workshop",
+    "dateTime": "Date & Time",
+    "guests": "Guests",
+    "confirmTitle": "Are you sure?",
+    "confirmDescription": "This action cannot be undone. Your booking will be permanently cancelled.",
+    "confirmButton": "Yes, Cancel My Booking",
+    "keepButton": "Keep My Booking",
+    "cancelling": "Cancelling...",
+    "successTitle": "Booking Cancelled",
+    "successDescription": "Your booking has been successfully cancelled. You will receive a confirmation email shortly.",
+    "successRebook": "Book a New Experience",
+    "returnHome": "Return Home",
+    "errorInvalid": "This cancellation link is invalid or has expired.",
+    "errorAlreadyCancelled": "This booking has already been cancelled.",
+    "errorExpired": "This cancellation link has expired.",
+    "errorTooLate": "Cancellations must be made at least 24 hours before the session.",
+    "errorTooLateDescription": "Please contact us directly to discuss your booking.",
+    "contactUs": "Contact Us",
+    "contactEmail": "Email: hello@mosotea.co.nz",
+    "errorGeneral": "Something went wrong. Please try again or contact us directly."
   }
 }

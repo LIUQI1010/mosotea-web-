@@ -19,10 +19,60 @@ function formatDateTime(isoString: string, locale: string): string {
         day: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
+        timeZone: 'Pacific/Auckland',
     })
 }
 
-// 发给客户的预约确认邮件
+// 发给客户的预约收到邮件（客户提交后，状态为pending）
+export async function sendBookingReceived(
+    booking: BookingWithTimeSlot,
+    cancellationUrl: string
+) {
+    const isZh = booking.preferred_language === 'zh-TW'
+    const dateStr = formatDateTime(booking.time_slot.start_time, booking.preferred_language)
+
+    await getResendClient().emails.send({
+        from: FROM_EMAIL,
+        to: booking.email,
+        subject: isZh ? '預約已收到 — Moso Tea' : 'Booking Received — Moso Tea',
+        html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
+        <h1 style="color: #7C5C3E;">${isZh ? '預約已收到' : 'Booking Received'}</h1>
+        <p>${isZh ? '親愛的' : 'Dear'} ${booking.customer_name},</p>
+        <p>${isZh ? '感謝您的預約！我們已收到您的預約，正在為您確認中。以下是您的預約詳情：' : 'Thank you for your booking! We have received your request and will confirm it shortly. Here are your details:'}</p>
+
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '體驗' : 'Experience'}</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${isZh ? '茶道工作坊' : 'The Workshop'}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '日期時間' : 'Date & Time'}</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${dateStr}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '賓客人數' : 'Guests'}</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.guest_count}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>${isZh ? '總價' : 'Total'}</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">NZ$${booking.guest_count * 75}</td>
+          </tr>
+        </table>
+
+        <p style="color: #6B6B6B; font-size: 14px;">
+          ${isZh ? '如需取消預約，請點擊以下連結（預約時間前24小時截止）：' : 'To cancel your booking (at least 24 hours before your session):'}
+        </p>
+        <a href="${cancellationUrl}" style="color: #7C5C3E;">${isZh ? '取消預約' : 'Cancel Booking'}</a>
+
+        <p style="margin-top: 30px;">${isZh ? '期待與您相見！' : 'We look forward to seeing you!'}</p>
+        <p>Moso Tea</p>
+      </div>
+    `,
+    })
+}
+
+// 发给客户的预约确认邮件（管理员确认后）
 export async function sendBookingConfirmation(
     booking: BookingWithTimeSlot,
     cancellationUrl: string
@@ -32,13 +82,13 @@ export async function sendBookingConfirmation(
 
     await getResendClient().emails.send({
         from: FROM_EMAIL,
-        to: booking.customer_email,
-        subject: isZh ? '預約確認 — Moso Tea' : 'Booking Confirmation — Moso Tea',
+        to: booking.email,
+        subject: isZh ? '預約已確認 — Moso Tea' : 'Booking Confirmed — Moso Tea',
         html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
-        <h1 style="color: #7C5C3E;">${isZh ? '預約確認' : 'Booking Confirmed'}</h1>
+        <h1 style="color: #7C5C3E;">${isZh ? '預約已確認' : 'Booking Confirmed'}</h1>
         <p>${isZh ? '親愛的' : 'Dear'} ${booking.customer_name},</p>
-        <p>${isZh ? '感謝您的預約！以下是您的預約詳情：' : 'Thank you for your booking! Here are your details:'}</p>
+        <p>${isZh ? '您的預約已確認！以下是您的預約詳情：' : 'Your booking has been confirmed! Here are your details:'}</p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
@@ -90,11 +140,11 @@ export async function sendBookingNotification(booking: BookingWithTimeSlot) {
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Email</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.customer_email}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.email}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Phone</strong></td>
-            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.customer_phone}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${booking.phone}</td>
           </tr>
           <tr>
             <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Date & Time</strong></td>
@@ -128,7 +178,7 @@ export async function sendCancellationConfirmation(booking: BookingWithTimeSlot)
 
     await getResendClient().emails.send({
         from: FROM_EMAIL,
-        to: booking.customer_email,
+        to: booking.email,
         subject: isZh ? '預約已取消 — Moso Tea' : 'Booking Cancelled — Moso Tea',
         html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">

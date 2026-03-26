@@ -68,7 +68,9 @@ mosotea-web-/
 │   │   │   ├── time-slots/
 │   │   │   │   └── route.ts        ← GET: available time slots by date
 │   │   │   ├── cancel/
-│   │   │   │   └── route.ts        ← POST: cancel booking via token
+│   │   │   │   ├── route.ts        ← POST: cancel booking via token
+│   │   │   │   └── lookup/
+│   │   │   │       └── route.ts    ← GET: lookup booking details by cancel token
 │   │   │   ├── contact/
 │   │   │   │   └── route.ts        ← POST: contact form submission
 │   │   │   └── admin/              ← (Sprint 3 — not yet implemented)
@@ -195,8 +197,8 @@ create table bookings (
   id uuid primary key default gen_random_uuid(),
   time_slot_id uuid references time_slots(id),
   customer_name text not null,
-  customer_email text not null,
-  customer_phone text not null,
+  email text not null,
+  phone text not null,
   guest_count int not null,
   special_requests text,
   preferred_language text default 'en',
@@ -377,6 +379,29 @@ Submits a new booking request.
 6. Send confirmation email to customer + notification to owner
 7. Emails are non-blocking — booking succeeds even if email fails
 
+### `GET /api/cancel/lookup?token=xxx`
+
+Returns booking details for a cancellation token without performing the cancellation. Used by the cancellation page to display booking info before the user confirms.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "customerName": "string",
+    "guestCount": 1,
+    "startTime": "iso",
+    "status": "pending",
+    "isCancellable": true,
+    "preferredLanguage": "en"
+  }
+}
+```
+
+- Returns `isCancellable: false` when less than 24 hours before session
+- Error codes: `invalid`, `already_cancelled`, `expired`
+- Only exposes non-sensitive data (no email, no phone)
+
 ### `POST /api/cancel`
 
 Cancels a booking via cancellation token.
@@ -553,6 +578,6 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Pre-Sprint | PRD, requirements, client sign-off | ✅ Done |
 | Sprint 0 | Project setup, DB schema, Figma wireframes | ✅ Done |
 | Sprint 1 | Core information pages + i18n | ✅ Done |
-| Sprint 2 | Booking system + cancellation emails | 🔄 In Progress |
-| Sprint 3 | Admin dashboard + self-cancellation | ⏳ Pending |
+| Sprint 2 | Booking system + cancellation emails | ✅ Done |
+| Sprint 3 | Admin dashboard + self-cancellation | 🔄 In Progress |
 | Sprint 4 | Testing, performance, launch | ⏳ Pending |

@@ -16,8 +16,8 @@ export interface Booking {
     id: string
     time_slot_id: string
     customer_name: string
-    customer_email: string
-    customer_phone: string
+    email: string
+    phone: string
     guest_count: number
     special_requests: string | null
     preferred_language: Language

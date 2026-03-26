@@ -158,10 +158,10 @@ Each developer answers:
 | Send confirmation email with cancellation link to customer | Developer 1 | ✅ Done |
 | Send booking notification email to business owner | Developer 1 | ✅ Done |
 | Develop booking success and error pages | Developer 2 | ✅ Done |
-| End-to-end testing with real database | Both | ⏳ Pending — needs time slots seeded in DB |
+| End-to-end testing with real database | Both | ✅ Done |
 
 **Definition of Done:**
-- [x] Complete booking flow works end-to-end (API implemented, pending E2E test with seeded data)
+- [x] Complete booking flow works end-to-end
 - [x] Double-booking of the same time slot is prevented (DB trigger + API capacity check)
 - [x] Customer receives confirmation email with a valid cancellation link
 - [x] Business owner receives booking notification email
@@ -186,7 +186,8 @@ Each developer answers:
 | Build time slot management page (add/remove/toggle slots) | Developer 1 | ⏳ Pending |
 | Implement admin slots API (`GET/POST/DELETE /api/admin/slots`) | Developer 1 | ⏳ Pending |
 | Implement "Generate Next 30 Days" bulk slot creation | Developer 1 | ⏳ Pending |
-| Build customer self-cancellation page (`/cancel/[token]`) | Developer 1 | ⏳ Pending |
+| Build customer self-cancellation page (`/cancel/[token]`) | Developer 1 | ✅ Done |
+| Implement cancellation token lookup API (`GET /api/cancel/lookup`) | Developer 1 | ✅ Done |
 | Responsive design for admin dashboard | Developer 2 | ⏳ Pending |
 | Write admin user guide for client | Developer 2 | ⏳ Pending |
 
