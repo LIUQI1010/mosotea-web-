@@ -258,13 +258,16 @@
       "language": "Preferred Language",
       "errorName": "Please enter your name",
       "errorNameShort": "Name must be at least 2 characters",
+      "errorNameTooLong": "Name must be 30 characters or fewer",
       "errorNameInvalid": "Name may only contain English or Chinese characters",
       "errorEmail": "Please enter your email",
+      "errorEmailTooLong": "Email must be 100 characters or fewer",
       "errorEmailInvalid": "Please enter a valid email address",
       "errorPhone": "Please enter your phone number",
+      "errorPhoneTooLong": "Phone number must be 20 characters or fewer",
       "errorPhoneInvalid": "Please enter a valid phone number",
       "errorGuests": "Please enter 1-8 guests",
-      "errorSpecialRequestsTooLong": "Special requests must be 500 characters or fewer"
+      "errorSpecialRequestsTooLong": "Special requests must be 200 characters or fewer"
     },
     "summary": {
       "title": "Booking Summary",
