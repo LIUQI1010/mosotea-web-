@@ -18,7 +18,7 @@ function HeroSection() {
           alt="Traditional tea ceremony setup with ceramic teapot and cups"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-tea-brown/40 via-tea-brown/50 to-tea-brown/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/15 to-black/20" />
       </div>
 
       {/* Content */}
@@ -187,7 +187,7 @@ function FeaturedExperiences() {
           <div className="bg-off-white rounded-lg overflow-hidden border border-border">
             <div className="aspect-[4/3] overflow-hidden">
               <img
-                src="/images/experience-classic.jpg"
+                src="/images/tea-journey.jpg"
                 alt="Tea Journey"
                 className="w-full h-full object-cover"
               />
@@ -206,7 +206,7 @@ function FeaturedExperiences() {
           <div className="bg-off-white rounded-lg overflow-hidden border border-border">
             <div className="aspect-[4/3] overflow-hidden">
               <img
-                src="/images/experience-garden.jpg"
+                src="/images/hands-on-experience.jpg"
                 alt="Hands-on Experience"
                 className="w-full h-full object-cover"
               />

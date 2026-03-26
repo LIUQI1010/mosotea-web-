@@ -6,11 +6,20 @@ import type { BookingWithTimeSlot } from '@/types'
 
 const bookingSchema = z.object({
     timeSlotId: z.string().uuid('Invalid time slot'),
-    fullName: z.string().min(1, 'Name is required'),
-    email: z.email('Invalid email address'),
-    phone: z.string().min(1, 'Phone number is required'),
+    fullName: z.string().trim().min(2, 'Name must be at least 2 characters').regex(
+        /^[a-zA-Z\u4e00-\u9fff\s\-']+$/,
+        'Name may only contain English or Chinese characters'
+    ),
+    email: z.string().trim().email('Invalid email address'),
+    phone: z.string().trim().min(1, 'Phone number is required').refine(
+        (val) => {
+            const digits = val.replace(/[\s\-().+]/g, '')
+            return /^\d{7,15}$/.test(digits)
+        },
+        { message: 'Invalid phone number' }
+    ),
     guests: z.number().int().min(1).max(8, 'Maximum 8 guests'),
-    specialRequests: z.string().optional().default(''),
+    specialRequests: z.string().max(500, 'Special requests must be 500 characters or fewer').optional().default(''),
     preferredLanguage: z.enum(['en', 'zh']),
 })
 
@@ -32,7 +41,7 @@ export async function POST(request: Request) {
         // 1. Check the time slot exists and has capacity
         const { data: slot, error: slotError } = await supabase
             .from('time_slots')
-            .select('*')
+            .select('id, start_time, end_time, max_guests, booked_guests, is_available, created_at')
             .eq('id', timeSlotId)
             .single()
 
@@ -81,7 +90,7 @@ export async function POST(request: Request) {
                 preferred_language: dbLanguage,
                 status: 'pending',
             })
-            .select()
+            .select('id, preferred_language')
             .single()
 
         if (bookingError) {
@@ -117,11 +126,21 @@ export async function POST(request: Request) {
 
         // 5. Build booking with time slot for email templates
         const bookingWithSlot: BookingWithTimeSlot = {
-            ...booking,
+            id: booking.id,
+            time_slot_id: timeSlotId,
+            customer_name: fullName,
+            email,
+            phone,
+            guest_count: guests,
+            special_requests: specialRequests || null,
             preferred_language: dbLanguage,
+            status: 'pending',
             cancellation_token: cancellationToken,
             cancellation_token_expires_at: tokenExpiresAt,
-            time_slot: slot,
+            cancelled_by: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            time_slot: slot as BookingWithTimeSlot['time_slot'],
         }
 
         // 6. Send emails (non-blocking — don't fail the booking if email fails)

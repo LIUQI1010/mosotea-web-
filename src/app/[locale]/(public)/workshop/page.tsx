@@ -36,7 +36,7 @@ function ExperienceParts() {
                     <div className="bg-card rounded-lg overflow-hidden border border-border">
                         <div className="aspect-[16/9] overflow-hidden">
                             <img
-                                src="/images/experience-classic.jpg"
+                                src="/images/tea-journey.jpg"
                                 alt="Tea Journey"
                                 className="w-full h-full object-cover"
                             />
@@ -67,7 +67,7 @@ function ExperienceParts() {
                     <div className="bg-card rounded-lg overflow-hidden border border-border">
                         <div className="aspect-[16/9] overflow-hidden">
                             <img
-                                src="/images/experience-garden.jpg"
+                                src="/images/hands-on-experience.jpg"
                                 alt="Hands-on Experience"
                                 className="w-full h-full object-cover"
                             />

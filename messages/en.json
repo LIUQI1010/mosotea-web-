@@ -257,10 +257,14 @@
       "specialRequestsPlaceholder": "Any dietary requirements, accessibility needs, or special occasions...",
       "language": "Preferred Language",
       "errorName": "Please enter your name",
+      "errorNameShort": "Name must be at least 2 characters",
+      "errorNameInvalid": "Name may only contain English or Chinese characters",
       "errorEmail": "Please enter your email",
       "errorEmailInvalid": "Please enter a valid email address",
       "errorPhone": "Please enter your phone number",
-      "errorGuests": "Please enter 1-8 guests"
+      "errorPhoneInvalid": "Please enter a valid phone number",
+      "errorGuests": "Please enter 1-8 guests",
+      "errorSpecialRequestsTooLong": "Special requests must be 500 characters or fewer"
     },
     "summary": {
       "title": "Booking Summary",

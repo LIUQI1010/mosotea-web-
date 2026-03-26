@@ -35,7 +35,8 @@ export default async function AdminBookingsPage({
       .select(
         'id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancelled_by, created_at, time_slots!inner(id, start_time, end_time, max_guests, booked_guests)'
       )
-      .order('created_at', { ascending: false }),
+      .order('created_at', { ascending: false })
+      .limit(500),
     supabase
       .from('bookings')
       .select('id', { count: 'exact', head: true })

@@ -37,9 +37,10 @@ export async function GET(request: Request) {
             )
         }
 
-        // Filter out fully booked slots
+        // Filter out fully booked slots and slots starting within 2.5 hours
+        const cutoff = new Date(Date.now() + 2.5 * 60 * 60 * 1000)
         const available = (slots || []).filter(
-            (slot) => slot.booked_guests < slot.max_guests
+            (slot) => slot.booked_guests < slot.max_guests && new Date(slot.start_time) > cutoff
         ).map((slot) => ({
             id: slot.id,
             start_time: slot.start_time,

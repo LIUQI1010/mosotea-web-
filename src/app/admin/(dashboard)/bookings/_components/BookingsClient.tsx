@@ -33,6 +33,11 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 
 const langLabel: Record<string, string> = { en: 'EN', 'zh-TW': '中' }
 
+const statusOrder: Record<string, number> = { pending: 0, confirmed: 1, cancelled: 2 }
+function sortByStatus(a: BookingRow, b: BookingRow): number {
+  return (statusOrder[a.status] ?? 9) - (statusOrder[b.status] ?? 9)
+}
+
 function getBookingNZDate(b: BookingRow): string {
   return new Date(b.time_slots.start_time).toLocaleDateString('en-CA', { timeZone: NZ_TZ })
 }
@@ -342,14 +347,14 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                     </div>
                     {day.isCurrentMonth && day.bookings.length > 0 && (
                       <div className="space-y-0.5">
-                        {day.bookings.slice(0, 3).map((b) => (
+                        {[...day.bookings].sort(sortByStatus).slice(0, 3).map((b) => (
                           <div
                             key={b.id}
-                            className={`truncate rounded px-1 py-0.5 text-[9px] font-medium leading-tight ${
+                            className={`truncate rounded px-1 py-0.5 text-[11px] font-medium leading-tight ${
                               b.status === 'pending'
-                                ? 'bg-tea-brown/15 text-tea-brown'
+                                ? 'bg-tea-brown text-primary-foreground'
                                 : b.status === 'confirmed'
-                                  ? 'bg-bamboo-green/15 text-bamboo-green'
+                                  ? 'bg-bamboo-green/20 text-bamboo-green'
                                   : 'bg-cream text-muted-foreground line-through'
                             }`}
                           >
@@ -369,6 +374,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
 
           {/* Right: Day Detail Sidebar */}
           <div className="w-[300px] shrink-0">
+            <div className="mb-4 h-[38px]" />
             <div
               className="sticky top-8 overflow-hidden rounded-2xl border border-border bg-off-white"
               style={{ maxHeight: 'calc(100vh - 4rem)' }}
@@ -386,7 +392,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
 
                   <div className="flex-1 space-y-4 overflow-y-auto p-4">
                     {(['morning', 'afternoon'] as const).map((session) => {
-                      const sessionBookings = selectedDateBookings.filter((b) => isBookingMorning(b) === (session === 'morning'))
+                      const sessionBookings = selectedDateBookings.filter((b) => isBookingMorning(b) === (session === 'morning')).sort(sortByStatus)
                       if (sessionBookings.length === 0) return null
                       return (
                         <div key={session}>

@@ -97,44 +97,58 @@ const bookingStatusConfig: Record<string, { label: string; className: string }> 
   cancelled: { label: '已取消', className: 'bg-cream text-muted-foreground border border-border' },
 }
 
-const langLabel: Record<string, string> = {
-  en: 'EN',
-  'zh-TW': '中',
+
+// Date string arithmetic helpers to avoid nzNow double-conversion
+function addDays(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10)
+}
+
+function getWeekBounds(todayStr: string): { weekStartStr: string; weekEndStr: string } {
+  const [y, m, d] = todayStr.split('-').map(Number)
+  const date = new Date(Date.UTC(y, m - 1, d))
+  const dow = date.getUTCDay() // 0=Sun
+  const mondayOffset = dow === 0 ? -6 : 1 - dow
+  return {
+    weekStartStr: addDays(todayStr, mondayOffset),
+    weekEndStr: addDays(todayStr, mondayOffset + 6),
+  }
+}
+
+function getMonthBounds(todayStr: string): { monthStartStr: string; monthEndStr: string } {
+  const [y, m] = todayStr.split('-').map(Number)
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate()
+  return {
+    monthStartStr: `${y}-${String(m).padStart(2, '0')}-01`,
+    monthEndStr: `${y}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`,
+  }
+}
+
+// Convert NZ date string to UTC range covering the full NZ day
+// NZ is UTC+12 (NZST) or UTC+13 (NZDT) — use both offsets for safe bounds
+function nzDayToUTCRange(dateStr: string): { start: string; end: string } {
+  return {
+    start: new Date(`${dateStr}T00:00:00+13:00`).toISOString(),
+    end: new Date(`${dateStr}T23:59:59+12:00`).toISOString(),
+  }
 }
 
 export default async function AdminDashboardPage() {
   const supabase = createAdminClient()
-  const now = new Date()
-  const todayStr = toNZDate(now)
+  const todayStr = toNZDate(new Date())
 
-  // Calculate week boundaries (Monday–Sunday) in NZ time
-  const nzNow = new Date(
-    now.toLocaleString('en-US', { timeZone: NZ_TZ })
-  )
-  const dayOfWeek = nzNow.getDay()
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-  const monday = new Date(nzNow)
-  monday.setDate(nzNow.getDate() + mondayOffset)
-  monday.setHours(0, 0, 0, 0)
-  const sunday = new Date(monday)
-  sunday.setDate(monday.getDate() + 6)
-  sunday.setHours(23, 59, 59, 999)
+  // Calculate boundaries using date string arithmetic
+  const { weekStartStr, weekEndStr } = getWeekBounds(todayStr)
+  const { monthStartStr, monthEndStr } = getMonthBounds(todayStr)
+  const future3Str = addDays(todayStr, 3)
 
-  const weekStartStr = toNZDate(monday)
-  const weekEndStr = toNZDate(sunday)
-
-  // Calculate month boundaries in NZ time
-  const monthStart = new Date(nzNow.getFullYear(), nzNow.getMonth(), 1)
-  const monthEnd = new Date(nzNow.getFullYear(), nzNow.getMonth() + 1, 0)
-  monthEnd.setHours(23, 59, 59, 999)
-  const monthStartStr = toNZDate(monthStart)
-  const monthEndStr = toNZDate(monthEnd)
-
-  // Future 3 days boundary
-  const future3 = new Date(nzNow)
-  future3.setDate(nzNow.getDate() + 3)
-  future3.setHours(23, 59, 59, 999)
-  const future3Str = toNZDate(future3)
+  // Convert NZ date ranges to UTC for correct timestamptz queries
+  const todayUTC = nzDayToUTCRange(todayStr)
+  const weekStartUTC = nzDayToUTCRange(weekStartStr)
+  const weekEndUTC = nzDayToUTCRange(weekEndStr)
+  const monthStartUTC = nzDayToUTCRange(monthStartStr)
+  const monthEndUTC = nzDayToUTCRange(monthEndStr)
+  const future3UTC = nzDayToUTCRange(future3Str)
 
   // Run all queries in parallel
   const [
@@ -149,22 +163,22 @@ export default async function AdminDashboardPage() {
       .from('bookings')
       .select('guest_count, time_slots!inner(start_time)')
       .neq('status', 'cancelled')
-      .gte('time_slots.start_time', `${todayStr}T00:00:00`)
-      .lt('time_slots.start_time', `${todayStr}T23:59:59`),
+      .gte('time_slots.start_time', todayUTC.start)
+      .lte('time_slots.start_time', todayUTC.end),
 
     supabase
       .from('bookings')
       .select('guest_count, time_slots!inner(start_time)')
       .neq('status', 'cancelled')
-      .gte('time_slots.start_time', `${weekStartStr}T00:00:00`)
-      .lte('time_slots.start_time', `${weekEndStr}T23:59:59`),
+      .gte('time_slots.start_time', weekStartUTC.start)
+      .lte('time_slots.start_time', weekEndUTC.end),
 
     supabase
       .from('bookings')
       .select('guest_count, time_slots!inner(start_time)')
       .neq('status', 'cancelled')
-      .gte('time_slots.start_time', `${monthStartStr}T00:00:00`)
-      .lte('time_slots.start_time', `${monthEndStr}T23:59:59`),
+      .gte('time_slots.start_time', monthStartUTC.start)
+      .lte('time_slots.start_time', monthEndUTC.end),
 
     supabase
       .from('bookings')
@@ -174,8 +188,8 @@ export default async function AdminDashboardPage() {
     supabase
       .from('time_slots')
       .select('id, start_time, end_time, max_guests, booked_guests, is_available')
-      .gte('start_time', `${todayStr}T00:00:00`)
-      .lte('start_time', `${future3Str}T23:59:59`)
+      .gte('start_time', todayUTC.start)
+      .lte('start_time', future3UTC.end)
       .order('start_time', { ascending: true }),
 
     supabase
@@ -200,53 +214,48 @@ export default async function AdminDashboardPage() {
   const bookings = bookingsResult.data ?? []
 
   const stats = [
-    { label: '今日預約', value: `${todayGuests} 人`, sub: '今天到訪' },
-    { label: '本週預約', value: `${weekGuests} 人`, sub: '本週合計' },
-    { label: '本月收入', value: `$${monthRevenue.toLocaleString()}`, sub: 'NZD' },
-    { label: '待確認',   value: `${pendingCount}`,  sub: '筆預約', urgent: pendingCount > 0 },
+    { label: '今日到訪', value: `${todayGuests} 人` },
+    { label: '本週預約', value: `${weekGuests} 人` },
+    { label: '本月收入', value: `$${monthRevenue.toLocaleString()}` },
+    { label: '待確認',   value: `${pendingCount} 筆`, urgent: pendingCount > 0, href: pendingCount > 0 ? '/admin/bookings?status=pending' : undefined },
   ]
 
   return (
     <div>
       {/* Topbar */}
-      <div className="mb-8 flex items-end justify-between">
-        <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">儀表板</p>
-          <h1 className="font-serif text-4xl font-semibold text-foreground">{formatNZDate(todayStr)}</h1>
-        </div>
-        {pendingCount > 0 && (
-          <Link
-            href="/admin/bookings"
-            className="flex items-center gap-2 rounded-lg bg-tea-brown px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-foreground/20 text-sm leading-none">
-              {pendingCount}
-            </span>
-            待確認預約
-          </Link>
-        )}
+      <div className="mb-8">
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">儀表板</p>
+        <h1 className="font-serif text-4xl font-semibold text-foreground">{formatNZDate(todayStr)}</h1>
       </div>
 
       {/* Stats Grid */}
       <div className="mb-8 grid grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className={`rounded-2xl border p-5 ${
-              stat.urgent
-                ? 'border-tea-brown/30 bg-tea-brown/5'
-                : 'border-border bg-off-white'
-            }`}
-          >
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {stat.label}
-            </p>
-            <p className={`mt-2 text-3xl font-semibold ${stat.urgent ? 'text-tea-brown' : 'text-foreground'}`}>
-              {stat.value}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">{stat.sub}</p>
-          </div>
-        ))}
+        {stats.map((stat) => {
+          const content = (
+            <>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {stat.label}
+              </p>
+              <p className={`mt-2 text-3xl font-semibold ${stat.urgent ? 'text-tea-brown' : 'text-foreground'}`}>
+                {stat.value}
+              </p>
+            </>
+          )
+          const className = `rounded-2xl border p-5 ${
+            stat.urgent
+              ? 'border-tea-brown/30 bg-tea-brown/5'
+              : 'border-border bg-off-white'
+          }`
+
+          if (stat.href) {
+            return (
+              <Link key={stat.label} href={stat.href} className={`${className} transition-colors hover:border-tea-brown/40 hover:bg-tea-brown/10`}>
+                {content}
+              </Link>
+            )
+          }
+          return <div key={stat.label} className={className}>{content}</div>
+        })}
       </div>
 
       {/* Two-column Section */}

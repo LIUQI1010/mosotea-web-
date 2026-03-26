@@ -61,6 +61,11 @@ export async function getBookings(filters: BookingFilters): Promise<BookingRow[]
     query = query.eq('time_slot_id', filters.slotId)
   }
 
+  if (filters.search) {
+    const term = filters.search.replace(/%/g, '\\%')
+    query = query.or(`customer_name.ilike.%${term}%,email.ilike.%${term}%`)
+  }
+
   if (filters.date) {
     // Convert NZ date to UTC range (NZ is +12 NZST or +13 NZDT)
     const dayStartUTC = new Date(`${filters.date}T00:00:00+13:00`).toISOString()
@@ -77,17 +82,7 @@ export async function getBookings(filters: BookingFilters): Promise<BookingRow[]
     return []
   }
 
-  let results = (data ?? []) as unknown as BookingRow[]
-
-  // Client-side search filter (Supabase doesn't support OR ilike across columns easily)
-  if (filters.search) {
-    const term = filters.search.toLowerCase()
-    results = results.filter(
-      (b) =>
-        b.customer_name.toLowerCase().includes(term) ||
-        b.email.toLowerCase().includes(term)
-    )
-  }
+  const results = (data ?? []) as unknown as BookingRow[]
 
   return results
 }
@@ -102,7 +97,7 @@ export async function confirmBooking(
   // Fetch booking + slot
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('*, time_slots(*)')
+    .select('id, time_slot_id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancellation_token, cancellation_token_expires_at, cancelled_by, created_at, updated_at, time_slots(id, start_time, end_time, max_guests, booked_guests, is_available, created_at)')
     .eq('id', bookingId)
     .single()
 
@@ -170,7 +165,7 @@ export async function createBooking(
   // Check slot capacity
   const { data: slot, error: slotError } = await supabase
     .from('time_slots')
-    .select('*')
+    .select('id, start_time, end_time, max_guests, booked_guests, is_available, created_at')
     .eq('id', data.timeSlotId)
     .single()
 
@@ -200,7 +195,7 @@ export async function createBooking(
       preferred_language: data.preferredLanguage,
       status: 'confirmed',
     })
-    .select()
+    .select('id, preferred_language')
     .single()
 
   if (insertError) {
@@ -224,11 +219,21 @@ export async function createBooking(
   if (data.sendEmail) {
     try {
       const bookingWithSlot: BookingWithTimeSlot = {
-        ...booking,
+        id: booking.id,
+        time_slot_id: data.timeSlotId,
+        customer_name: data.customerName,
+        email: data.email,
+        phone: data.phone || '',
+        guest_count: data.guestCount,
+        special_requests: data.specialRequests || null,
         preferred_language: data.preferredLanguage as 'en' | 'zh-TW',
+        status: 'confirmed',
         cancellation_token: cancellationToken,
         cancellation_token_expires_at: slot.start_time,
-        time_slot: slot,
+        cancelled_by: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        time_slot: slot as BookingWithTimeSlot['time_slot'],
       }
 
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -331,7 +336,7 @@ export async function cancelBooking(
 
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('*, time_slots(*)')
+    .select('id, time_slot_id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancellation_token, cancellation_token_expires_at, cancelled_by, created_at, updated_at, time_slots(id, start_time, end_time, max_guests, booked_guests, is_available, created_at)')
     .eq('id', bookingId)
     .single()
 

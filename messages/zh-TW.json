@@ -257,10 +257,14 @@
       "specialRequestsPlaceholder": "任何飲食需求、無障礙需求或特殊場合...",
       "language": "語言偏好",
       "errorName": "請輸入您的姓名",
+      "errorNameShort": "姓名至少需要 2 個字元",
+      "errorNameInvalid": "姓名只能包含中文或英文字元",
       "errorEmail": "請輸入您的電郵",
       "errorEmailInvalid": "請輸入有效的電郵地址",
       "errorPhone": "請輸入您的電話號碼",
-      "errorGuests": "請輸入 1-8 位賓客"
+      "errorPhoneInvalid": "請輸入有效的電話號碼",
+      "errorGuests": "請輸入 1-8 位賓客",
+      "errorSpecialRequestsTooLong": "特別要求不得超過 500 個字元"
     },
     "summary": {
       "title": "預約摘要",

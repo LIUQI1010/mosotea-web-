@@ -158,7 +158,7 @@ function SlotCell({
   return (
     <button
       onClick={() => onSelect(slot, type)}
-      className={`relative h-6 w-full rounded border ${colors.bg} ${colors.border} ${colors.ring} flex items-center gap-0.5 px-1 transition-all hover:opacity-80`}
+      className={`relative h-7 w-full rounded border ${colors.bg} ${colors.border} ${colors.ring} flex items-center gap-0.5 px-1 transition-all hover:opacity-80`}
     >
       <div className="absolute inset-0 overflow-hidden rounded">
         <div className={`h-full ${colors.bar} opacity-20`} style={{ width: `${Math.min(pct, 100)}%` }} />
@@ -168,10 +168,10 @@ function SlotCell({
           <line x1="0" y1="100%" x2="100%" y2="0" stroke="rgba(220,38,38,0.3)" strokeWidth="1.5" />
         </svg>
       )}
-      <span className={`relative z-10 text-[9px] font-medium ${colors.text}`}>
+      <span className={`relative z-10 text-[11px] font-medium ${colors.text}`}>
         {type === 'morning' ? '上午' : '下午'}
       </span>
-      <span className={`relative z-10 ml-auto text-[9px] ${colors.text}`}>
+      <span className={`relative z-10 ml-auto text-[11px] ${colors.text}`}>
         {slot.booked_guests}/{slot.max_guests}
       </span>
     </button>
@@ -499,6 +499,8 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
           </div>
 
           <div className="w-[280px] shrink-0">
+            {/* Spacer to align detail panel top with the month nav row */}
+            <div className="mb-4 h-[38px]" />
             <div className="sticky top-8 overflow-hidden rounded-2xl border border-border bg-off-white" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
               {selectedSlot ? (
                 <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} />
@@ -590,6 +592,8 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
           </div>
 
           <div className="w-[280px] shrink-0">
+            {/* Spacer to align detail panel top with the week label row */}
+            <div className="h-7" />
             <div className="sticky top-8 overflow-hidden rounded-2xl border border-border bg-off-white" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
               {selectedSlot ? (
                 <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} />
