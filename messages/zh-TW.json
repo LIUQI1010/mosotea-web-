@@ -252,7 +252,7 @@
       "phone": "電話號碼",
       "phonePlaceholder": "+64 21 123 4567",
       "guests": "人數",
-      "guestsMax": "（最多 8 人）",
+      "guestsMax": "（最多 {max} 人）",
       "specialRequests": "特別要求",
       "specialRequestsPlaceholder": "任何飲食需求、無障礙需求或特殊場合...",
       "language": "語言偏好",
@@ -298,5 +298,31 @@
       "step3Title": "準備參加",
       "step3Description": "您將在課程前收到詳細的說明和注意事項。"
     }
+  },
+  "cancel": {
+    "title": "取消預約",
+    "loading": "正在載入預約資料...",
+    "bookingDetails": "預約詳情",
+    "experience": "體驗",
+    "workshopName": "茶道工作坊",
+    "dateTime": "日期時間",
+    "guests": "賓客人數",
+    "confirmTitle": "確認取消預約？",
+    "confirmDescription": "取消後無法恢復。",
+    "confirmButton": "確認取消",
+    "keepButton": "返回",
+    "cancelling": "取消中...",
+    "successTitle": "預約已取消",
+    "successDescription": "您的預約已成功取消。您將很快收到確認電郵。",
+    "successRebook": "預約新體驗",
+    "returnHome": "返回首頁",
+    "errorInvalid": "此取消連結無效或已過期。",
+    "errorAlreadyCancelled": "此預約已被取消。",
+    "errorExpired": "此取消連結已過期。",
+    "errorTooLate": "取消必須在體驗開始前至少24小時進行。",
+    "errorTooLateDescription": "請直接聯繫我們討論您的預約。",
+    "contactUs": "聯繫我們",
+    "contactEmail": "電郵：hello@mosotea.co.nz",
+    "errorGeneral": "出現了問題。請重試或直接聯繫我們。"
   }
 }

@@ -58,8 +58,7 @@ mosotea-web-/
 │   │   │   ├── login/
 │   │   │   │   └── page.tsx        ← Admin login (/admin/login)
 │   │   │   ├── bookings/
-│   │   │   │   └── [id]/
-│   │   │   │       └── page.tsx    ← Booking detail (/admin/bookings/[id])
+│   │   │   │   └── page.tsx        ← Booking list with inline edit/confirm/cancel (/admin/bookings)
 │   │   │   └── slots/
 │   │   │       └── page.tsx        ← Time slot management (/admin/slots)
 │   │   ├── api/                    ← API Routes (server-side only)
@@ -68,14 +67,11 @@ mosotea-web-/
 │   │   │   ├── time-slots/
 │   │   │   │   └── route.ts        ← GET: available time slots by date
 │   │   │   ├── cancel/
-│   │   │   │   └── route.ts        ← POST: cancel booking via token
-│   │   │   ├── contact/
-│   │   │   │   └── route.ts        ← POST: contact form submission
-│   │   │   └── admin/              ← (Sprint 3 — not yet implemented)
-│   │   │       ├── bookings/
-│   │   │       │   └── route.ts    ← GET: list bookings, PATCH: confirm/cancel
-│   │   │       └── slots/
-│   │   │           └── route.ts    ← GET/POST/DELETE: manage time slots
+│   │   │   │   ├── route.ts        ← POST: cancel booking via token
+│   │   │   │   └── lookup/
+│   │   │   │       └── route.ts    ← GET: lookup booking details by cancel token
+│   │   │   └── contact/
+│   │   │       └── route.ts        ← POST: contact form submission
 │   │   ├── globals.css             ← Tailwind v4 config + Moso Tea color palette
 │   │   └── layout.tsx              ← Root layout (fonts, metadata)
 │   ├── components/
@@ -195,8 +191,8 @@ create table bookings (
   id uuid primary key default gen_random_uuid(),
   time_slot_id uuid references time_slots(id),
   customer_name text not null,
-  customer_email text not null,
-  customer_phone text not null,
+  email text not null,
+  phone text not null,
   guest_count int not null,
   special_requests text,
   preferred_language text default 'en',
@@ -285,7 +281,8 @@ time_slots ──── bookings
 - Cancellation tokens expire after the booking start time has passed
 - Each token is single-use only
 - When cancelled, `booked_guests` is released via database trigger
-- Both customer and admin receive cancellation notification emails
+- When customer self-cancels: customer receives `sendCancellationConfirmation`, admin receives `sendCancellationNotice`
+- When admin cancels: customer receives `sendCancellationConfirmation` only (admin already knows)
 - `cancelled_by` records the source: `customer` or `admin`
 
 ### Admin Rules
@@ -301,10 +298,11 @@ time_slots ──── bookings
 
 | Function | Recipient | Trigger |
 |---|---|---|
-| `sendBookingConfirmation` | Customer | On booking submission — includes cancellation link |
-| `sendBookingNotification` | Admin/Owner | On booking submission |
-| `sendCancellationConfirmation` | Customer | When customer self-cancels |
-| `sendCancellationNotice` | Admin/Owner | When customer self-cancels |
+| `sendBookingReceived` | Customer | When customer submits booking (status: `pending`) |
+| `sendBookingNotification` | Admin/Owner | When customer submits booking |
+| `sendBookingConfirmation` | Customer | When admin confirms a booking, or admin creates a booking directly (includes cancellation link) |
+| `sendCancellationConfirmation` | Customer | When booking is cancelled — by customer self-cancel or by admin |
+| `sendCancellationNotice` | Admin/Owner | When customer self-cancels only (not sent for admin-initiated cancellations) |
 
 All emails respect `preferred_language` — English or Traditional Chinese (zh-TW).
 
@@ -376,6 +374,29 @@ Submits a new booking request.
 5. Generate HMAC cancellation token, store on booking
 6. Send confirmation email to customer + notification to owner
 7. Emails are non-blocking — booking succeeds even if email fails
+
+### `GET /api/cancel/lookup?token=xxx`
+
+Returns booking details for a cancellation token without performing the cancellation. Used by the cancellation page to display booking info before the user confirms.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "customerName": "string",
+    "guestCount": 1,
+    "startTime": "iso",
+    "status": "pending",
+    "isCancellable": true,
+    "preferredLanguage": "en"
+  }
+}
+```
+
+- Returns `isCancellable: false` when less than 24 hours before session
+- Error codes: `invalid`, `already_cancelled`, `expired`
+- Only exposes non-sensitive data (no email, no phone)
 
 ### `POST /api/cancel`
 
@@ -533,6 +554,46 @@ refactor: extract email templates to separate file
 
 ---
 
+## Known Issues & Cautions
+
+### Database Column Names
+The actual `bookings` table uses `email` and `phone` (not `customer_email` / `customer_phone`). Always verify column names against the live schema before writing Supabase queries — the schema in this file is the source of truth.
+
+### Timezone-Aware Supabase Queries
+When filtering `timestamptz` columns by NZ date, always convert to UTC first. Passing a bare date string like `2026-03-26T00:00:00` is treated as UTC by Supabase, which will miss NZ morning slots stored as the previous UTC day.
+
+```typescript
+// ✅ Correct — covers both NZDT (+13) and NZST (+12)
+const startUTC = new Date(`${dateStr}T00:00:00+13:00`).toISOString()
+const endUTC   = new Date(`${dateStr}T23:59:59+12:00`).toISOString()
+
+// ❌ Wrong — treated as UTC, misses NZ morning slots
+.gte('start_time', `${dateStr}T00:00:00`)
+```
+
+### DST-Aware Slot Generation
+Use `Intl.DateTimeFormat.formatToParts` to get the correct NZ UTC offset per date. Do **not** use `toLocaleString` for offset calculation — it behaves incorrectly on Windows. See `_actions.ts` `getNZOffset()` for the correct implementation.
+
+### setState in useEffect (ESLint Error)
+Calling `setState` inside `useEffect` triggers `react-hooks/set-state-in-effect`. For modals and forms that receive initial data via props, use **lazy state initializers** instead:
+
+```typescript
+// ✅ Correct
+const [name, setName] = useState(() => booking?.customer_name ?? '')
+
+// ❌ Wrong — causes ESLint error
+useEffect(() => { setName(booking.customer_name) }, [booking])
+```
+
+### Email Functions — Trigger Summary
+- `sendBookingReceived` — sent to customer when they submit (status: `pending`). Subject: "Booking Received"
+- `sendBookingNotification` — sent to admin when customer submits. Not sent for admin-created bookings.
+- `sendBookingConfirmation` — sent to customer when admin confirms, or when admin creates a booking directly. Subject: "Booking Confirmed"
+- `sendCancellationConfirmation` — sent to customer on any cancellation (customer or admin initiated)
+- `sendCancellationNotice` — sent to admin only when customer self-cancels. Not sent when admin cancels.
+
+---
+
 ## Design Guidelines
 
 - **Style:** Minimal, natural, East Asian-inspired aesthetic
@@ -553,6 +614,6 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Pre-Sprint | PRD, requirements, client sign-off | ✅ Done |
 | Sprint 0 | Project setup, DB schema, Figma wireframes | ✅ Done |
 | Sprint 1 | Core information pages + i18n | ✅ Done |
-| Sprint 2 | Booking system + cancellation emails | 🔄 In Progress |
-| Sprint 3 | Admin dashboard + self-cancellation | ⏳ Pending |
+| Sprint 2 | Booking system + cancellation emails | ✅ Done |
+| Sprint 3 | Admin dashboard + self-cancellation | 🔄 In Progress |
 | Sprint 4 | Testing, performance, launch | ⏳ Pending |

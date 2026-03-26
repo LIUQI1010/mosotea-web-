@@ -1,7 +1,7 @@
 import { z } from 'zod/v4'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generateCancellationToken } from '@/lib/token'
-import { sendBookingConfirmation, sendBookingNotification } from '@/lib/resend/emails'
+import { sendBookingReceived, sendBookingNotification } from '@/lib/resend/emails'
 import type { BookingWithTimeSlot } from '@/types'
 
 const bookingSchema = z.object({
@@ -74,8 +74,8 @@ export async function POST(request: Request) {
             .insert({
                 time_slot_id: timeSlotId,
                 customer_name: fullName,
-                customer_email: email,
-                customer_phone: phone,
+                email: email,
+                phone: phone,
                 guest_count: guests,
                 special_requests: specialRequests || null,
                 preferred_language: dbLanguage,
@@ -85,6 +85,7 @@ export async function POST(request: Request) {
             .single()
 
         if (bookingError) {
+            console.error('Booking insert error:', bookingError)
             // The trigger may reject if capacity exceeded (race condition safety)
             if (bookingError.message?.includes('capacity') || bookingError.message?.includes('guests')) {
                 return Response.json(
@@ -125,11 +126,12 @@ export async function POST(request: Request) {
 
         // 6. Send emails (non-blocking — don't fail the booking if email fails)
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-        const cancellationUrl = `${appUrl}/cancel/${cancellationToken}`
+        const localePrefix = dbLanguage === 'zh-TW' ? '/zh-TW' : ''
+        const cancellationUrl = `${appUrl}${localePrefix}/cancel/${cancellationToken}`
 
         try {
             await Promise.all([
-                sendBookingConfirmation(bookingWithSlot, cancellationUrl),
+                sendBookingReceived(bookingWithSlot, cancellationUrl),
                 sendBookingNotification(bookingWithSlot),
             ])
         } catch (emailError) {
@@ -140,7 +142,8 @@ export async function POST(request: Request) {
             success: true,
             data: { bookingId: booking.id },
         })
-    } catch {
+    } catch (err) {
+        console.error('Booking route unexpected error:', err)
         return Response.json(
             { success: false, error: 'Internal server error' },
             { status: 500 }

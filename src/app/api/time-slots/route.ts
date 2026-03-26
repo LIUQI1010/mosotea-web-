@@ -16,15 +16,17 @@ export async function GET(request: Request) {
 
         const supabase = createAdminClient()
 
-        // Query time slots for the given date where there is still capacity
-        const startOfDay = `${date}T00:00:00`
-        const endOfDay = `${date}T23:59:59`
+        // Convert NZ date to UTC range
+        // NZ is UTC+12 (NZST) or UTC+13 (NZDT)
+        // Use +12 for start and +13 for end to cover both DST states
+        const startOfDayUTC = new Date(`${date}T00:00:00+13:00`).toISOString() // latest possible start
+        const endOfDayUTC = new Date(`${date}T23:59:59+12:00`).toISOString()   // earliest possible end
 
         const { data: slots, error } = await supabase
             .from('time_slots')
             .select('id, start_time, end_time, max_guests, booked_guests, is_available')
-            .gte('start_time', startOfDay)
-            .lte('start_time', endOfDay)
+            .gte('start_time', startOfDayUTC)
+            .lte('start_time', endOfDayUTC)
             .eq('is_available', true)
             .order('start_time', { ascending: true })
 

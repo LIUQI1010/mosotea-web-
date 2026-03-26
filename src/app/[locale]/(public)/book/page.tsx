@@ -22,6 +22,7 @@ interface BookingFormData {
     date: string
     timeSlotId: string
     timeSlotLabel: string
+    maxGuests: number
     fullName: string
     email: string
     phone: string
@@ -212,16 +213,15 @@ function Calendar({
     )
 }
 
-// Format a time slot's start/end into a readable label
+// Format a time slot's start/end into a readable label (always NZ time)
 function formatSlotLabel(startTime: string, endTime: string): string {
-    const fmt = (iso: string) => {
-        const d = new Date(iso)
-        const h = d.getHours()
-        const m = d.getMinutes()
-        const ampm = h >= 12 ? "PM" : "AM"
-        const h12 = h % 12 || 12
-        return `${h12}:${String(m).padStart(2, "0")} ${ampm}`
-    }
+    const fmt = (iso: string) =>
+        new Date(iso).toLocaleTimeString("en-NZ", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "Pacific/Auckland",
+        })
     return `${fmt(startTime)} - ${fmt(endTime)}`
 }
 
@@ -236,7 +236,7 @@ function DateTimeSelection({
     selectedDate: string
     selectedSlotId: string
     onDateSelect: (date: string) => void
-    onSlotSelect: (slotId: string, label: string) => void
+    onSlotSelect: (slotId: string, label: string, remaining: number) => void
     errors: FormErrors
 }) {
     const t = useTranslations("book")
@@ -301,7 +301,7 @@ function DateTimeSelection({
                                     return (
                                         <button
                                             key={slot.id}
-                                            onClick={() => onSlotSelect(slot.id, label)}
+                                            onClick={() => onSlotSelect(slot.id, label, slot.remaining)}
                                             className={`py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${selectedSlotId === slot.id
                                                     ? "border-tea-brown bg-tea-brown text-primary-foreground"
                                                     : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
@@ -464,9 +464,9 @@ function PersonalDetails({
                         <button
                             type="button"
                             onClick={() => {
-                                if (formData.guests < 8) onFieldChange("guests", formData.guests + 1)
+                                if (formData.guests < formData.maxGuests) onFieldChange("guests", formData.guests + 1)
                             }}
-                            disabled={formData.guests >= 8}
+                            disabled={formData.guests >= formData.maxGuests}
                             className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 8
                                     ? "border-border text-muted-foreground/40 cursor-not-allowed"
                                     : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
@@ -475,7 +475,7 @@ function PersonalDetails({
                             +
                         </button>
                         <span className="text-sm text-muted-foreground ml-1">
-                            {t("step3.guestsMax")}
+                            {t("step3.guestsMax", { max: formData.maxGuests })}
                         </span>
                     </div>
                     {errors.guests && (
@@ -558,6 +558,7 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
                                 day: "numeric",
                                 month: "short",
                                 year: "numeric",
+                                timeZone: "Pacific/Auckland",
                             })}
                         </span>
                     </div>
@@ -662,6 +663,7 @@ function BookingForm() {
         date: "",
         timeSlotId: "",
         timeSlotLabel: "",
+        maxGuests: 8,
         fullName: "",
         email: "",
         phone: "",
@@ -695,7 +697,7 @@ function BookingForm() {
             if (!formData.phone.trim()) {
                 newErrors.phone = t("step3.errorPhone")
             }
-            if (formData.guests < 1 || formData.guests > 8) {
+            if (formData.guests < 1 || formData.guests > formData.maxGuests) {
                 newErrors.guests = t("step3.errorGuests")
             }
         }
@@ -781,10 +783,16 @@ function BookingForm() {
                             onDateSelect={(date) => {
                                 handleFieldChange("date", date)
                                 // Reset time slot when date changes
-                                setFormData((prev) => ({ ...prev, date, timeSlotId: "", timeSlotLabel: "" }))
+                                setFormData((prev) => ({ ...prev, date, timeSlotId: "", timeSlotLabel: "", maxGuests: 8 }))
                             }}
-                            onSlotSelect={(slotId, label) => {
-                                setFormData((prev) => ({ ...prev, timeSlotId: slotId, timeSlotLabel: label }))
+                            onSlotSelect={(slotId, label, remaining) => {
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    timeSlotId: slotId,
+                                    timeSlotLabel: label,
+                                    maxGuests: remaining,
+                                    guests: Math.min(prev.guests, remaining),
+                                }))
                                 if (errors.timeSlot) {
                                     setErrors((prev) => ({ ...prev, timeSlot: undefined }))
                                 }

@@ -158,10 +158,10 @@ Each developer answers:
 | Send confirmation email with cancellation link to customer | Developer 1 | ✅ Done |
 | Send booking notification email to business owner | Developer 1 | ✅ Done |
 | Develop booking success and error pages | Developer 2 | ✅ Done |
-| End-to-end testing with real database | Both | ⏳ Pending — needs time slots seeded in DB |
+| End-to-end testing with real database | Both | ✅ Done |
 
 **Definition of Done:**
-- [x] Complete booking flow works end-to-end (API implemented, pending E2E test with seeded data)
+- [x] Complete booking flow works end-to-end
 - [x] Double-booking of the same time slot is prevented (DB trigger + API capacity check)
 - [x] Customer receives confirmation email with a valid cancellation link
 - [x] Business owner receives booking notification email
@@ -176,27 +176,29 @@ Each developer answers:
 
 | Task | Owner | Status |
 |---|---|---|
-| Set up Supabase Auth for admin login | Developer 1 | ⏳ Pending |
-| Build admin login page with protected route middleware | Developer 1 | ⏳ Pending |
-| Develop booking list page (view all bookings) | Developer 2 | ⏳ Pending |
-| Develop booking detail view | Developer 2 | ⏳ Pending |
-| Implement admin bookings API (`GET/PATCH /api/admin/bookings`) | Developer 1 | ⏳ Pending |
-| Implement confirm booking action | Developer 1 | ⏳ Pending |
-| Implement admin cancel booking action with email notification | Developer 1 | ⏳ Pending |
-| Build time slot management page (add/remove/toggle slots) | Developer 1 | ⏳ Pending |
-| Implement admin slots API (`GET/POST/DELETE /api/admin/slots`) | Developer 1 | ⏳ Pending |
-| Implement "Generate Next 30 Days" bulk slot creation | Developer 1 | ⏳ Pending |
-| Build customer self-cancellation page (`/cancel/[token]`) | Developer 1 | ⏳ Pending |
+| Set up Supabase Auth for admin login | Developer 1 | ✅ Done |
+| Build admin login page with protected route middleware | Developer 1 | ✅ Done |
+| Develop booking list page (view all bookings) | Developer 2 | ✅ Done |
+| Implement admin bookings API (`GET/PATCH /api/admin/bookings`) | Developer 1 | ✅ Done (via Server Actions) |
+| Implement confirm booking action | Developer 1 | ✅ Done |
+| Implement admin cancel booking action with email notification | Developer 1 | ✅ Done |
+| Build time slot management page (add/remove/toggle slots) | Developer 1 | ✅ Done |
+| Implement admin slots API (`GET/POST/DELETE /api/admin/slots`) | Developer 1 | ✅ Done (via Server Actions) |
+| Implement "Generate Next 30 Days" bulk slot creation | Developer 1 | ✅ Done |
+| Build customer self-cancellation page (`/cancel/[token]`) | Developer 1 | ✅ Done |
+| Implement cancellation token lookup API (`GET /api/cancel/lookup`) | Developer 1 | ✅ Done |
 | Responsive design for admin dashboard | Developer 2 | ⏳ Pending |
 | Write admin user guide for client | Developer 2 | ⏳ Pending |
 
 **Definition of Done:**
-- [ ] Admin login works and unauthenticated users are redirected
-- [ ] Owner can view, confirm, and cancel bookings
-- [ ] Owner can manage available time slots (add, remove, toggle, bulk generate)
-- [ ] Customer can self-cancel via email link (if more than 24 hours before booking)
-- [ ] Cancellation within 24 hours shows appropriate error message
-- [ ] All cancellation emails send correctly
+- [x] Admin login works and unauthenticated users are redirected
+- [x] Owner can view, confirm, and cancel bookings
+- [x] Owner can manage available time slots (add, remove, toggle, bulk generate)
+- [x] Customer can self-cancel via email link (if more than 24 hours before booking)
+- [x] Cancellation within 24 hours shows appropriate error message
+- [x] All cancellation emails send correctly
+- [ ] Responsive design for admin dashboard
+- [ ] Admin user guide for client
 
 ---
 
