@@ -11,7 +11,7 @@
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 14+ (App Router) with TypeScript |
+| Framework | Next.js 16 (App Router) with TypeScript |
 | Styling | Tailwind CSS |
 | Backend | Next.js API Routes |
 | Database | Supabase (PostgreSQL) |
@@ -187,8 +187,21 @@ Each developer answers:
 | Implement "Generate Next 30 Days" bulk slot creation | Developer 1 | ✅ Done |
 | Build customer self-cancellation page (`/cancel/[token]`) | Developer 1 | ✅ Done |
 | Implement cancellation token lookup API (`GET /api/cancel/lookup`) | Developer 1 | ✅ Done |
-| Responsive design for admin dashboard | Developer 2 | ⏳ Pending |
+| Responsive design for admin dashboard | Developer 2 | ✅ Done |
 | Write admin user guide for client | Developer 2 | ⏳ Pending |
+| Add Privacy Policy page | Developer 1 | ✅ Done |
+| Add Terms of Service page | Developer 1 | ✅ Done |
+| Fix time slot 2.5h cutoff filter | Developer 1 | ✅ Done |
+| Add booking form validation (name, email, phone, guests, special requests) | Developer 1 | ✅ Done |
+| Scroll to top after successful booking | Developer 1 | ✅ Done |
+| Fix timezone double-conversion bug (nzNow hack) in slots/dashboard | Developer 1 | ✅ Done |
+| Fix dashboard stats timezone queries (bare date → UTC range) | Developer 1 | ✅ Done |
+| Optimize database queries (search filter, select columns, pagination) | Developer 1 | ✅ Done |
+| Add admin loading state | Developer 1 | ✅ Done |
+| Compress images (20MB → 2MB) | Developer 1 | ✅ Done |
+| Add SVG favicon | Developer 1 | ✅ Done |
+| Dashboard UI: integrate pending badge into stats card | Developer 1 | ✅ Done |
+| Bookings calendar: align sidebar, increase text size, sort by status | Developer 1 | ✅ Done |
 
 **Definition of Done:**
 - [x] Admin login works and unauthenticated users are redirected
@@ -197,7 +210,7 @@ Each developer answers:
 - [x] Customer can self-cancel via email link (if more than 24 hours before booking)
 - [x] Cancellation within 24 hours shows appropriate error message
 - [x] All cancellation emails send correctly
-- [ ] Responsive design for admin dashboard
+- [x] Responsive design for admin dashboard
 - [ ] Admin user guide for client
 
 ---
@@ -206,24 +219,24 @@ Each developer answers:
 
 > **Goal:** Website is stable, performant, and live on mosotea.co.nz. Client has accepted delivery.
 
-| Task | Owner |
-|---|---|
-| Run Lighthouse audits — target 90+ on all scores | Developer 1 |
-| Performance optimisation (images, fonts, code splitting) | Developer 1 |
-| Cross-browser testing: Chrome, Safari, Firefox | Developer 2 |
-| Full mobile device testing | Developer 2 |
-| End-to-end booking and cancellation flow regression test | Both |
-| Error boundary and loading state review | Both |
-| Connect mosotea.co.nz in Vercel and configure Cloudflare DNS | Developer 1 |
-| Configure production environment variables in Vercel | Developer 1 |
-| Submit sitemap to Google Search Console | Developer 1 |
-| Set up Google Business Profile | Developer 2 |
-| Client User Acceptance Testing (UAT) | Both |
-| Finalise README and project documentation | Both |
-| Deliver admin credentials and user guide to client | Developer 1 |
+| Task | Owner | Status |
+|---|---|---|
+| Performance optimisation (images, fonts, code splitting) | Developer 1 | ✅ Done (images compressed) |
+| Error boundary and loading state review | Both | ✅ Done (admin loading.tsx added) |
+| Connect mosotea.co.nz in Vercel and configure Cloudflare DNS | Developer 1 | ✅ Done |
+| Configure production environment variables in Vercel | Developer 1 | ✅ Done |
+| Run Lighthouse audits — target 90+ on all scores | Developer 1 | ✅ Done (97-98 across all pages) |
+| Cross-browser testing: Chrome, Safari, Firefox | Developer 2 | ✅ Done |
+| Full mobile device testing | Developer 2 | ✅ Done |
+| End-to-end booking and cancellation flow regression test | Both | ✅ Done |
+| Submit sitemap to Google Search Console | Developer 1 | ✅ Done |
+| Set up Google Business Profile | Developer 2 | ✅ Done |
+| Client User Acceptance Testing (UAT) | Both | ⏳ Pending |
+| Finalise README and project documentation | Both | ✅ Done |
+| Deliver admin credentials and user guide to client | Developer 1 | ⏳ Pending |
 
 **Definition of Done:**
-- [ ] Lighthouse scores 90+ for Performance, Accessibility, Best Practices, SEO
+- [x] Lighthouse scores 90+ for Performance, Accessibility, Best Practices, SEO
 - [ ] Website live on mosotea.co.nz with valid HTTPS
 - [ ] Full booking and cancellation flow tested and working in production
 - [ ] Client has completed UAT and signed delivery acceptance
@@ -239,8 +252,8 @@ Each developer answers:
 | Sprint 0 | 1 week | Project scaffolding, approved wireframes |
 | Sprint 1 | 1 week | All information pages live, bilingual support |
 | Sprint 2 | 1 week | Full booking system with cancellation link |
-| Sprint 3 | 1 week | Admin dashboard + customer self-cancellation |
-| Sprint 4 | 1 week | Tested, launched, client accepted |
+| Sprint 3 | 1 week | Admin dashboard + customer self-cancellation + bug fixes |
+| Sprint 4 | 1 week | Testing, performance, launch |
 
 ---
 

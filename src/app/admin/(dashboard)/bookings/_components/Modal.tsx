@@ -30,7 +30,7 @@ export function Modal({ open, onClose, children }: ModalProps) {
         if (e.target === overlayRef.current) onClose()
       }}
     >
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-off-white p-6 shadow-xl">
+      <div className="mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-off-white p-4 shadow-xl sm:mx-0 sm:p-6">
         {children}
       </div>
     </div>

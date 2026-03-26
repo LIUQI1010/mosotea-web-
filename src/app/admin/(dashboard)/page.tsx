@@ -225,18 +225,18 @@ export default async function AdminDashboardPage() {
       {/* Topbar */}
       <div className="mb-8">
         <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">儀表板</p>
-        <h1 className="font-serif text-4xl font-semibold text-foreground">{formatNZDate(todayStr)}</h1>
+        <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl lg:text-4xl">{formatNZDate(todayStr)}</h1>
       </div>
 
       {/* Stats Grid */}
-      <div className="mb-8 grid grid-cols-4 gap-4">
+      <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((stat) => {
           const content = (
             <>
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {stat.label}
               </p>
-              <p className={`mt-2 text-3xl font-semibold ${stat.urgent ? 'text-tea-brown' : 'text-foreground'}`}>
+              <p className={`mt-2 text-2xl font-semibold sm:text-3xl ${stat.urgent ? 'text-tea-brown' : 'text-foreground'}`}>
                 {stat.value}
               </p>
             </>
@@ -259,7 +259,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Two-column Section */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
         {/* Left: Upcoming Slots */}
         <div className="rounded-2xl border border-border bg-off-white p-5">
@@ -287,7 +287,7 @@ export default async function AdminDashboardPage() {
                   <Link
                     key={slot.id}
                     href={`/admin/slots?slot_id=${slot.id}`}
-                    className="grid grid-cols-[1fr_56px_72px] items-center gap-2 rounded-xl border border-border bg-cream px-4 py-3 transition-colors hover:border-tea-brown/30 hover:bg-tea-brown/5"
+                    className="grid grid-cols-[1fr_auto] items-center gap-2 rounded-xl border border-border bg-cream px-3 py-2.5 transition-colors hover:border-tea-brown/30 hover:bg-tea-brown/5 sm:grid-cols-[1fr_56px_72px] sm:px-4 sm:py-3"
                   >
                     <div>
                       <p className="text-sm font-medium text-foreground">
@@ -297,7 +297,7 @@ export default async function AdminDashboardPage() {
                         {formatSlotTime(slot.start_time)}
                       </p>
                     </div>
-                    <span className="text-center text-sm text-muted-foreground">
+                    <span className="hidden text-center text-sm text-muted-foreground sm:block">
                       {slot.booked_guests}/{slot.max_guests}
                     </span>
                     <div className="flex justify-end">
@@ -344,25 +344,19 @@ export default async function AdminDashboardPage() {
                   <Link
                     key={booking.id}
                     href={nzDate ? `/admin/bookings?date=${nzDate}` : '/admin/bookings'}
-                    className="grid grid-cols-[1fr_40px_44px_24px_80px] items-center gap-2 rounded-xl border border-border bg-cream px-4 py-3 transition-colors hover:border-tea-brown/30 hover:bg-tea-brown/5"
+                    className="flex items-center justify-between gap-2 rounded-xl border border-border bg-cream px-3 py-2.5 transition-colors hover:border-tea-brown/30 hover:bg-tea-brown/5 sm:px-4 sm:py-3"
                   >
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {booking.customer_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {slotData ? formatBookingDate(slotData.start_time) : '—'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {slotData ? formatBookingTime(slotData.start_time) : '—'}
-                    </p>
-                    <p className="text-center text-xs text-muted-foreground">
-                      {booking.guest_count}人
-                    </p>
-                    <div className="flex justify-end">
-                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusCfg.className}`}>
-                        {statusCfg.label}
-                      </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {booking.customer_name}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {slotData ? `${formatBookingDate(slotData.start_time)} ${formatBookingTime(slotData.start_time)}` : '—'} · {booking.guest_count}人
+                      </p>
                     </div>
+                    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${statusCfg.className}`}>
+                      {statusCfg.label}
+                    </span>
                   </Link>
                 )
               })}
