@@ -24,7 +24,7 @@ function formatSlotOption(slot: AvailableSlot): string {
   const timeRange = hour < 12 ? '10:00–11:30' : '14:00–15:30'
   const remaining = slot.max_guests - slot.booked_guests
 
-  return `${dateStr} ${timeRange}（${remaining}位空余）`
+  return `${dateStr} ${timeRange}（${remaining}位空位）`
 }
 
 interface BookingData {
@@ -62,6 +62,10 @@ interface BookingModalProps {
   }) => Promise<{ error?: string }>
 }
 
+const inputClass = 'w-full rounded-lg border border-border bg-cream px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-colors focus:border-tea-brown focus:ring-2 focus:ring-tea-brown/20'
+const labelClass = 'mb-1.5 block text-sm font-medium text-foreground'
+const readonlyClass = 'rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground'
+
 export function BookingModal({
   open,
   onClose,
@@ -95,8 +99,6 @@ export function BookingModal({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-
-  // Calculate max guests for selected slot
   const selectedSlot =
     mode === 'edit'
       ? booking?.time_slots
@@ -112,18 +114,7 @@ export function BookingModal({
     e.preventDefault()
     setError('')
     setLoading(true)
-
-    const result = await onSubmit({
-      timeSlotId,
-      customerName,
-      email,
-      phone,
-      guestCount,
-      specialRequests,
-      preferredLanguage,
-      sendEmail,
-    })
-
+    const result = await onSubmit({ timeSlotId, customerName, email, phone, guestCount, specialRequests, preferredLanguage, sendEmail })
     setLoading(false)
     if (result.error) {
       setError(result.error)
@@ -132,145 +123,79 @@ export function BookingModal({
     }
   }
 
-  // Format the read-only slot display for edit mode
   const editSlotLabel = booking
     ? (() => {
         const date = new Date(booking.time_slots.start_time)
-        const dateStr = new Intl.DateTimeFormat('zh-CN', {
-          timeZone: NZ_TZ,
-          month: 'numeric',
-          day: 'numeric',
-        }).format(date)
-        const hour = Number(
-          new Intl.DateTimeFormat('en-GB', {
-            timeZone: NZ_TZ,
-            hour: '2-digit',
-            hour12: false,
-          }).format(date)
-        )
+        const dateStr = new Intl.DateTimeFormat('zh-CN', { timeZone: NZ_TZ, month: 'numeric', day: 'numeric' }).format(date)
+        const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: NZ_TZ, hour: '2-digit', hour12: false }).format(date))
         return `${dateStr} ${hour < 12 ? '10:00–11:30' : '14:00–15:30'}`
       })()
     : ''
 
   return (
     <Modal open={open} onClose={onClose}>
-      <h2 className="text-lg font-medium text-[#3D3D3D]">
-        {mode === 'create' ? '新增预约' : '编辑预约'}
+      <h2 className="font-serif text-lg font-semibold text-foreground">
+        {mode === 'create' ? '新增預約' : '編輯預約'}
       </h2>
 
-      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-        {/* Slot selection */}
+      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        {/* Slot */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-            场次
-          </label>
+          <label className={labelClass}>場次</label>
           {mode === 'create' ? (
             <select
               value={timeSlotId}
-              onChange={(e) => {
-                setTimeSlotId(e.target.value)
-                setGuestCount(1)
-              }}
+              onChange={(e) => { setTimeSlotId(e.target.value); setGuestCount(1) }}
               required
-              className="w-full rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
+              className={inputClass}
             >
-              <option value="" disabled>
-                请选择场次
-              </option>
+              <option value="" disabled>請選擇場次</option>
               {availableSlots.map((slot) => (
-                <option key={slot.id} value={slot.id}>
-                  {formatSlotOption(slot)}
-                </option>
+                <option key={slot.id} value={slot.id}>{formatSlotOption(slot)}</option>
               ))}
             </select>
           ) : (
-            <div className="rounded-lg border border-[#E8E0D8] bg-stone-50 px-3 py-2 text-sm text-[#6B6B6B]">
-              {editSlotLabel}
-            </div>
+            <div className={readonlyClass}>{editSlotLabel}</div>
           )}
         </div>
 
         {/* Customer name */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-            客户姓名
-          </label>
+          <label className={labelClass}>客戶姓名</label>
           {mode === 'create' ? (
-            <input
-              type="text"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              required
-              className="w-full rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
-              placeholder="请输入姓名"
-            />
+            <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required className={inputClass} placeholder="請輸入姓名" />
           ) : (
-            <div className="rounded-lg border border-[#E8E0D8] bg-stone-50 px-3 py-2 text-sm text-[#6B6B6B]">
-              {customerName}
-            </div>
+            <div className={readonlyClass}>{customerName}</div>
           )}
         </div>
 
         {/* Guest count */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-            人数
-          </label>
-          <input
-            type="number"
-            value={guestCount}
-            onChange={(e) => setGuestCount(Number(e.target.value))}
-            min={1}
-            max={maxAllowed}
-            required
-            className="w-full rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
-          />
-          <p className="mt-1 text-xs text-[#6B6B6B]">最多 {maxAllowed} 人</p>
+          <label className={labelClass}>人數</label>
+          <input type="number" value={guestCount} onChange={(e) => setGuestCount(Number(e.target.value))} min={1} max={maxAllowed} required className={inputClass} />
+          <p className="mt-1 text-xs text-muted-foreground">最多 {maxAllowed} 人</p>
         </div>
 
-        {/* Email — only in create mode */}
+        {/* Email — create only */}
         {mode === 'create' && (
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-              邮箱
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
-              placeholder="customer@example.com"
-            />
+            <label className={labelClass}>電郵</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} placeholder="customer@example.com" />
           </div>
         )}
 
-        {/* Phone — only in create mode */}
+        {/* Phone — create only */}
         {mode === 'create' && (
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-              电话 <span className="font-normal text-[#6B6B6B]">（选填）</span>
-            </label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
-              placeholder="021 xxx xxxx"
-            />
+            <label className={labelClass}>電話 <span className="font-normal text-muted-foreground">（選填）</span></label>
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="021 xxx xxxx" />
           </div>
         )}
 
         {/* Language */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-            语言偏好
-          </label>
-          <select
-            value={preferredLanguage}
-            onChange={(e) => setPreferredLanguage(e.target.value)}
-            className="w-full rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
-          >
+          <label className={labelClass}>語言偏好</label>
+          <select value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className={inputClass}>
             <option value="en">English</option>
             <option value="zh-TW">繁體中文</option>
           </select>
@@ -278,53 +203,30 @@ export function BookingModal({
 
         {/* Special requests */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-[#3D3D3D]">
-            特殊需求 <span className="font-normal text-[#6B6B6B]">（选填）</span>
-          </label>
-          <textarea
-            value={specialRequests}
-            onChange={(e) => setSpecialRequests(e.target.value)}
-            rows={3}
-            className="w-full resize-none rounded-lg border border-[#E8E0D8] bg-[#FAFAF8] px-3 py-2 text-sm text-[#3D3D3D] outline-none focus:border-[#7C5C3E] focus:ring-1 focus:ring-[#7C5C3E]"
-          />
+          <label className={labelClass}>特殊需求 <span className="font-normal text-muted-foreground">（選填）</span></label>
+          <textarea value={specialRequests} onChange={(e) => setSpecialRequests(e.target.value)} rows={3} className={`${inputClass} resize-none`} />
         </div>
 
-        {/* Send email checkbox — create mode only */}
+        {/* Send email — create only */}
         {mode === 'create' && (
-          <label className="flex items-center gap-2 text-sm text-[#3D3D3D]">
-            <input
-              type="checkbox"
-              checked={sendEmail}
-              onChange={(e) => setSendEmail(e.target.checked)}
-              className="rounded border-[#E8E0D8] accent-[#7C5C3E]"
-            />
-            发送确认邮件给客户
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
+            <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="rounded border-border accent-tea-brown" />
+            傳送確認電郵給客戶
           </label>
         )}
 
         {/* Error */}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p className="rounded-lg border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-red-600">{error}</p>
+        )}
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={loading}
-            className="rounded-lg border border-[#E8E0D8] px-4 py-2 text-sm text-[#6B6B6B] hover:bg-stone-50"
-          >
+          <button type="button" onClick={onClose} disabled={loading} className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-cream">
             取消
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-lg bg-[#7C5C3E] px-4 py-2 text-sm font-medium text-[#FDF6F0] hover:opacity-90 disabled:opacity-50"
-          >
-            {loading
-              ? '保存中...'
-              : mode === 'create'
-                ? '保存'
-                : '保存修改'}
+          <button type="submit" disabled={loading} className="rounded-lg bg-tea-brown px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50">
+            {loading ? '儲存中...' : mode === 'create' ? '儲存' : '儲存修改'}
           </button>
         </div>
       </form>

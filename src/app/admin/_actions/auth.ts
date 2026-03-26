@@ -14,7 +14,7 @@ export async function login(
   const password = formData.get('password') as string
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
-    return { error: '密码错误，请重试' }
+    return { error: '密碼錯誤，請重試' }
   }
 
   const cookieStore = await cookies()

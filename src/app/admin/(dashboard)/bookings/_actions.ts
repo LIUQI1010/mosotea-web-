@@ -107,11 +107,11 @@ export async function confirmBooking(
     .single()
 
   if (fetchError || !booking) {
-    return { success: false, error: '预约不存在' }
+    return { success: false, error: '預約不存在' }
   }
 
   if (booking.status !== 'pending') {
-    return { success: false, error: '只能确认待确认状态的预约' }
+    return { success: false, error: '只能確認待確認狀態的預約' }
   }
 
   const { error: updateError } = await supabase
@@ -175,16 +175,16 @@ export async function createBooking(
     .single()
 
   if (slotError || !slot) {
-    return { success: false, error: '场次不存在' }
+    return { success: false, error: '場次不存在' }
   }
 
   if (!slot.is_available) {
-    return { success: false, error: '该场次已禁用' }
+    return { success: false, error: '該場次已停用' }
   }
 
   const remaining = slot.max_guests - slot.booked_guests
   if (data.guestCount > remaining) {
-    return { success: false, error: `剩余名额不足，当前仅剩 ${remaining} 位` }
+    return { success: false, error: `剩餘名額不足，目前僅剩 ${remaining} 位` }
   }
 
   // Insert booking as confirmed (admin-created)
@@ -205,7 +205,7 @@ export async function createBooking(
 
   if (insertError) {
     if (insertError.message?.includes('capacity') || insertError.message?.includes('guests')) {
-      return { success: false, error: '容量已满，请选择其他场次' }
+      return { success: false, error: '容量已滿，請選擇其他場次' }
     }
     return { success: false, error: insertError.message }
   }
@@ -267,7 +267,7 @@ export async function updateBooking(
     .single()
 
   if (fetchError || !current) {
-    return { success: false, error: '预约不存在' }
+    return { success: false, error: '預約不存在' }
   }
 
   // If guest count increased, check capacity
@@ -280,7 +280,7 @@ export async function updateBooking(
     const remaining = slot.max_guests - slot.booked_guests
 
     if (diff > remaining) {
-      return { success: false, error: `剩余名额不足，最多还可增加 ${remaining} 人` }
+      return { success: false, error: `剩餘名額不足，最多還可增加 ${remaining} 人` }
     }
   }
 
@@ -336,11 +336,11 @@ export async function cancelBooking(
     .single()
 
   if (fetchError || !booking) {
-    return { success: false, error: '预约不存在' }
+    return { success: false, error: '預約不存在' }
   }
 
   if (booking.status === 'cancelled') {
-    return { success: false, error: '预约已取消' }
+    return { success: false, error: '預約已取消' }
   }
 
   const { error: updateError } = await supabase

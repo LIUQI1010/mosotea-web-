@@ -148,7 +148,7 @@ export async function toggleSlot(
       .neq('status', 'cancelled')
 
     if (count && count > 0) {
-      return { success: false, error: '该场次有有效预约，请先取消预约后再禁用' }
+      return { success: false, error: '該場次有有效預約，請先取消預約後再停用' }
     }
   }
 
