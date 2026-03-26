@@ -390,11 +390,11 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
       {/* Topbar */}
       <div className="mb-6">
         <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">場次管理</p>
-        <h1 className="font-serif text-3xl font-semibold text-foreground">時間段管理</h1>
+        <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">時間段管理</h1>
       </div>
 
       {/* Generation Banner */}
-      <div className={`mb-6 flex items-center justify-between rounded-2xl border px-5 py-4 ${
+      <div className={`mb-6 flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 ${
         isUpToDate ? 'border-bamboo-green/20 bg-bamboo-green/5' : 'border-border bg-off-white'
       }`}>
         <p className="text-sm text-foreground">
@@ -403,7 +403,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
             : latestDateStr
               ? `目前已生成至 ${formatLatestDate(latestDateStr)} · 還差 ${daysRemaining} 天未生成`
               : '尚未生成任何場次'}
-          {!isUpToDate && <span className="ml-2 text-muted-foreground">（一鍵生成從今天起未來 30 天的場次）</span>}
+          {!isUpToDate && <span className="ml-0 mt-1 block text-muted-foreground sm:ml-2 sm:mt-0 sm:inline">（一鍵生成從今天起未來 30 天的場次）</span>}
         </p>
         <button
           onClick={handleGenerate}
@@ -419,13 +419,13 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
       </div>
 
       {/* Filter Tabs */}
-      <div className="mb-6 flex items-center gap-4">
+      <div className="mb-6 flex flex-wrap items-center gap-3 sm:gap-4">
         <div className="flex gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => { setActiveTab(tab.key); setSelectedSlot(null) }}
-              className={`rounded-lg px-3.5 py-1.5 text-sm transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-sm transition-colors sm:px-3.5 ${
                 activeTab === tab.key
                   ? 'bg-tea-brown text-primary-foreground'
                   : 'border border-border bg-off-white text-muted-foreground hover:bg-cream hover:text-foreground'
@@ -445,7 +445,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
 
       {/* ═══ Calendar View ═══ */}
       {activeTab === 'all' && (
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
             {allMonths.length > 0 && (
               <div className="mb-4 flex items-center justify-between">
@@ -463,7 +463,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
               </div>
             )}
 
-            <div className="overflow-hidden rounded-2xl border border-border bg-off-white">
+            <div className="overflow-hidden rounded-2xl border border-border bg-off-white" style={{ touchAction: 'manipulation' }}>
               <div className="grid grid-cols-7 border-b border-border bg-cream">
                 {weekdayHeaders.map(d => (
                   <div key={d} className="py-2.5 text-center text-xs font-medium text-muted-foreground">{d}</div>
@@ -473,7 +473,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                 {calendarDays.map((day, i) => (
                   <div
                     key={day.dateStr + i}
-                    className={`min-h-[80px] border-b border-r border-border p-1.5 transition-colors ${
+                    className={`min-h-[60px] border-b border-r border-border p-1 transition-colors sm:min-h-[80px] sm:p-1.5 ${
                       !day.isCurrentMonth ? 'bg-cream/40' : ''
                     } ${day.isToday ? 'bg-tea-brown/5' : ''} ${(i + 1) % 7 === 0 ? 'border-r-0' : ''}`}
                   >
@@ -498,14 +498,14 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
             </div>
           </div>
 
-          <div className="w-[280px] shrink-0">
+          <div className="w-full lg:w-[280px] lg:shrink-0">
             {/* Spacer to align detail panel top with the month nav row */}
-            <div className="mb-4 h-[38px]" />
-            <div className="sticky top-8 overflow-hidden rounded-2xl border border-border bg-off-white" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+            <div className="mb-4 hidden h-[38px] lg:block" />
+            <div className="overflow-hidden rounded-2xl border border-border bg-off-white lg:sticky lg:top-8" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
               {selectedSlot ? (
                 <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} />
               ) : (
-                <div className="flex h-[300px] flex-col items-center justify-center p-6 text-center">
+                <div className="flex h-[200px] flex-col items-center justify-center p-6 text-center lg:h-[300px]">
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-cream">
                     <svg className="h-5 w-5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
@@ -521,7 +521,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
 
       {/* ═══ Table View + Sidebar ═══ */}
       {activeTab !== 'all' && (
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
             {filteredSlots.length === 0 ? (
               <div className="rounded-2xl border border-border bg-off-white py-12 text-center text-sm text-muted-foreground">暫無場次資料</div>
@@ -530,7 +530,63 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                 {grouped.map((group) => (
                   <div key={group.weekLabel}>
                     <p className="mb-2 px-1 text-sm font-semibold text-foreground">{group.weekLabel}</p>
-                    <div className="overflow-hidden rounded-2xl border border-border bg-off-white">
+
+                    {/* Mobile: Card View */}
+                    <div className="space-y-2 md:hidden">
+                      {group.slots.map((slot) => {
+                        const status = getSlotStatus(slot)
+                        const config = statusConfig[status]
+                        const remaining = slot.max_guests - slot.booked_guests
+                        const pct = (slot.booked_guests / slot.max_guests) * 100
+                        const dateStr = getNZDate(slot.start_time)
+                        const isMorning = isSlotMorning(slot.start_time)
+                        const isActive = selectedSlot?.slot.id === slot.id
+                        return (
+                          <div
+                            key={slot.id}
+                            onClick={() => handleSelectSlot(slot, isMorning ? 'morning' : 'afternoon')}
+                            className={`cursor-pointer rounded-xl border border-border bg-off-white p-3.5 transition-colors ${
+                              isActive ? 'border-tea-brown/30 bg-tea-brown/5' : 'hover:bg-cream'
+                            }`}
+                          >
+                            <div className="mb-2 flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-foreground">{formatDateChinese(dateStr)}</p>
+                                <p className="mt-0.5 text-xs text-muted-foreground">{formatSlotTime(slot.start_time)}</p>
+                              </div>
+                              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
+                                {config.labelFn ? config.labelFn(remaining) : config.label}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                              <div className="h-1.5 flex-1 rounded-full bg-border">
+                                <div
+                                  className={`h-full rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : isMorning ? 'bg-tea-brown' : 'bg-bamboo-green'}`}
+                                  style={{ width: `${Math.min(pct, 100)}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-muted-foreground">{slot.booked_guests}/{slot.max_guests}</span>
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <button
+                                  onClick={() => handleToggle(slot.id, !slot.is_available)}
+                                  disabled={togglingId === slot.id}
+                                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                                    slot.is_available
+                                      ? 'border border-border bg-off-white text-muted-foreground hover:bg-cream'
+                                      : 'border border-bamboo-green/20 bg-bamboo-green/10 text-bamboo-green hover:bg-bamboo-green/20'
+                                  }`}
+                                >
+                                  {togglingId === slot.id ? '...' : slot.is_available ? '停用' : '啟用'}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    {/* Desktop: Table View */}
+                    <div className="hidden overflow-hidden rounded-2xl border border-border bg-off-white md:block">
                       <div className="grid grid-cols-[1.4fr_1.1fr_1.6fr_1.1fr_0.9fr] items-center gap-2 border-b border-border bg-cream px-5 py-3 text-center">
                         {['日期', '時段', '容量', '狀態', '操作'].map(h => (
                           <span key={h} className="text-xs font-medium text-muted-foreground">{h}</span>
@@ -591,20 +647,20 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
             )}
           </div>
 
-          <div className="w-[280px] shrink-0">
+          <div className="w-full lg:w-[280px] lg:shrink-0">
             {/* Spacer to align detail panel top with the week label row */}
-            <div className="h-7" />
-            <div className="sticky top-8 overflow-hidden rounded-2xl border border-border bg-off-white" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+            <div className="hidden h-7 lg:block" />
+            <div className="overflow-hidden rounded-2xl border border-border bg-off-white lg:sticky lg:top-8" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
               {selectedSlot ? (
                 <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} />
               ) : (
-                <div className="flex h-[300px] flex-col items-center justify-center p-6 text-center">
+                <div className="flex h-[200px] flex-col items-center justify-center p-6 text-center lg:h-[300px]">
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-cream">
                     <svg className="h-5 w-5 text-muted-foreground/40" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
                     </svg>
                   </div>
-                  <p className="text-sm text-muted-foreground">點擊左側場次<br />查看詳情和預約資訊</p>
+                  <p className="text-sm text-muted-foreground">點擊場次卡片<br />查看詳情和預約資訊</p>
                 </div>
               )}
             </div>

@@ -224,14 +224,14 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
       )}
 
       {/* Topbar */}
-      <div className="mb-6 flex items-end justify-between">
+      <div className="mb-6 flex items-end justify-between gap-3">
         <div>
           <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">預約管理</p>
-          <h1 className="font-serif text-3xl font-semibold text-foreground">預約列表</h1>
+          <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">預約列表</h1>
         </div>
         <button
           onClick={openCreateModal}
-          className="rounded-lg bg-tea-brown px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-lg bg-tea-brown px-3 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:px-4"
         >
           ＋ 新增預約
         </button>
@@ -239,7 +239,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
 
       {/* Pending Banner */}
       {pendingCount > 0 && (
-        <div className="mb-6 flex items-center justify-between rounded-2xl border border-tea-brown/20 bg-tea-brown/5 px-5 py-3">
+        <div className="mb-6 flex flex-col gap-2 rounded-2xl border border-tea-brown/20 bg-tea-brown/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <p className="text-sm text-tea-brown">
             有 <span className="font-semibold">{pendingCount}</span> 筆待確認預約，請及時處理
           </p>
@@ -250,13 +250,13 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
       )}
 
       {/* Filter Tabs + Search */}
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div className="flex gap-2">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex flex-wrap gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`rounded-lg px-3.5 py-1.5 text-sm transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-sm transition-colors sm:px-3.5 ${
                 activeTab === tab.key
                   ? 'bg-tea-brown text-primary-foreground'
                   : 'border border-border bg-off-white text-muted-foreground hover:bg-cream hover:text-foreground'
@@ -280,14 +280,14 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="搜尋姓名或電郵..."
-            className="w-56 rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-tea-brown focus:ring-2 focus:ring-tea-brown/20"
+            className="w-full rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-tea-brown focus:ring-2 focus:ring-tea-brown/20 sm:w-56"
           />
         )}
       </div>
 
       {/* ═══ Calendar View ═══ */}
       {activeTab === 'all' && (
-        <div className="flex gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
           {/* Left: Calendar */}
           <div className="min-w-0 flex-1">
             {/* Month Nav */}
@@ -310,7 +310,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
             </div>
 
             {/* Calendar Grid */}
-            <div className="overflow-hidden rounded-2xl border border-border bg-off-white">
+            <div className="overflow-hidden rounded-2xl border border-border bg-off-white" style={{ touchAction: 'manipulation' }}>
               <div className="grid grid-cols-7 border-b border-border bg-cream">
                 {['一', '二', '三', '四', '五', '六', '日'].map((d) => (
                   <div key={d} className="py-2.5 text-center text-xs font-medium text-muted-foreground">{d}</div>
@@ -324,7 +324,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                       day.isCurrentMonth && day.bookings.length > 0 &&
                       setSelectedCalendarDate(selectedCalendarDate === day.dateStr ? null : day.dateStr)
                     }
-                    className={`min-h-[90px] border-b border-r border-border p-1.5 transition-colors ${
+                    className={`min-h-[60px] border-b border-r border-border p-1 transition-colors sm:min-h-[90px] sm:p-1.5 ${
                       !day.isCurrentMonth ? 'bg-cream/40' : ''
                     } ${day.isToday && day.dateStr !== selectedCalendarDate ? 'bg-tea-brown/5' : ''} ${
                       day.dateStr === selectedCalendarDate
@@ -347,23 +347,37 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                     </div>
                     {day.isCurrentMonth && day.bookings.length > 0 && (
                       <div className="space-y-0.5">
-                        {[...day.bookings].sort(sortByStatus).slice(0, 3).map((b) => (
-                          <div
-                            key={b.id}
-                            className={`truncate rounded px-1 py-0.5 text-[11px] font-medium leading-tight ${
-                              b.status === 'pending'
-                                ? 'bg-tea-brown text-primary-foreground'
-                                : b.status === 'confirmed'
-                                  ? 'bg-bamboo-green/20 text-bamboo-green'
-                                  : 'bg-cream text-muted-foreground line-through'
-                            }`}
-                          >
-                            {b.customer_name} {b.guest_count}人
-                          </div>
-                        ))}
-                        {day.bookings.length > 3 && (
-                          <div className="px-1 text-[9px] text-muted-foreground">+{day.bookings.length - 3}</div>
-                        )}
+                        {/* Mobile: show dot indicators */}
+                        <div className="flex flex-wrap gap-0.5 sm:hidden">
+                          {[...day.bookings].sort(sortByStatus).slice(0, 4).map((b) => (
+                            <span
+                              key={b.id}
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                b.status === 'pending' ? 'bg-tea-brown' : b.status === 'confirmed' ? 'bg-bamboo-green' : 'bg-muted-foreground/30'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        {/* Desktop: show full booking names */}
+                        <div className="hidden sm:block sm:space-y-0.5">
+                          {[...day.bookings].sort(sortByStatus).slice(0, 3).map((b) => (
+                            <div
+                              key={b.id}
+                              className={`truncate rounded px-1 py-0.5 text-[11px] font-medium leading-tight ${
+                                b.status === 'pending'
+                                  ? 'bg-tea-brown text-primary-foreground'
+                                  : b.status === 'confirmed'
+                                    ? 'bg-bamboo-green/20 text-bamboo-green'
+                                    : 'bg-cream text-muted-foreground line-through'
+                              }`}
+                            >
+                              {b.customer_name} {b.guest_count}人
+                            </div>
+                          ))}
+                          {day.bookings.length > 3 && (
+                            <div className="px-1 text-[9px] text-muted-foreground">+{day.bookings.length - 3}</div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -373,10 +387,10 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
           </div>
 
           {/* Right: Day Detail Sidebar */}
-          <div className="w-[300px] shrink-0">
-            <div className="mb-4 h-[38px]" />
+          <div className="w-full lg:w-[300px] lg:shrink-0">
+            <div className="mb-4 hidden h-[38px] lg:block" />
             <div
-              className="sticky top-8 overflow-hidden rounded-2xl border border-border bg-off-white"
+              className="overflow-hidden rounded-2xl border border-border bg-off-white lg:sticky lg:top-8"
               style={{ maxHeight: 'calc(100vh - 4rem)' }}
             >
               {selectedCalendarDate && selectedDateBookings.length > 0 ? (
@@ -466,64 +480,119 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
 
       {/* ═══ Table View ═══ */}
       {activeTab !== 'all' && (
-        <div className="overflow-x-auto rounded-2xl border border-border bg-off-white min-w-0">
-          <div className="grid min-w-[1100px] grid-cols-[1fr_1.5fr_1fr_70px_50px_90px_45px_42px_1.2fr_65px_1.3fr] gap-2 border-b border-border bg-cream px-5 py-3 text-center">
-            {['姓名','電郵','電話','日期','星期','時段','人數','語言','特殊需求','狀態','操作'].map((h) => (
-              <span key={h} className="text-xs font-medium text-muted-foreground">{h}</span>
-            ))}
-          </div>
-
+        <>
           {filtered.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted-foreground">暫無預約記錄</p>
+            <div className="rounded-2xl border border-border bg-off-white py-12 text-center text-sm text-muted-foreground">暫無預約記錄</div>
           ) : (
-            filtered.map((booking) => {
-              const isCancelled = booking.status === 'cancelled'
-              const isPending = booking.status === 'pending'
-              const slot = formatSlotDateTime(booking.time_slots.start_time)
-              const cfg = statusConfig[booking.status] ?? statusConfig.pending
+            <>
+              {/* Mobile: Card View */}
+              <div className="space-y-3 lg:hidden">
+                {filtered.map((booking) => {
+                  const isCancelled = booking.status === 'cancelled'
+                  const isPending = booking.status === 'pending'
+                  const slot = formatSlotDateTime(booking.time_slots.start_time)
+                  const cfg = statusConfig[booking.status] ?? statusConfig.pending
 
-              return (
-                <div
-                  key={booking.id}
-                  className={`grid min-w-[1100px] grid-cols-[1fr_1.5fr_1fr_70px_50px_90px_45px_42px_1.2fr_65px_1.3fr] items-center gap-2 border-b border-border px-5 py-3 text-center transition-colors last:border-b-0 ${
-                    isCancelled ? 'opacity-40' : isPending ? 'bg-tea-brown/5 hover:bg-tea-brown/10' : 'hover:bg-cream'
-                  }`}
-                >
-                  <span className="truncate text-sm font-medium text-foreground">{booking.customer_name}</span>
-                  <span className="truncate text-xs text-muted-foreground">{booking.email}</span>
-                  <span className="truncate text-xs text-muted-foreground">{booking.phone || '—'}</span>
-                  <span className="text-sm text-foreground">{slot.date}</span>
-                  <span className="text-sm text-muted-foreground">{slot.weekday}</span>
-                  <span className="text-xs text-muted-foreground">{slot.time}</span>
-                  <span className="text-sm text-foreground">{booking.guest_count}</span>
-                  <span className="text-xs text-muted-foreground">{langLabel[booking.preferred_language] ?? booking.preferred_language}</span>
-                  <span className="truncate text-xs text-muted-foreground" title={booking.special_requests || ''}>{booking.special_requests || '—'}</span>
-                  <div>
-                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>{cfg.label}</span>
-                  </div>
-                  <div className="flex flex-nowrap items-center justify-center gap-1.5">
-                    {isPending && (
-                      <button
-                        onClick={() => handleConfirm(booking.id)}
-                        disabled={confirmingId === booking.id}
-                        className="whitespace-nowrap rounded-md bg-bamboo-green/10 px-2 py-1 text-xs font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/20 disabled:opacity-50"
-                      >
-                        {confirmingId === booking.id ? '...' : '✓ 確認'}
-                      </button>
-                    )}
-                    {!isCancelled && (
-                      <>
-                        <button onClick={() => openEditModal(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-cream">編輯</button>
-                        <button onClick={() => setCancelTarget(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">取消</button>
-                      </>
-                    )}
-                    {isCancelled && <span className="text-xs text-muted-foreground/30">—</span>}
-                  </div>
+                  return (
+                    <div
+                      key={booking.id}
+                      className={`rounded-xl border border-border bg-off-white p-4 ${
+                        isCancelled ? 'opacity-50' : isPending ? 'border-tea-brown/20 bg-tea-brown/5' : ''
+                      }`}
+                    >
+                      <div className="mb-2 flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-foreground">{booking.customer_name}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            {slot.date} {slot.weekday} · {slot.time}
+                          </p>
+                        </div>
+                        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>{cfg.label}</span>
+                      </div>
+                      <div className="space-y-0.5 text-xs text-muted-foreground">
+                        <p>{booking.guest_count}人 · {langLabel[booking.preferred_language] ?? booking.preferred_language}</p>
+                        <p className="truncate">{booking.email}</p>
+                        {booking.phone && <p>{booking.phone}</p>}
+                        {booking.special_requests && <p className="truncate" title={booking.special_requests}>{booking.special_requests}</p>}
+                      </div>
+                      {!isCancelled && (
+                        <div className="mt-3 flex gap-2">
+                          {isPending && (
+                            <button
+                              onClick={() => handleConfirm(booking.id)}
+                              disabled={confirmingId === booking.id}
+                              className="rounded-md bg-bamboo-green/10 px-3 py-1.5 text-xs font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/20 disabled:opacity-50"
+                            >
+                              {confirmingId === booking.id ? '...' : '✓ 確認'}
+                            </button>
+                          )}
+                          <button onClick={() => openEditModal(booking)} className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-cream">編輯</button>
+                          <button onClick={() => setCancelTarget(booking)} className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">取消</button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Desktop: Table View */}
+              <div className="hidden overflow-x-auto rounded-2xl border border-border bg-off-white lg:block">
+                <div className="grid min-w-[1100px] grid-cols-[1fr_1.5fr_1fr_70px_50px_90px_45px_42px_1.2fr_65px_1.3fr] gap-2 border-b border-border bg-cream px-5 py-3 text-center">
+                  {['姓名','電郵','電話','日期','星期','時段','人數','語言','特殊需求','狀態','操作'].map((h) => (
+                    <span key={h} className="text-xs font-medium text-muted-foreground">{h}</span>
+                  ))}
                 </div>
-              )
-            })
+
+                {filtered.map((booking) => {
+                  const isCancelled = booking.status === 'cancelled'
+                  const isPending = booking.status === 'pending'
+                  const slot = formatSlotDateTime(booking.time_slots.start_time)
+                  const cfg = statusConfig[booking.status] ?? statusConfig.pending
+
+                  return (
+                    <div
+                      key={booking.id}
+                      className={`grid min-w-[1100px] grid-cols-[1fr_1.5fr_1fr_70px_50px_90px_45px_42px_1.2fr_65px_1.3fr] items-center gap-2 border-b border-border px-5 py-3 text-center transition-colors last:border-b-0 ${
+                        isCancelled ? 'opacity-40' : isPending ? 'bg-tea-brown/5 hover:bg-tea-brown/10' : 'hover:bg-cream'
+                      }`}
+                    >
+                      <span className="truncate text-sm font-medium text-foreground">{booking.customer_name}</span>
+                      <span className="truncate text-xs text-muted-foreground">{booking.email}</span>
+                      <span className="truncate text-xs text-muted-foreground">{booking.phone || '—'}</span>
+                      <span className="text-sm text-foreground">{slot.date}</span>
+                      <span className="text-sm text-muted-foreground">{slot.weekday}</span>
+                      <span className="text-xs text-muted-foreground">{slot.time}</span>
+                      <span className="text-sm text-foreground">{booking.guest_count}</span>
+                      <span className="text-xs text-muted-foreground">{langLabel[booking.preferred_language] ?? booking.preferred_language}</span>
+                      <span className="truncate text-xs text-muted-foreground" title={booking.special_requests || ''}>{booking.special_requests || '—'}</span>
+                      <div>
+                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>{cfg.label}</span>
+                      </div>
+                      <div className="flex flex-nowrap items-center justify-center gap-1.5">
+                        {isPending && (
+                          <button
+                            onClick={() => handleConfirm(booking.id)}
+                            disabled={confirmingId === booking.id}
+                            className="whitespace-nowrap rounded-md bg-bamboo-green/10 px-2 py-1 text-xs font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/20 disabled:opacity-50"
+                          >
+                            {confirmingId === booking.id ? '...' : '✓ 確認'}
+                          </button>
+                        )}
+                        {!isCancelled && (
+                          <>
+                            <button onClick={() => openEditModal(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-cream">編輯</button>
+                            <button onClick={() => setCancelTarget(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">取消</button>
+                          </>
+                        )}
+                        {isCancelled && <span className="text-xs text-muted-foreground/30">—</span>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           )}
-        </div>
+        </>
       )}
 
       {/* Booking Modal */}

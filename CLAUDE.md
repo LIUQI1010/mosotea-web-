@@ -48,19 +48,31 @@ mosotea-web-/
 │   │   │   │   └── page.tsx        ← Booking form (/book)
 │   │   │   ├── contact/
 │   │   │   │   └── page.tsx        ← Contact page (/contact)
+│   │   │   ├── privacy/
+│   │   │   │   ├── layout.tsx      ← Privacy Policy metadata
+│   │   │   │   └── page.tsx        ← Privacy Policy (/privacy)
+│   │   │   ├── terms/
+│   │   │   │   ├── layout.tsx      ← Terms of Service metadata
+│   │   │   │   └── page.tsx        ← Terms of Service (/terms)
 │   │   │   └── cancel/
 │   │   │       └── [token]/
 │   │   │           └── page.tsx    ← Customer self-cancellation (/cancel/[token])
 │   │   ├── [locale]/
 │   │   │   └── not-found.tsx       ← 404 Not Found page
 │   │   ├── admin/                  ← Protected admin dashboard (English only, no locale)
-│   │   │   ├── page.tsx            ← Booking list (/admin)
+│   │   │   ├── (dashboard)/
+│   │   │   │   ├── layout.tsx      ← Dashboard layout with sidebar
+│   │   │   │   ├── loading.tsx     ← Shared loading state for all admin pages
+│   │   │   │   ├── page.tsx        ← Dashboard with stats (/admin)
+│   │   │   │   ├── AdminSidebar.tsx ← Sidebar navigation component
+│   │   │   │   ├── bookings/
+│   │   │   │   │   ├── page.tsx    ← Booking list with calendar view (/admin/bookings)
+│   │   │   │   │   └── _actions.ts ← Server actions: confirm, cancel, create, update bookings
+│   │   │   │   └── slots/
+│   │   │   │       ├── page.tsx    ← Time slot management (/admin/slots)
+│   │   │   │       └── _actions.ts ← Server actions: generate slots, toggle availability
 │   │   │   ├── login/
 │   │   │   │   └── page.tsx        ← Admin login (/admin/login)
-│   │   │   ├── bookings/
-│   │   │   │   └── page.tsx        ← Booking list with inline edit/confirm/cancel (/admin/bookings)
-│   │   │   └── slots/
-│   │   │       └── page.tsx        ← Time slot management (/admin/slots)
 │   │   ├── api/                    ← API Routes (server-side only)
 │   │   │   ├── booking/
 │   │   │   │   └── route.ts        ← POST: submit booking
@@ -345,6 +357,7 @@ Returns available time slots for a given date.
 ```
 
 - Filters out slots where `is_available = false` or `booked_guests >= max_guests`
+- Filters out slots within 2.5 hours of current time (prevents last-minute bookings)
 - Uses admin client (service role) to bypass RLS
 
 ### `POST /api/booking`
@@ -365,6 +378,13 @@ Submits a new booking request.
 ```
 
 **Response:** `{ "success": true, "data": { "bookingId": "uuid" } }`
+
+**Validation rules:**
+- `fullName`: 2–30 chars, Chinese or English characters only
+- `email`: max 100 chars, valid email format
+- `phone`: max 20 chars, 7–15 digits (E.164 international)
+- `guests`: 1–8 integer
+- `specialRequests`: max 200 chars
 
 **Flow:**
 1. Validate input with Zod
@@ -431,10 +451,12 @@ Sends a contact form message to the owner via email.
 }
 ```
 
-### Admin API Routes (Sprint 3 — not yet implemented)
+### Admin Server Actions
 
-- `GET/PATCH /api/admin/bookings` — List and manage bookings
-- `GET/POST/DELETE /api/admin/slots` — Manage time slots
+Admin operations use Next.js Server Actions instead of API routes:
+
+- `src/app/admin/(dashboard)/bookings/_actions.ts` — `getBookings`, `confirmBooking`, `cancelBooking`, `createBooking`, `updateBooking`, `getAvailableSlots`
+- `src/app/admin/(dashboard)/slots/_actions.ts` — `generateSlots`, `toggleSlot`
 
 ---
 
@@ -574,6 +596,21 @@ const endUTC   = new Date(`${dateStr}T23:59:59+12:00`).toISOString()
 ### DST-Aware Slot Generation
 Use `Intl.DateTimeFormat.formatToParts` to get the correct NZ UTC offset per date. Do **not** use `toLocaleString` for offset calculation — it behaves incorrectly on Windows. See `_actions.ts` `getNZOffset()` for the correct implementation.
 
+### Avoid the `nzNow` Hack for Date Arithmetic
+Do **not** use `new Date(now.toLocaleString('en-US', { timeZone: NZ_TZ }))` to create a "fake" NZ Date object for date arithmetic. This creates a Date whose internal UTC timestamp depends on the server's timezone. When `toLocaleDateString` with NZ timezone is later applied, it **double-converts**, causing off-by-one day errors on Vercel (UTC server) vs local development.
+
+```typescript
+// ❌ Wrong — double-converts timezone, off-by-one on Vercel
+const nzNow = new Date(now.toLocaleString('en-US', { timeZone: NZ_TZ }))
+const target = new Date(nzNow); target.setDate(nzNow.getDate() + 30)
+const targetStr = toNZDateStr(target) // shifted by 1 day on UTC servers
+
+// ✅ Correct — use date string arithmetic
+const todayStr = toNZDateStr(new Date()) // one correct timezone conversion
+const [y, m, d] = todayStr.split('-').map(Number)
+const targetStr = new Date(Date.UTC(y, m - 1, d + 30)).toISOString().slice(0, 10)
+```
+
 ### setState in useEffect (ESLint Error)
 Calling `setState` inside `useEffect` triggers `react-hooks/set-state-in-effect`. For modals and forms that receive initial data via props, use **lazy state initializers** instead:
 
@@ -615,5 +652,5 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Sprint 0 | Project setup, DB schema, Figma wireframes | ✅ Done |
 | Sprint 1 | Core information pages + i18n | ✅ Done |
 | Sprint 2 | Booking system + cancellation emails | ✅ Done |
-| Sprint 3 | Admin dashboard + self-cancellation | 🔄 In Progress |
-| Sprint 4 | Testing, performance, launch | ⏳ Pending |
+| Sprint 3 | Admin dashboard + self-cancellation | ✅ Done |
+| Sprint 4 | Testing, performance, launch | 🔄 In Progress |

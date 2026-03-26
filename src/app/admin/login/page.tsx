@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Login Card */}
-        <div className="rounded-2xl border border-border bg-off-white px-8 py-9 shadow-sm">
+        <div className="rounded-2xl border border-border bg-off-white px-5 py-7 shadow-sm sm:px-8 sm:py-9">
           <h2 className="mb-6 font-serif text-xl font-semibold text-foreground text-center">管理員登入</h2>
 
           <form action={formAction}>

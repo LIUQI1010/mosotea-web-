@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/app/admin/_actions/auth'
@@ -36,17 +37,31 @@ function LogoutIcon({ className }: { className?: string }) {
   )
 }
 
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+  )
+}
+
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  )
+}
+
 const navItems = [
   { href: '/admin', label: '儀表板', Icon: DashboardIcon },
   { href: '/admin/slots', label: '時間段', Icon: CalendarIcon },
   { href: '/admin/bookings', label: '預約', Icon: BookingsIcon },
 ]
 
-export function AdminSidebar() {
-  const pathname = usePathname()
-
+function SidebarContent({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
-    <aside className="fixed left-0 top-0 flex h-screen w-[200px] flex-col border-r border-border bg-off-white">
+    <>
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-full border border-tea-brown/30 bg-cream">
@@ -66,6 +81,7 @@ export function AdminSidebar() {
             <Link
               key={href}
               href={href}
+              onClick={onNavigate}
               className={`mb-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
                 isActive
                   ? 'bg-tea-brown/10 font-medium text-tea-brown'
@@ -91,6 +107,67 @@ export function AdminSidebar() {
           </button>
         </form>
       </div>
-    </aside>
+    </>
+  )
+}
+
+export function AdminSidebar() {
+  const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = '' }
+    }
+  }, [mobileOpen])
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center border-b border-border bg-off-white px-4 md:hidden">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-cream hover:text-foreground"
+        >
+          <MenuIcon className="h-5 w-5" />
+        </button>
+        <div className="ml-3 flex items-center gap-2">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full border border-tea-brown/30 bg-cream">
+            <span className="font-serif text-xs font-semibold text-tea-brown">茶</span>
+          </div>
+          <span className="font-serif text-base font-semibold text-foreground">Moso Tea</span>
+        </div>
+      </div>
+
+      {/* Mobile drawer overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+        >
+          <aside
+            className="flex h-full w-[240px] flex-col bg-off-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-end px-3 pt-3">
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-cream hover:text-foreground"
+              >
+                <CloseIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className="fixed left-0 top-0 hidden h-screen w-[200px] flex-col border-r border-border bg-off-white md:flex">
+        <SidebarContent pathname={pathname} />
+      </aside>
+    </>
   )
 }

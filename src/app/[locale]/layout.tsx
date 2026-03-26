@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getMessages, getTranslations } from 'next-intl/server'
+import { getMessages } from 'next-intl/server'
 import { NextIntlClientProvider } from 'next-intl'
 import { routing } from '@/i18n/routing'
 
@@ -23,19 +23,35 @@ export async function generateMetadata({
     ? '在 Moso Tea 體驗茶道藝術。在威靈頓私密花園中享受正宗茶道體驗。'
     : 'Experience the art of tea at Moso Tea. Authentic tea ceremony experiences in an intimate Wellington garden setting.'
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mosotea.co.nz'
+
   return {
     title: {
       default: title,
-      template: isZh ? '%s | Moso Tea' : '%s | Moso Tea',
+      template: '%s | Moso Tea',
     },
     description,
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://mosotea.co.nz'),
+    metadataBase: new URL(baseUrl),
     openGraph: {
       title,
       description,
       siteName: 'Moso Tea',
       locale: isZh ? 'zh_TW' : 'en_NZ',
       type: 'website',
+      images: [
+        {
+          url: '/images/hero-tea-ceremony.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Moso Tea — Traditional Tea Ceremony Experience',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/images/hero-tea-ceremony.jpg'],
     },
     alternates: {
       languages: {
