@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generateCancellationToken } from '@/lib/token'
-import { sendBookingConfirmation } from '@/lib/resend/emails'
+import { sendBookingConfirmation, sendCancellationConfirmation } from '@/lib/resend/emails'
 import type { BookingWithTimeSlot } from '@/types'
 
 // ── Helpers ──
@@ -331,7 +331,7 @@ export async function cancelBooking(
 
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('status')
+    .select('*, time_slots(*)')
     .eq('id', bookingId)
     .single()
 
@@ -354,6 +354,24 @@ export async function cancelBooking(
 
   if (updateError) {
     return { success: false, error: updateError.message }
+  }
+
+  // Send cancellation notification to customer (non-blocking)
+  try {
+    const slot = Array.isArray(booking.time_slots)
+      ? booking.time_slots[0]
+      : booking.time_slots
+
+    const bookingWithSlot: BookingWithTimeSlot = {
+      ...booking,
+      status: 'cancelled',
+      cancelled_by: 'admin',
+      time_slot: slot,
+    }
+
+    await sendCancellationConfirmation(bookingWithSlot)
+  } catch (e) {
+    console.error('Failed to send cancellation email:', e)
   }
 
   revalidateAdmin()

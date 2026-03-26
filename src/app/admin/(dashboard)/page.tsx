@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+
 // NZ timezone
 const NZ_TZ = 'Pacific/Auckland'
 
@@ -53,16 +54,21 @@ function formatSlotDate(startTime: string): string {
   }).format(date)
 }
 
-function formatBookingDateTime(startTime: string): string {
-  const date = new Date(startTime)
+function formatBookingDate(startTime: string): string {
   return new Intl.DateTimeFormat('zh-CN', {
     timeZone: NZ_TZ,
     month: 'numeric',
     day: 'numeric',
+  }).format(new Date(startTime))
+}
+
+function formatBookingTime(startTime: string): string {
+  return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: NZ_TZ,
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-  }).format(date)
+  }).format(new Date(startTime))
 }
 
 type SlotStatus = 'full' | 'available' | 'empty' | 'disabled'
@@ -84,7 +90,7 @@ const statusConfig: Record<
 > = {
   full: {
     label: '已满',
-    className: 'bg-red-50 text-red-700 border border-red-200',
+    className: 'bg-red-100 text-red-700 border border-red-200',
   },
   available: {
     label: '有空余',
@@ -96,7 +102,7 @@ const statusConfig: Record<
   },
   disabled: {
     label: '已禁用',
-    className: 'bg-white text-stone-400 border border-stone-300',
+    className: 'bg-red-100 text-red-600 border border-red-300',
   },
 }
 
@@ -289,9 +295,10 @@ export default async function AdminDashboardPage() {
                   const status = getSlotStatus(slot)
                   const config = statusConfig[status]
                   return (
-                    <div
+                    <Link
                       key={slot.id}
-                      className="flex items-center justify-between rounded-xl border border-[#E8E0D8] px-4 py-3"
+                      href={`/admin/slots?slot_id=${slot.id}`}
+                      className="grid grid-cols-[1fr_60px_72px] items-center rounded-xl border border-[#E8E0D8] px-4 py-3 transition-colors hover:bg-stone-50"
                     >
                       <div>
                         <p className="text-sm font-medium text-[#3D3D3D]">
@@ -301,17 +308,17 @@ export default async function AdminDashboardPage() {
                           {formatSlotTime(slot.start_time)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-[#6B6B6B]">
-                          {slot.booked_guests}/{slot.max_guests}
-                        </span>
+                      <span className="text-center text-sm text-[#6B6B6B]">
+                        {slot.booked_guests}/{slot.max_guests}
+                      </span>
+                      <div className="flex justify-center">
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}
                         >
                           {config.label}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   )
                 }
               )}
@@ -355,36 +362,44 @@ export default async function AdminDashboardPage() {
                       'bg-green-50 text-green-700 border border-green-200',
                     cancelled: 'bg-stone-50 text-stone-400 border border-stone-200',
                   }
+                  const nzDate = slotData
+                    ? new Date(slotData.start_time).toLocaleDateString('en-CA', { timeZone: NZ_TZ })
+                    : null
                   return (
-                    <div
+                    <Link
                       key={booking.id}
-                      className="flex items-center justify-between rounded-xl border border-[#E8E0D8] px-4 py-3"
+                      href={nzDate ? `/admin/bookings?date=${nzDate}` : '/admin/bookings'}
+                      className="grid grid-cols-[0.7fr_48px_48px_40px_28px_1fr] items-center gap-2 rounded-xl border border-[#E8E0D8] px-4 py-3 transition-colors hover:bg-stone-50"
                     >
-                      <div>
-                        <p className="text-sm font-medium text-[#3D3D3D]">
-                          {booking.customer_name}
-                        </p>
-                        <p className="text-xs text-[#6B6B6B]">
-                          {slotData
-                            ? formatBookingDateTime(slotData.start_time)
-                            : '—'}{' '}
-                          · {booking.guest_count}人 ·{' '}
-                          {langLabel[booking.preferred_language] ??
-                            booking.preferred_language}
-                        </p>
+                      <p className="truncate text-sm font-medium text-[#3D3D3D]">
+                        {booking.customer_name}
+                      </p>
+                      <p className="text-xs text-[#6B6B6B]">
+                        {slotData ? formatBookingDate(slotData.start_time) : '—'}
+                      </p>
+                      <p className="text-xs text-[#6B6B6B]">
+                        {slotData ? formatBookingTime(slotData.start_time) : '—'}
+                      </p>
+                      <p className="text-center text-xs text-[#6B6B6B]">
+                        {booking.guest_count}人
+                      </p>
+                      <p className="text-center text-xs text-[#6B6B6B]">
+                        {langLabel[booking.preferred_language] ?? booking.preferred_language}
+                      </p>
+                      <div className="flex justify-end">
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                            statusColors[booking.status] ?? ''
+                          }`}
+                        >
+                          {booking.status === 'pending'
+                            ? '待确认'
+                            : booking.status === 'confirmed'
+                              ? '已确认'
+                              : '已取消'}
+                        </span>
                       </div>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          statusColors[booking.status] ?? ''
-                        }`}
-                      >
-                        {booking.status === 'pending'
-                          ? '待确认'
-                          : booking.status === 'confirmed'
-                            ? '已确认'
-                            : '已取消'}
-                      </span>
-                    </div>
+                    </Link>
                   )
                 }
               )}

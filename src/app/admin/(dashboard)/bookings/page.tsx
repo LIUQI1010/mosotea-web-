@@ -16,20 +16,26 @@ export default async function AdminBookingsPage({
   const now = new Date()
   const todayStr = now.toLocaleDateString('en-CA', { timeZone: NZ_TZ })
 
-  // Fetch all bookings with slot info
-  let query = supabase
-    .from('bookings')
-    .select(
-      'id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancelled_by, created_at, time_slots!inner(id, start_time, end_time, max_guests, booked_guests)'
-    )
-    .order('created_at', { ascending: false })
-
+  // If slot_id provided, fetch that slot's date for calendar pre-navigation (no data filtering)
+  let initialSlotDate: string | null = null
   if (params.slot_id) {
-    query = query.eq('time_slot_id', params.slot_id)
+    const { data: slot } = await supabase
+      .from('time_slots')
+      .select('start_time')
+      .eq('id', params.slot_id)
+      .single()
+    if (slot) {
+      initialSlotDate = new Date(slot.start_time).toLocaleDateString('en-CA', { timeZone: NZ_TZ })
+    }
   }
 
   const [bookingsResult, pendingResult] = await Promise.all([
-    query,
+    supabase
+      .from('bookings')
+      .select(
+        'id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancelled_by, created_at, time_slots!inner(id, start_time, end_time, max_guests, booked_guests)'
+      )
+      .order('created_at', { ascending: false }),
     supabase
       .from('bookings')
       .select('id', { count: 'exact', head: true })
@@ -41,6 +47,7 @@ export default async function AdminBookingsPage({
       bookings={(bookingsResult.data ?? []) as unknown as import('./_actions').BookingRow[]}
       pendingCount={pendingResult.count ?? 0}
       todayStr={todayStr}
+      initialSlotDate={initialSlotDate}
     />
   )
 }

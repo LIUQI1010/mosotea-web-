@@ -18,7 +18,12 @@ export interface SlotBooking {
   preferred_language: string
 }
 
-export default async function AdminSlotsPage() {
+export default async function AdminSlotsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ slot_id?: string }>
+}) {
+  const { slot_id: initialSlotId } = await searchParams
   const supabase = createAdminClient()
   const now = new Date()
   const nzNow = new Date(now.toLocaleString('en-US', { timeZone: NZ_TZ }))
@@ -85,6 +90,7 @@ export default async function AdminSlotsPage() {
       latestDateStr={latestDateStr}
       daysRemaining={daysRemaining}
       todayStr={todayStr}
+      initialSlotId={initialSlotId}
     />
   )
 }

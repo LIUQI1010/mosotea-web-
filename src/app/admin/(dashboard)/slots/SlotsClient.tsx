@@ -155,6 +155,11 @@ function SlotCell({
       <div className="absolute inset-0 overflow-hidden rounded">
         <div className={`h-full ${colors.bar} opacity-15`} style={{ width: `${Math.min(pct, 100)}%` }} />
       </div>
+      {status === 'disabled' && (
+        <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden rounded" preserveAspectRatio="none">
+          <line x1="0" y1="100%" x2="100%" y2="0" stroke="rgba(220,38,38,0.35)" strokeWidth="1.5" />
+        </svg>
+      )}
       <span className={`relative z-10 text-[9px] font-medium ${colors.text}`}>
         {type === 'morning' ? '午前' : '午后'}
       </span>
@@ -280,12 +285,31 @@ interface SlotsClientProps {
   latestDateStr: string | null
   daysRemaining: number
   todayStr: string
+  initialSlotId?: string
 }
 
-export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemaining, todayStr }: SlotsClientProps) {
-  const [activeTab, setActiveTab] = useState<FilterTab>('this_week')
-  const [currentMonth, setCurrentMonth] = useState(() => getMonthKey(new Date().toISOString()))
-  const [selectedSlot, setSelectedSlot] = useState<{ slot: Slot; type: 'morning' | 'afternoon' } | null>(null)
+export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemaining, todayStr, initialSlotId }: SlotsClientProps) {
+  const [activeTab, setActiveTab] = useState<FilterTab>(() => {
+    if (!initialSlotId) return 'this_week'
+    const slot = slots.find((s) => s.id === initialSlotId)
+    if (!slot) return 'this_week'
+    const dateStr = getNZDate(slot.start_time)
+    const week = getWeekRange(todayStr, 0)
+    return dateStr >= week.start && dateStr <= week.end ? 'this_week' : 'all'
+  })
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    if (initialSlotId) {
+      const slot = slots.find((s) => s.id === initialSlotId)
+      if (slot) return getMonthKey(slot.start_time)
+    }
+    return getMonthKey(new Date().toISOString())
+  })
+  const [selectedSlot, setSelectedSlot] = useState<{ slot: Slot; type: 'morning' | 'afternoon' } | null>(() => {
+    if (!initialSlotId) return null
+    const slot = slots.find((s) => s.id === initialSlotId)
+    if (!slot) return null
+    return { slot, type: isSlotMorning(slot.start_time) ? 'morning' : 'afternoon' }
+  })
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isGenerating, startGenerating] = useTransition()
   const [togglingId, setTogglingId] = useState<string | null>(null)
@@ -515,55 +539,71 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
       {activeTab !== 'all' && (
         <div className="flex gap-6">
           {/* Left: Table */}
-          <div className="min-w-0 flex-1 rounded-2xl border border-[#E8E0D8] bg-white">
-            <div className="grid grid-cols-[140px_120px_150px_90px] gap-2 border-b border-[#E8E0D8] px-5 py-3">
-              <span className="text-xs font-medium text-[#6B6B6B]">日期</span>
-              <span className="text-xs font-medium text-[#6B6B6B]">时段</span>
-              <span className="text-xs font-medium text-[#6B6B6B]">容量</span>
-              <span className="text-xs font-medium text-[#6B6B6B]">状态</span>
-            </div>
+          <div className="min-w-0 flex-1">
             {filteredSlots.length === 0 ? (
-              <p className="py-12 text-center text-sm text-[#6B6B6B]">暂无场次数据</p>
+              <div className="rounded-2xl border border-[#E8E0D8] bg-white py-12 text-center text-sm text-[#6B6B6B]">暂无场次数据</div>
             ) : (
-              grouped.map((group) => (
-                <div key={group.weekLabel}>
-                  <div className="border-b border-[#E8E0D8] bg-stone-50/50 px-5 py-2">
-                    <span className="text-xs font-medium text-[#6B6B6B]">{group.weekLabel}</span>
-                  </div>
-                  {group.slots.map((slot) => {
-                    const status = getSlotStatus(slot)
-                    const config = statusConfig[status]
-                    const remaining = slot.max_guests - slot.booked_guests
-                    const pct = (slot.booked_guests / slot.max_guests) * 100
-                    const dateStr = getNZDate(slot.start_time)
-                    const isMorning = isSlotMorning(slot.start_time)
-                    const isActive = selectedSlot?.slot.id === slot.id
-                    return (
-                      <button
-                        key={slot.id}
-                        onClick={() => handleSelectSlot(slot, isMorning ? 'morning' : 'afternoon')}
-                        className={`grid w-full grid-cols-[140px_120px_150px_90px] gap-2 border-b border-[#E8E0D8] px-5 py-3 text-left transition-colors last:border-b-0 ${
-                          isActive ? 'bg-[#FDF6F0]' : 'hover:bg-stone-50/50'
-                        }`}
-                      >
-                        <span className="text-sm text-[#3D3D3D]">{formatDateChinese(dateStr)}</span>
-                        <span className="text-sm text-[#6B6B6B]">{formatSlotTime(slot.start_time)}</span>
-                        <div className="flex items-center gap-2.5">
-                          <div className="h-1.5 w-20 rounded-full bg-stone-100">
-                            <div className={`h-full rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : 'bg-[#5C7A5C]'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+              <div className="space-y-4">
+                {grouped.map((group) => (
+                  <div key={group.weekLabel}>
+                    <p className="mb-2 px-1 text-sm font-medium text-[#3D3D3D]">{group.weekLabel}</p>
+                    <div className="rounded-2xl border border-[#E8E0D8] bg-white">
+                      <div className="grid grid-cols-[1.4fr_1.1fr_1.6fr_1.1fr_0.9fr] items-center gap-2 border-b border-[#E8E0D8] px-5 py-3 text-center">
+                        <span className="text-xs font-medium text-[#6B6B6B]">日期</span>
+                        <span className="text-xs font-medium text-[#6B6B6B]">时段</span>
+                        <span className="text-xs font-medium text-[#6B6B6B]">容量</span>
+                        <span className="text-xs font-medium text-[#6B6B6B]">状态</span>
+                        <span className="text-xs font-medium text-[#6B6B6B]">操作</span>
+                      </div>
+                      {group.slots.map((slot) => {
+                        const status = getSlotStatus(slot)
+                        const config = statusConfig[status]
+                        const remaining = slot.max_guests - slot.booked_guests
+                        const pct = (slot.booked_guests / slot.max_guests) * 100
+                        const dateStr = getNZDate(slot.start_time)
+                        const isMorning = isSlotMorning(slot.start_time)
+                        const isActive = selectedSlot?.slot.id === slot.id
+                        return (
+                          <div
+                            key={slot.id}
+                            onClick={() => handleSelectSlot(slot, isMorning ? 'morning' : 'afternoon')}
+                            className={`grid w-full cursor-pointer grid-cols-[1.4fr_1.1fr_1.6fr_1.1fr_0.9fr] items-center gap-2 border-b border-[#E8E0D8] px-5 py-3 text-center transition-colors last:border-b-0 ${
+                              isActive ? 'bg-[#FDF6F0]' : 'hover:bg-stone-50/50'
+                            }`}
+                          >
+                            <span className="text-sm text-[#3D3D3D]">{formatDateChinese(dateStr)}</span>
+                            <span className="text-sm text-[#6B6B6B]">{formatSlotTime(slot.start_time)}</span>
+                            <div className="flex items-center justify-center gap-2.5">
+                              <div className="h-1.5 w-20 rounded-full bg-stone-100">
+                                <div className={`h-full rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : 'bg-[#5C7A5C]'}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+                              </div>
+                              <span className="text-xs text-[#6B6B6B]">{slot.booked_guests}/{slot.max_guests}</span>
+                            </div>
+                            <div className="flex justify-center">
+                              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
+                                {config.label}
+                              </span>
+                            </div>
+                            <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                onClick={() => handleToggle(slot.id, !slot.is_available)}
+                                disabled={togglingId === slot.id}
+                                className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                                  slot.is_available
+                                    ? 'bg-stone-100 text-[#6B6B6B] hover:bg-stone-200'
+                                    : 'border border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
+                                }`}
+                              >
+                                {togglingId === slot.id ? '...' : slot.is_available ? '禁用' : '启用'}
+                              </button>
+                            </div>
                           </div>
-                          <span className="text-xs text-[#6B6B6B]">{slot.booked_guests}/{slot.max_guests}</span>
-                        </div>
-                        <div>
-                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
-                            {config.labelFn ? config.labelFn(remaining) : config.label}
-                          </span>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              ))
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
