@@ -61,6 +61,11 @@ export async function getBookings(filters: BookingFilters): Promise<BookingRow[]
     query = query.eq('time_slot_id', filters.slotId)
   }
 
+  if (filters.search) {
+    const term = filters.search.replace(/%/g, '\\%')
+    query = query.or(`customer_name.ilike.%${term}%,email.ilike.%${term}%`)
+  }
+
   if (filters.date) {
     // Convert NZ date to UTC range (NZ is +12 NZST or +13 NZDT)
     const dayStartUTC = new Date(`${filters.date}T00:00:00+13:00`).toISOString()
@@ -77,17 +82,7 @@ export async function getBookings(filters: BookingFilters): Promise<BookingRow[]
     return []
   }
 
-  let results = (data ?? []) as unknown as BookingRow[]
-
-  // Client-side search filter (Supabase doesn't support OR ilike across columns easily)
-  if (filters.search) {
-    const term = filters.search.toLowerCase()
-    results = results.filter(
-      (b) =>
-        b.customer_name.toLowerCase().includes(term) ||
-        b.email.toLowerCase().includes(term)
-    )
-  }
+  const results = (data ?? []) as unknown as BookingRow[]
 
   return results
 }
@@ -102,16 +97,16 @@ export async function confirmBooking(
   // Fetch booking + slot
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('*, time_slots(*)')
+    .select('id, time_slot_id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancellation_token, cancellation_token_expires_at, cancelled_by, created_at, updated_at, time_slots(id, start_time, end_time, max_guests, booked_guests, is_available, created_at)')
     .eq('id', bookingId)
     .single()
 
   if (fetchError || !booking) {
-    return { success: false, error: '预约不存在' }
+    return { success: false, error: '預約不存在' }
   }
 
   if (booking.status !== 'pending') {
-    return { success: false, error: '只能确认待确认状态的预约' }
+    return { success: false, error: '只能確認待確認狀態的預約' }
   }
 
   const { error: updateError } = await supabase
@@ -170,21 +165,21 @@ export async function createBooking(
   // Check slot capacity
   const { data: slot, error: slotError } = await supabase
     .from('time_slots')
-    .select('*')
+    .select('id, start_time, end_time, max_guests, booked_guests, is_available, created_at')
     .eq('id', data.timeSlotId)
     .single()
 
   if (slotError || !slot) {
-    return { success: false, error: '场次不存在' }
+    return { success: false, error: '場次不存在' }
   }
 
   if (!slot.is_available) {
-    return { success: false, error: '该场次已禁用' }
+    return { success: false, error: '該場次已停用' }
   }
 
   const remaining = slot.max_guests - slot.booked_guests
   if (data.guestCount > remaining) {
-    return { success: false, error: `剩余名额不足，当前仅剩 ${remaining} 位` }
+    return { success: false, error: `剩餘名額不足，目前僅剩 ${remaining} 位` }
   }
 
   // Insert booking as confirmed (admin-created)
@@ -200,12 +195,12 @@ export async function createBooking(
       preferred_language: data.preferredLanguage,
       status: 'confirmed',
     })
-    .select()
+    .select('id, preferred_language')
     .single()
 
   if (insertError) {
     if (insertError.message?.includes('capacity') || insertError.message?.includes('guests')) {
-      return { success: false, error: '容量已满，请选择其他场次' }
+      return { success: false, error: '容量已滿，請選擇其他場次' }
     }
     return { success: false, error: insertError.message }
   }
@@ -224,11 +219,21 @@ export async function createBooking(
   if (data.sendEmail) {
     try {
       const bookingWithSlot: BookingWithTimeSlot = {
-        ...booking,
+        id: booking.id,
+        time_slot_id: data.timeSlotId,
+        customer_name: data.customerName,
+        email: data.email,
+        phone: data.phone || '',
+        guest_count: data.guestCount,
+        special_requests: data.specialRequests || null,
         preferred_language: data.preferredLanguage as 'en' | 'zh-TW',
+        status: 'confirmed',
         cancellation_token: cancellationToken,
         cancellation_token_expires_at: slot.start_time,
-        time_slot: slot,
+        cancelled_by: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        time_slot: slot as BookingWithTimeSlot['time_slot'],
       }
 
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
@@ -267,7 +272,7 @@ export async function updateBooking(
     .single()
 
   if (fetchError || !current) {
-    return { success: false, error: '预约不存在' }
+    return { success: false, error: '預約不存在' }
   }
 
   // If guest count increased, check capacity
@@ -280,7 +285,7 @@ export async function updateBooking(
     const remaining = slot.max_guests - slot.booked_guests
 
     if (diff > remaining) {
-      return { success: false, error: `剩余名额不足，最多还可增加 ${remaining} 人` }
+      return { success: false, error: `剩餘名額不足，最多還可增加 ${remaining} 人` }
     }
   }
 
@@ -331,16 +336,16 @@ export async function cancelBooking(
 
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('*, time_slots(*)')
+    .select('id, time_slot_id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancellation_token, cancellation_token_expires_at, cancelled_by, created_at, updated_at, time_slots(id, start_time, end_time, max_guests, booked_guests, is_available, created_at)')
     .eq('id', bookingId)
     .single()
 
   if (fetchError || !booking) {
-    return { success: false, error: '预约不存在' }
+    return { success: false, error: '預約不存在' }
   }
 
   if (booking.status === 'cancelled') {
-    return { success: false, error: '预约已取消' }
+    return { success: false, error: '預約已取消' }
   }
 
   const { error: updateError } = await supabase

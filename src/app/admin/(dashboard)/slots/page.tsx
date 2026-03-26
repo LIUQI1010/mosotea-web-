@@ -25,9 +25,7 @@ export default async function AdminSlotsPage({
 }) {
   const { slot_id: initialSlotId } = await searchParams
   const supabase = createAdminClient()
-  const now = new Date()
-  const nzNow = new Date(now.toLocaleString('en-US', { timeZone: NZ_TZ }))
-  const todayStr = toNZDateStr(nzNow)
+  const todayStr = toNZDateStr(new Date())
 
   // Convert NZ "start of today" to UTC for correct filtering
   // NZ is UTC+12 (NZST) or UTC+13 (NZDT) — use +13 to get the earliest possible UTC
@@ -67,10 +65,9 @@ export default async function AdminSlotsPage({
     .limit(1)
     .single()
 
-  // Calculate generation info
-  const target30 = new Date(nzNow)
-  target30.setDate(nzNow.getDate() + 30)
-  const target30Str = toNZDateStr(target30)
+  // Calculate generation info — use date string arithmetic to avoid timezone double-conversion
+  const [ty, tm, td] = todayStr.split('-').map(Number)
+  const target30Str = new Date(Date.UTC(ty, tm - 1, td + 30)).toISOString().slice(0, 10)
 
   let latestDateStr: string | null = null
   let daysRemaining = 30

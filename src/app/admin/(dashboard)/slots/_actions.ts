@@ -46,37 +46,30 @@ export async function generateSlots(): Promise<{ created: number; error?: string
     .limit(1)
     .single()
 
-  const now = new Date()
-  const nzNow = new Date(now.toLocaleString('en-US', { timeZone: NZ_TZ }))
-
-  // Target: today + 30 days (including today)
-  const targetEnd = new Date(nzNow)
-  targetEnd.setDate(nzNow.getDate() + 30)
+  // Use date string arithmetic to avoid timezone double-conversion
+  // (the nzNow hack via toLocaleString produces a fake Date whose internal UTC
+  //  timestamp depends on the server's timezone, causing off-by-one on Vercel)
+  const todayStr = toNZDateStr(new Date())
+  const [ty, tm, td] = todayStr.split('-').map(Number)
+  const targetEndStr = new Date(Date.UTC(ty, tm - 1, td + 30)).toISOString().slice(0, 10)
 
   // Start from today, or day after latest slot — whichever is later
-  const today = new Date(nzNow)
-  today.setHours(0, 0, 0, 0)
-
-  let startDate = today
+  let startDateStr = todayStr
   if (latestSlot) {
     const latestDateStr = toNZDateStr(new Date(latestSlot.start_time))
-    const latestPlusOne = new Date(`${latestDateStr}T12:00:00`)
-    latestPlusOne.setDate(latestPlusOne.getDate() + 1)
-    latestPlusOne.setHours(0, 0, 0, 0)
-    if (latestPlusOne > startDate) {
-      startDate = latestPlusOne
+    const [ly, lm, ld] = latestDateStr.split('-').map(Number)
+    const nextDayStr = new Date(Date.UTC(ly, lm - 1, ld + 1)).toISOString().slice(0, 10)
+    if (nextDayStr > startDateStr) {
+      startDateStr = nextDayStr
     }
   }
 
   // Fetch existing slot dates to avoid duplicates
-  const startStr = toNZDateStr(startDate)
-  const endStr = toNZDateStr(targetEnd)
-
   const { data: existingSlots } = await supabase
     .from('time_slots')
     .select('start_time')
-    .gte('start_time', `${startStr}T00:00:00`)
-    .lte('start_time', `${endStr}T23:59:59`)
+    .gte('start_time', `${startDateStr}T00:00:00`)
+    .lte('start_time', `${targetEndStr}T23:59:59`)
 
   const existingDates = new Set(
     (existingSlots ?? []).map((s: { start_time: string }) =>
@@ -84,7 +77,7 @@ export async function generateSlots(): Promise<{ created: number; error?: string
     )
   )
 
-  // Generate slots for each day
+  // Generate slots for each day using string comparison
   const slotsToInsert: {
     start_time: string
     end_time: string
@@ -93,28 +86,29 @@ export async function generateSlots(): Promise<{ created: number; error?: string
     is_available: boolean
   }[] = []
 
-  const current = new Date(startDate)
-  while (current <= targetEnd) {
-    const dateStr = toNZDateStr(current)
-    if (!existingDates.has(dateStr)) {
+  let currentDateStr = startDateStr
+  while (currentDateStr <= targetEndStr) {
+    if (!existingDates.has(currentDateStr)) {
       // Morning: 10:00 – 11:30 NZ time (DST-aware)
       slotsToInsert.push({
-        start_time: toNZTime(dateStr, '10:00').toISOString(),
-        end_time: toNZTime(dateStr, '11:30').toISOString(),
+        start_time: toNZTime(currentDateStr, '10:00').toISOString(),
+        end_time: toNZTime(currentDateStr, '11:30').toISOString(),
         max_guests: 8,
         booked_guests: 0,
         is_available: true,
       })
       // Afternoon: 14:00 – 15:30 NZ time (DST-aware)
       slotsToInsert.push({
-        start_time: toNZTime(dateStr, '14:00').toISOString(),
-        end_time: toNZTime(dateStr, '15:30').toISOString(),
+        start_time: toNZTime(currentDateStr, '14:00').toISOString(),
+        end_time: toNZTime(currentDateStr, '15:30').toISOString(),
         max_guests: 8,
         booked_guests: 0,
         is_available: true,
       })
     }
-    current.setDate(current.getDate() + 1)
+    // Advance to next day
+    const [cy, cm, cd] = currentDateStr.split('-').map(Number)
+    currentDateStr = new Date(Date.UTC(cy, cm - 1, cd + 1)).toISOString().slice(0, 10)
   }
 
   if (slotsToInsert.length === 0) {
@@ -148,7 +142,7 @@ export async function toggleSlot(
       .neq('status', 'cancelled')
 
     if (count && count > 0) {
-      return { success: false, error: '该场次有有效预约，请先取消预约后再禁用' }
+      return { success: false, error: '該場次有有效預約，請先取消預約後再停用' }
     }
   }
 

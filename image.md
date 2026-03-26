@@ -12,9 +12,8 @@ All images should be placed in `public/images/` as `.jpg` files.
 
 | File | Description | Used In |
 |---|---|---|
-| `experience-classic.jpg` | Classic tea ceremony scene | Home, Experiences |
-| `experience-matcha.jpg` | Matcha preparation / Japanese matcha green tea | Home, Experiences |
-| `experience-garden.jpg` | Private garden pavilion tea session | Home, Experiences |
+| `tea-journey.jpg` | Classic tea ceremony scene | Home, Workshop |
+| `hands-on-experience.jpg` | Private garden pavilion tea session | Home, Workshop |
 
 ## About Page
 
@@ -34,4 +33,4 @@ All images should be placed in `public/images/` as `.jpg` files.
 | `gallery-5.jpg` | Guests during tea ceremony (square) | About |
 | `gallery-6.jpg` | Garden tea pavilion (portrait 4:5 ratio) | About |
 
-## Total: 12 images
+## Total: 11 images

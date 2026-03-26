@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         // 1. Find booking by cancellation token
         const { data: booking, error: findError } = await supabase
             .from('bookings')
-            .select('*, time_slot:time_slots(*)')
+            .select('id, time_slot_id, customer_name, email, phone, guest_count, special_requests, preferred_language, status, cancellation_token, cancellation_token_expires_at, cancelled_by, created_at, updated_at, time_slot:time_slots!inner(id, start_time, end_time, max_guests, booked_guests, is_available, created_at)')
             .eq('cancellation_token', token)
             .single()
 
@@ -49,7 +49,8 @@ export async function POST(request: Request) {
         }
 
         // 4. Check 24-hour cutoff
-        const startTime = new Date(booking.time_slot.start_time)
+        const timeSlot = Array.isArray(booking.time_slot) ? booking.time_slot[0] : booking.time_slot
+        const startTime = new Date(timeSlot.start_time)
         const now = new Date()
         const hoursUntilSession = (startTime.getTime() - now.getTime()) / (1000 * 60 * 60)
 
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
             cancelled_by: 'customer',
             created_at: booking.created_at,
             updated_at: booking.updated_at,
-            time_slot: booking.time_slot,
+            time_slot: timeSlot as BookingWithTimeSlot['time_slot'],
         }
 
         try {

@@ -39,6 +39,7 @@ interface FormErrors {
     email?: string
     phone?: string
     guests?: string
+    specialRequests?: string
 }
 
 // Page Hero Section
@@ -498,8 +499,11 @@ function PersonalDetails({
                         onChange={(e) => onFieldChange("specialRequests", e.target.value)}
                         placeholder={t("step3.specialRequestsPlaceholder")}
                         rows={3}
-                        className="w-full px-4 py-3 rounded-lg border-2 border-border bg-off-white transition-colors focus:outline-none focus:ring-0 focus:border-tea-brown resize-none"
+                        className={`w-full px-4 py-3 rounded-lg border-2 bg-off-white transition-colors focus:outline-none focus:ring-0 resize-none ${errors.specialRequests ? "border-red-400 focus:border-red-400" : "border-border focus:border-tea-brown"}`}
                     />
+                    {errors.specialRequests && (
+                        <p className="mt-1.5 text-sm text-red-500">{errors.specialRequests}</p>
+                    )}
                 </div>
 
                 {/* Language Preference */}
@@ -686,19 +690,39 @@ function BookingForm() {
         }
 
         if (step === 2) {
-            if (!formData.fullName.trim()) {
+            const trimmedName = formData.fullName.trim()
+            if (!trimmedName) {
                 newErrors.fullName = t("step3.errorName")
+            } else if (trimmedName.length < 2) {
+                newErrors.fullName = t("step3.errorNameShort")
+            } else if (!/^[a-zA-Z\u4e00-\u9fff\s\-']+$/.test(trimmedName)) {
+                newErrors.fullName = t("step3.errorNameInvalid")
             }
-            if (!formData.email.trim()) {
+
+            const trimmedEmail = formData.email.trim()
+            if (!trimmedEmail) {
                 newErrors.email = t("step3.errorEmail")
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
                 newErrors.email = t("step3.errorEmailInvalid")
             }
-            if (!formData.phone.trim()) {
+
+            const trimmedPhone = formData.phone.trim()
+            if (!trimmedPhone) {
                 newErrors.phone = t("step3.errorPhone")
+            } else {
+                // Strip formatting characters, then check digit count (7–15 per E.164)
+                const digits = trimmedPhone.replace(/[\s\-().+]/g, '')
+                if (!/^\d{7,15}$/.test(digits)) {
+                    newErrors.phone = t("step3.errorPhoneInvalid")
+                }
             }
-            if (formData.guests < 1 || formData.guests > formData.maxGuests) {
+
+            if (!Number.isInteger(formData.guests) || formData.guests < 1 || formData.guests > formData.maxGuests) {
                 newErrors.guests = t("step3.errorGuests")
+            }
+
+            if (formData.specialRequests.length > 500) {
+                newErrors.specialRequests = t("step3.errorSpecialRequestsTooLong")
             }
         }
 
@@ -746,6 +770,7 @@ function BookingForm() {
             }
 
             setIsSubmitted(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
         } catch {
             setSubmitError(t("error.network"))
         } finally {

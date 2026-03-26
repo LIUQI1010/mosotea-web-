@@ -46,7 +46,7 @@ function formatSlotTime(startTime: string): string {
 
 function formatSlotDate(startTime: string): string {
   const date = new Date(startTime)
-  return new Intl.DateTimeFormat('zh-CN', {
+  return new Intl.DateTimeFormat('zh-TW', {
     timeZone: NZ_TZ,
     month: 'long',
     day: 'numeric',
@@ -55,7 +55,7 @@ function formatSlotDate(startTime: string): string {
 }
 
 function formatBookingDate(startTime: string): string {
-  return new Intl.DateTimeFormat('zh-CN', {
+  return new Intl.DateTimeFormat('zh-TW', {
     timeZone: NZ_TZ,
     month: 'numeric',
     day: 'numeric',
@@ -63,7 +63,7 @@ function formatBookingDate(startTime: string): string {
 }
 
 function formatBookingTime(startTime: string): string {
-  return new Intl.DateTimeFormat('zh-CN', {
+  return new Intl.DateTimeFormat('zh-TW', {
     timeZone: NZ_TZ,
     hour: '2-digit',
     minute: '2-digit',
@@ -84,66 +84,71 @@ function getSlotStatus(slot: {
   return 'empty'
 }
 
-const statusConfig: Record<
-  SlotStatus,
-  { label: string; className: string }
-> = {
-  full: {
-    label: '已满',
-    className: 'bg-red-100 text-red-700 border border-red-200',
-  },
-  available: {
-    label: '有空余',
-    className: 'bg-green-50 text-green-700 border border-green-200',
-  },
-  empty: {
-    label: '空闲',
-    className: 'bg-stone-50 text-stone-500 border border-stone-200',
-  },
-  disabled: {
-    label: '已禁用',
-    className: 'bg-red-100 text-red-600 border border-red-300',
-  },
+const statusConfig: Record<SlotStatus, { label: string; className: string }> = {
+  full:      { label: '已滿',   className: 'bg-red-50 text-red-600 border border-red-100' },
+  available: { label: '有空位', className: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20' },
+  empty:     { label: '空閒',   className: 'bg-cream text-muted-foreground border border-border' },
+  disabled:  { label: '已停用', className: 'bg-red-50 text-red-400 border border-red-100' },
 }
 
-const langLabel: Record<string, string> = {
-  en: 'EN',
-  'zh-TW': '中',
+const bookingStatusConfig: Record<string, { label: string; className: string }> = {
+  pending:   { label: '待確認', className: 'bg-tea-brown/10 text-tea-brown border border-tea-brown/20' },
+  confirmed: { label: '已確認', className: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20' },
+  cancelled: { label: '已取消', className: 'bg-cream text-muted-foreground border border-border' },
+}
+
+
+// Date string arithmetic helpers to avoid nzNow double-conversion
+function addDays(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10)
+}
+
+function getWeekBounds(todayStr: string): { weekStartStr: string; weekEndStr: string } {
+  const [y, m, d] = todayStr.split('-').map(Number)
+  const date = new Date(Date.UTC(y, m - 1, d))
+  const dow = date.getUTCDay() // 0=Sun
+  const mondayOffset = dow === 0 ? -6 : 1 - dow
+  return {
+    weekStartStr: addDays(todayStr, mondayOffset),
+    weekEndStr: addDays(todayStr, mondayOffset + 6),
+  }
+}
+
+function getMonthBounds(todayStr: string): { monthStartStr: string; monthEndStr: string } {
+  const [y, m] = todayStr.split('-').map(Number)
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate()
+  return {
+    monthStartStr: `${y}-${String(m).padStart(2, '0')}-01`,
+    monthEndStr: `${y}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`,
+  }
+}
+
+// Convert NZ date string to UTC range covering the full NZ day
+// NZ is UTC+12 (NZST) or UTC+13 (NZDT) — use both offsets for safe bounds
+function nzDayToUTCRange(dateStr: string): { start: string; end: string } {
+  return {
+    start: new Date(`${dateStr}T00:00:00+13:00`).toISOString(),
+    end: new Date(`${dateStr}T23:59:59+12:00`).toISOString(),
+  }
 }
 
 export default async function AdminDashboardPage() {
   const supabase = createAdminClient()
-  const now = new Date()
-  const todayStr = toNZDate(now)
+  const todayStr = toNZDate(new Date())
 
-  // Calculate week boundaries (Monday–Sunday) in NZ time
-  const nzNow = new Date(
-    now.toLocaleString('en-US', { timeZone: NZ_TZ })
-  )
-  const dayOfWeek = nzNow.getDay()
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-  const monday = new Date(nzNow)
-  monday.setDate(nzNow.getDate() + mondayOffset)
-  monday.setHours(0, 0, 0, 0)
-  const sunday = new Date(monday)
-  sunday.setDate(monday.getDate() + 6)
-  sunday.setHours(23, 59, 59, 999)
+  // Calculate boundaries using date string arithmetic
+  const { weekStartStr, weekEndStr } = getWeekBounds(todayStr)
+  const { monthStartStr, monthEndStr } = getMonthBounds(todayStr)
+  const future3Str = addDays(todayStr, 3)
 
-  const weekStartStr = toNZDate(monday)
-  const weekEndStr = toNZDate(sunday)
-
-  // Calculate month boundaries in NZ time
-  const monthStart = new Date(nzNow.getFullYear(), nzNow.getMonth(), 1)
-  const monthEnd = new Date(nzNow.getFullYear(), nzNow.getMonth() + 1, 0)
-  monthEnd.setHours(23, 59, 59, 999)
-  const monthStartStr = toNZDate(monthStart)
-  const monthEndStr = toNZDate(monthEnd)
-
-  // Future 3 days boundary
-  const future3 = new Date(nzNow)
-  future3.setDate(nzNow.getDate() + 3)
-  future3.setHours(23, 59, 59, 999)
-  const future3Str = toNZDate(future3)
+  // Convert NZ date ranges to UTC for correct timestamptz queries
+  const todayUTC = nzDayToUTCRange(todayStr)
+  const weekStartUTC = nzDayToUTCRange(weekStartStr)
+  const weekEndUTC = nzDayToUTCRange(weekEndStr)
+  const monthStartUTC = nzDayToUTCRange(monthStartStr)
+  const monthEndUTC = nzDayToUTCRange(monthEndStr)
+  const future3UTC = nzDayToUTCRange(future3Str)
 
   // Run all queries in parallel
   const [
@@ -154,255 +159,213 @@ export default async function AdminDashboardPage() {
     slotsResult,
     bookingsResult,
   ] = await Promise.all([
-    // 1. Today's guest count
     supabase
       .from('bookings')
       .select('guest_count, time_slots!inner(start_time)')
       .neq('status', 'cancelled')
-      .gte('time_slots.start_time', `${todayStr}T00:00:00`)
-      .lt('time_slots.start_time', `${todayStr}T23:59:59`),
+      .gte('time_slots.start_time', todayUTC.start)
+      .lte('time_slots.start_time', todayUTC.end),
 
-    // 2. This week's guest count
     supabase
       .from('bookings')
       .select('guest_count, time_slots!inner(start_time)')
       .neq('status', 'cancelled')
-      .gte('time_slots.start_time', `${weekStartStr}T00:00:00`)
-      .lte('time_slots.start_time', `${weekEndStr}T23:59:59`),
+      .gte('time_slots.start_time', weekStartUTC.start)
+      .lte('time_slots.start_time', weekEndUTC.end),
 
-    // 3. This month's guest count (for revenue)
     supabase
       .from('bookings')
       .select('guest_count, time_slots!inner(start_time)')
       .neq('status', 'cancelled')
-      .gte('time_slots.start_time', `${monthStartStr}T00:00:00`)
-      .lte('time_slots.start_time', `${monthEndStr}T23:59:59`),
+      .gte('time_slots.start_time', monthStartUTC.start)
+      .lte('time_slots.start_time', monthEndUTC.end),
 
-    // 4. Pending count
     supabase
       .from('bookings')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'pending'),
 
-    // 5. Future 3 days time slots
     supabase
       .from('time_slots')
       .select('id, start_time, end_time, max_guests, booked_guests, is_available')
-      .gte('start_time', `${todayStr}T00:00:00`)
-      .lte('start_time', `${future3Str}T23:59:59`)
+      .gte('start_time', todayUTC.start)
+      .lte('start_time', future3UTC.end)
       .order('start_time', { ascending: true }),
 
-    // 6. Latest 5 bookings
     supabase
       .from('bookings')
-      .select(
-        'id, customer_name, guest_count, preferred_language, status, created_at, time_slots(start_time)'
-      )
+      .select('id, customer_name, guest_count, preferred_language, status, created_at, time_slots(start_time)')
       .order('created_at', { ascending: false })
       .limit(5),
   ])
 
   const todayGuests = (todayResult.data ?? []).reduce(
-    (sum: number, b: { guest_count: number }) => sum + b.guest_count,
-    0
+    (sum: number, b: { guest_count: number }) => sum + b.guest_count, 0
   )
   const weekGuests = (weekResult.data ?? []).reduce(
-    (sum: number, b: { guest_count: number }) => sum + b.guest_count,
-    0
+    (sum: number, b: { guest_count: number }) => sum + b.guest_count, 0
   )
   const monthRevenue =
     (monthResult.data ?? []).reduce(
-      (sum: number, b: { guest_count: number }) => sum + b.guest_count,
-      0
+      (sum: number, b: { guest_count: number }) => sum + b.guest_count, 0
     ) * 75
   const pendingCount = pendingResult.count ?? 0
   const slots = slotsResult.data ?? []
   const bookings = bookingsResult.data ?? []
 
   const stats = [
-    { label: '今日预约', value: `${todayGuests} 人` },
-    { label: '本周预约', value: `${weekGuests} 人` },
-    {
-      label: '本月收入',
-      value: `NZD $${monthRevenue.toLocaleString()}`,
-    },
-    {
-      label: '待确认',
-      value: `${pendingCount}`,
-      highlight: pendingCount > 0,
-    },
+    { label: '今日到訪', value: `${todayGuests} 人` },
+    { label: '本週預約', value: `${weekGuests} 人` },
+    { label: '本月收入', value: `$${monthRevenue.toLocaleString()}` },
+    { label: '待確認',   value: `${pendingCount} 筆`, urgent: pendingCount > 0, href: pendingCount > 0 ? '/admin/bookings?status=pending' : undefined },
   ]
 
   return (
     <div>
       {/* Topbar */}
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-[#3D3D3D]">仪表盘</h1>
-        <span className="text-sm text-[#6B6B6B]">
-          {formatNZDate(todayStr)}
-        </span>
+      <div className="mb-8">
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">儀表板</p>
+        <h1 className="font-serif text-4xl font-semibold text-foreground">{formatNZDate(todayStr)}</h1>
       </div>
 
       {/* Stats Grid */}
       <div className="mb-8 grid grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-[#E8E0D8] bg-white p-5"
-          >
-            <p className="text-sm text-[#6B6B6B]">{stat.label}</p>
-            <p
-              className={`mt-1 text-2xl font-medium ${
-                'highlight' in stat && stat.highlight
-                  ? 'text-red-600'
-                  : 'text-[#3D3D3D]'
-              }`}
-            >
-              {stat.value}
-            </p>
-          </div>
-        ))}
+        {stats.map((stat) => {
+          const content = (
+            <>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {stat.label}
+              </p>
+              <p className={`mt-2 text-3xl font-semibold ${stat.urgent ? 'text-tea-brown' : 'text-foreground'}`}>
+                {stat.value}
+              </p>
+            </>
+          )
+          const className = `rounded-2xl border p-5 ${
+            stat.urgent
+              ? 'border-tea-brown/30 bg-tea-brown/5'
+              : 'border-border bg-off-white'
+          }`
+
+          if (stat.href) {
+            return (
+              <Link key={stat.label} href={stat.href} className={`${className} transition-colors hover:border-tea-brown/40 hover:bg-tea-brown/10`}>
+                {content}
+              </Link>
+            )
+          }
+          return <div key={stat.label} className={className}>{content}</div>
+        })}
       </div>
 
       {/* Two-column Section */}
       <div className="grid grid-cols-2 gap-6">
+
         {/* Left: Upcoming Slots */}
-        <div className="rounded-2xl border border-[#E8E0D8] bg-white p-5">
+        <div className="rounded-2xl border border-border bg-off-white p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-medium text-[#3D3D3D]">近期场次</h2>
-            <Link
-              href="/admin/slots"
-              className="text-sm text-[#7C5C3E] hover:underline"
-            >
+            <h2 className="font-serif text-base font-semibold text-foreground">近期場次</h2>
+            <Link href="/admin/slots" className="text-xs text-tea-brown hover:underline">
               查看全部 →
             </Link>
           </div>
 
           {slots.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[#6B6B6B]">
-              暂无近期场次
-            </p>
+            <p className="py-8 text-center text-sm text-muted-foreground">暫無近期場次</p>
           ) : (
-            <div className="space-y-3">
-              {slots.map(
-                (slot: {
-                  id: string
-                  start_time: string
-                  max_guests: number
-                  booked_guests: number
-                  is_available: boolean
-                }) => {
-                  const status = getSlotStatus(slot)
-                  const config = statusConfig[status]
-                  return (
-                    <Link
-                      key={slot.id}
-                      href={`/admin/slots?slot_id=${slot.id}`}
-                      className="grid grid-cols-[1fr_60px_72px] items-center rounded-xl border border-[#E8E0D8] px-4 py-3 transition-colors hover:bg-stone-50"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-[#3D3D3D]">
-                          {formatSlotDate(slot.start_time)}
-                        </p>
-                        <p className="text-xs text-[#6B6B6B]">
-                          {formatSlotTime(slot.start_time)}
-                        </p>
-                      </div>
-                      <span className="text-center text-sm text-[#6B6B6B]">
-                        {slot.booked_guests}/{slot.max_guests}
+            <div className="space-y-2">
+              {slots.map((slot: {
+                id: string
+                start_time: string
+                max_guests: number
+                booked_guests: number
+                is_available: boolean
+              }) => {
+                const status = getSlotStatus(slot)
+                const config = statusConfig[status]
+                return (
+                  <Link
+                    key={slot.id}
+                    href={`/admin/slots?slot_id=${slot.id}`}
+                    className="grid grid-cols-[1fr_56px_72px] items-center gap-2 rounded-xl border border-border bg-cream px-4 py-3 transition-colors hover:border-tea-brown/30 hover:bg-tea-brown/5"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        {formatSlotDate(slot.start_time)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatSlotTime(slot.start_time)}
+                      </p>
+                    </div>
+                    <span className="text-center text-sm text-muted-foreground">
+                      {slot.booked_guests}/{slot.max_guests}
+                    </span>
+                    <div className="flex justify-end">
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
+                        {config.label}
                       </span>
-                      <div className="flex justify-center">
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}
-                        >
-                          {config.label}
-                        </span>
-                      </div>
-                    </Link>
-                  )
-                }
-              )}
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           )}
         </div>
 
         {/* Right: Latest Bookings */}
-        <div className="rounded-2xl border border-[#E8E0D8] bg-white p-5">
+        <div className="rounded-2xl border border-border bg-off-white p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-medium text-[#3D3D3D]">最新预约</h2>
-            <Link
-              href="/admin/bookings"
-              className="text-sm text-[#7C5C3E] hover:underline"
-            >
+            <h2 className="font-serif text-base font-semibold text-foreground">最新預約</h2>
+            <Link href="/admin/bookings" className="text-xs text-tea-brown hover:underline">
               查看全部 →
             </Link>
           </div>
 
           {bookings.length === 0 ? (
-            <p className="py-6 text-center text-sm text-[#6B6B6B]">
-              暂无预约记录
-            </p>
+            <p className="py-8 text-center text-sm text-muted-foreground">暫無預約記錄</p>
           ) : (
-            <div className="space-y-3">
-              {bookings.map(
-                (booking: {
-                  id: string
-                  customer_name: string
-                  guest_count: number
-                  preferred_language: string
-                  status: string
-                  time_slots: { start_time: string } | { start_time: string }[]
-                }) => {
-                  const slotData = Array.isArray(booking.time_slots)
-                    ? booking.time_slots[0]
-                    : booking.time_slots
-                  const statusColors: Record<string, string> = {
-                    pending: 'bg-amber-50 text-amber-700 border border-amber-200',
-                    confirmed:
-                      'bg-green-50 text-green-700 border border-green-200',
-                    cancelled: 'bg-stone-50 text-stone-400 border border-stone-200',
-                  }
-                  const nzDate = slotData
-                    ? new Date(slotData.start_time).toLocaleDateString('en-CA', { timeZone: NZ_TZ })
-                    : null
-                  return (
-                    <Link
-                      key={booking.id}
-                      href={nzDate ? `/admin/bookings?date=${nzDate}` : '/admin/bookings'}
-                      className="grid grid-cols-[0.7fr_48px_48px_40px_28px_1fr] items-center gap-2 rounded-xl border border-[#E8E0D8] px-4 py-3 transition-colors hover:bg-stone-50"
-                    >
-                      <p className="truncate text-sm font-medium text-[#3D3D3D]">
-                        {booking.customer_name}
-                      </p>
-                      <p className="text-xs text-[#6B6B6B]">
-                        {slotData ? formatBookingDate(slotData.start_time) : '—'}
-                      </p>
-                      <p className="text-xs text-[#6B6B6B]">
-                        {slotData ? formatBookingTime(slotData.start_time) : '—'}
-                      </p>
-                      <p className="text-center text-xs text-[#6B6B6B]">
-                        {booking.guest_count}人
-                      </p>
-                      <p className="text-center text-xs text-[#6B6B6B]">
-                        {langLabel[booking.preferred_language] ?? booking.preferred_language}
-                      </p>
-                      <div className="flex justify-end">
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            statusColors[booking.status] ?? ''
-                          }`}
-                        >
-                          {booking.status === 'pending'
-                            ? '待确认'
-                            : booking.status === 'confirmed'
-                              ? '已确认'
-                              : '已取消'}
-                        </span>
-                      </div>
-                    </Link>
-                  )
-                }
-              )}
+            <div className="space-y-2">
+              {bookings.map((booking: {
+                id: string
+                customer_name: string
+                guest_count: number
+                preferred_language: string
+                status: string
+                time_slots: { start_time: string } | { start_time: string }[]
+              }) => {
+                const slotData = Array.isArray(booking.time_slots)
+                  ? booking.time_slots[0]
+                  : booking.time_slots
+                const statusCfg = bookingStatusConfig[booking.status] ?? bookingStatusConfig.cancelled
+                const nzDate = slotData
+                  ? new Date(slotData.start_time).toLocaleDateString('en-CA', { timeZone: NZ_TZ })
+                  : null
+                return (
+                  <Link
+                    key={booking.id}
+                    href={nzDate ? `/admin/bookings?date=${nzDate}` : '/admin/bookings'}
+                    className="grid grid-cols-[1fr_40px_44px_24px_80px] items-center gap-2 rounded-xl border border-border bg-cream px-4 py-3 transition-colors hover:border-tea-brown/30 hover:bg-tea-brown/5"
+                  >
+                    <p className="truncate text-sm font-medium text-foreground">
+                      {booking.customer_name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {slotData ? formatBookingDate(slotData.start_time) : '—'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {slotData ? formatBookingTime(slotData.start_time) : '—'}
+                    </p>
+                    <p className="text-center text-xs text-muted-foreground">
+                      {booking.guest_count}人
+                    </p>
+                    <div className="flex justify-end">
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusCfg.className}`}>
+                        {statusCfg.label}
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           )}
         </div>
