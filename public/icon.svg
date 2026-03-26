@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Tea leaf -->
+  <path d="M16 4C12 4 6 10 6 18c0 5 4 10 10 10s10-5 10-10C26 10 20 4 16 4z" fill="#7C5C3E"/>
+  <!-- Leaf vein -->
+  <path d="M16 8v16M16 12c-3 2-5 4-5.5 6M16 14c3 2 5 4 5.5 6" stroke="#FDF6F0" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

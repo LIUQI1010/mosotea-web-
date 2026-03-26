@@ -6,12 +6,12 @@ import type { BookingWithTimeSlot } from '@/types'
 
 const bookingSchema = z.object({
     timeSlotId: z.string().uuid('Invalid time slot'),
-    fullName: z.string().trim().min(2, 'Name must be at least 2 characters').regex(
+    fullName: z.string().trim().min(2, 'Name must be at least 2 characters').max(30, 'Name must be 30 characters or fewer').regex(
         /^[a-zA-Z\u4e00-\u9fff\s\-']+$/,
         'Name may only contain English or Chinese characters'
     ),
-    email: z.string().trim().email('Invalid email address'),
-    phone: z.string().trim().min(1, 'Phone number is required').refine(
+    email: z.string().trim().max(100, 'Email must be 100 characters or fewer').email('Invalid email address'),
+    phone: z.string().trim().min(1, 'Phone number is required').max(20, 'Phone number must be 20 characters or fewer').refine(
         (val) => {
             const digits = val.replace(/[\s\-().+]/g, '')
             return /^\d{7,15}$/.test(digits)
@@ -19,7 +19,7 @@ const bookingSchema = z.object({
         { message: 'Invalid phone number' }
     ),
     guests: z.number().int().min(1).max(8, 'Maximum 8 guests'),
-    specialRequests: z.string().max(500, 'Special requests must be 500 characters or fewer').optional().default(''),
+    specialRequests: z.string().max(200, 'Special requests must be 200 characters or fewer').optional().default(''),
     preferredLanguage: z.enum(['en', 'zh']),
 })
 

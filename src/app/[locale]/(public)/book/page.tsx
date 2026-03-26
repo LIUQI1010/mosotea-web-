@@ -353,6 +353,7 @@ function InputField({
     placeholder,
     error,
     required = false,
+    maxLength,
 }: {
     label: string
     type?: string
@@ -361,6 +362,7 @@ function InputField({
     placeholder?: string
     error?: string
     required?: boolean
+    maxLength?: number
 }) {
     return (
         <div>
@@ -373,6 +375,7 @@ function InputField({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
+                maxLength={maxLength}
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-off-white transition-colors focus:outline-none focus:ring-0 ${error
                         ? "border-red-400 focus:border-red-500"
                         : "border-border focus:border-tea-brown"
@@ -417,6 +420,7 @@ function PersonalDetails({
                     placeholder={t("step3.fullNamePlaceholder")}
                     error={errors.fullName}
                     required
+                    maxLength={30}
                 />
 
                 <InputField
@@ -427,6 +431,7 @@ function PersonalDetails({
                     placeholder={t("step3.emailPlaceholder")}
                     error={errors.email}
                     required
+                    maxLength={100}
                 />
 
                 <InputField
@@ -437,6 +442,7 @@ function PersonalDetails({
                     placeholder={t("step3.phonePlaceholder")}
                     error={errors.phone}
                     required
+                    maxLength={20}
                 />
 
                 {/* Guest Count */}
@@ -499,6 +505,7 @@ function PersonalDetails({
                         onChange={(e) => onFieldChange("specialRequests", e.target.value)}
                         placeholder={t("step3.specialRequestsPlaceholder")}
                         rows={3}
+                        maxLength={200}
                         className={`w-full px-4 py-3 rounded-lg border-2 bg-off-white transition-colors focus:outline-none focus:ring-0 resize-none ${errors.specialRequests ? "border-red-400 focus:border-red-400" : "border-border focus:border-tea-brown"}`}
                     />
                     {errors.specialRequests && (
@@ -695,6 +702,8 @@ function BookingForm() {
                 newErrors.fullName = t("step3.errorName")
             } else if (trimmedName.length < 2) {
                 newErrors.fullName = t("step3.errorNameShort")
+            } else if (trimmedName.length > 30) {
+                newErrors.fullName = t("step3.errorNameTooLong")
             } else if (!/^[a-zA-Z\u4e00-\u9fff\s\-']+$/.test(trimmedName)) {
                 newErrors.fullName = t("step3.errorNameInvalid")
             }
@@ -702,6 +711,8 @@ function BookingForm() {
             const trimmedEmail = formData.email.trim()
             if (!trimmedEmail) {
                 newErrors.email = t("step3.errorEmail")
+            } else if (trimmedEmail.length > 100) {
+                newErrors.email = t("step3.errorEmailTooLong")
             } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
                 newErrors.email = t("step3.errorEmailInvalid")
             }
@@ -709,6 +720,8 @@ function BookingForm() {
             const trimmedPhone = formData.phone.trim()
             if (!trimmedPhone) {
                 newErrors.phone = t("step3.errorPhone")
+            } else if (trimmedPhone.length > 20) {
+                newErrors.phone = t("step3.errorPhoneTooLong")
             } else {
                 // Strip formatting characters, then check digit count (7–15 per E.164)
                 const digits = trimmedPhone.replace(/[\s\-().+]/g, '')
@@ -721,7 +734,7 @@ function BookingForm() {
                 newErrors.guests = t("step3.errorGuests")
             }
 
-            if (formData.specialRequests.length > 500) {
+            if (formData.specialRequests.length > 200) {
                 newErrors.specialRequests = t("step3.errorSpecialRequestsTooLong")
             }
         }
