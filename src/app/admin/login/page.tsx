@@ -74,6 +74,7 @@ export default function AdminLoginPage() {
                 type="password"
                 required
                 autoFocus
+                maxLength={200}
                 className="w-full rounded-lg border border-border bg-cream px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-colors focus:border-tea-brown focus:ring-2 focus:ring-tea-brown/20"
                 placeholder={t('placeholder')}
               />

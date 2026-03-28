@@ -283,6 +283,7 @@ function ContactForm() {
                         onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                         }
+                        maxLength={100}
                         className={`w-full px-4 py-3 rounded-lg border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors ${errors.name ? "border-red-400" : "border-border"
                             }`}
                         placeholder={t("form.namePlaceholder")}
@@ -307,6 +308,7 @@ function ContactForm() {
                         onChange={(e) =>
                             setFormData({ ...formData, email: e.target.value })
                         }
+                        maxLength={100}
                         className={`w-full px-4 py-3 rounded-lg border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors ${errors.email ? "border-red-400" : "border-border"
                             }`}
                         placeholder={t("form.emailPlaceholder")}
@@ -331,6 +333,7 @@ function ContactForm() {
                         onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
                         }
+                        maxLength={20}
                         className="w-full px-4 py-3 rounded-lg border border-border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors"
                         placeholder={t("form.phonePlaceholder")}
                     />
@@ -351,6 +354,7 @@ function ContactForm() {
                         onChange={(e) =>
                             setFormData({ ...formData, message: e.target.value })
                         }
+                        maxLength={2000}
                         className={`w-full px-4 py-3 rounded-lg border bg-off-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-tea-brown/20 focus:border-tea-brown transition-colors resize-none ${errors.message ? "border-red-400" : "border-border"
                             }`}
                         placeholder={t("form.messagePlaceholder")}

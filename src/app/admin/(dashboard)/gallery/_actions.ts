@@ -27,6 +27,7 @@ export async function uploadImage(
   const caption = (formData.get('caption') as string)?.trim() || null
 
   if (!file) return { success: false, error: 'No file provided' }
+  if (caption && caption.length > 200) return { success: false, error: 'Caption must be 200 characters or less' }
 
   // Validate file type
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
@@ -78,6 +79,10 @@ export async function updateCaption(
   id: string,
   caption: string | null
 ): Promise<{ success: boolean; error?: string }> {
+  if (caption && caption.length > 200) {
+    return { success: false, error: 'Caption must be 200 characters or less' }
+  }
+
   const supabase = createAdminClient()
 
   const { error } = await supabase

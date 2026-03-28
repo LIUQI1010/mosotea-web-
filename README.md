@@ -10,8 +10,11 @@ Built with Next.js, TypeScript, Tailwind CSS, Supabase, and Resend.
 - **Online booking system** — Date picker, time slot selection, guest count, and real-time capacity checking
 - **Automated emails** — Booking confirmation, admin notification, and cancellation emails via Resend
 - **Customer self-cancellation** — Secure HMAC-SHA256 token-based cancellation links with 24-hour cutoff
-- **Admin dashboard** — View/confirm/cancel bookings, manage time slots, calendar view, responsive design
+- **Admin dashboard** — View/confirm/cancel bookings, manage time slots, calendar view, bilingual (EN/繁中), responsive design
 - **Time slot management** — Bulk generation (next 30 days), toggle availability, capacity tracking
+- **Announcement banner** — Admin-managed bilingual announcements with auto-rotation on the homepage
+- **Gallery** — Masonry layout with lightbox, admin image upload with client-side compression, Supabase Storage
+- **Input validation** — All forms have client-side `maxLength` and server-side Zod validation to prevent abuse
 - **SEO optimised** — Sitemap, robots.txt, meta tags for all pages
 - **Responsive design** — Mobile-first layout across all public and admin pages
 
@@ -113,6 +116,29 @@ create table gallery (
   caption text,
   uploaded_at timestamptz default now()
 );
+
+-- Announcements (bilingual, displayed on homepage)
+create table announcements (
+  id uuid primary key default gen_random_uuid(),
+  title_en text not null,
+  title_zh text not null,
+  content_en text not null,
+  content_zh text not null,
+  is_active boolean default true,
+  sort_order int not null default 0,
+  created_at timestamptz default now()
+);
+
+-- Email templates (admin-editable customer-facing emails)
+create table email_templates (
+  id uuid primary key default gen_random_uuid(),
+  type text not null unique,
+  subject_en text not null,
+  subject_zh text not null,
+  body_en text not null,
+  body_zh text not null,
+  updated_at timestamptz default now()
+);
 ```
 
 Then set up the required database triggers:
@@ -128,6 +154,8 @@ And configure RLS policies:
 | `time_slots` | All users | Authenticated | Authenticated |
 | `bookings` | Authenticated | All users | Authenticated |
 | `gallery` | All users | Authenticated | Authenticated |
+| `announcements` | All users | Authenticated | Authenticated |
+| `email_templates` | Authenticated | Authenticated | Authenticated |
 
 ### 5. Run the development server
 
@@ -157,16 +185,18 @@ src/
 │   │   ├── workshop/       ← Workshop details
 │   │   ├── book/           ← Booking form
 │   │   ├── contact/        ← Contact page
+│   │   ├── gallery/        ← Gallery with masonry layout + lightbox
 │   │   ├── privacy/        ← Privacy Policy
 │   │   ├── terms/          ← Terms of Service
 │   │   └── cancel/[token]/ ← Customer self-cancellation
-│   ├── admin/              ← Protected admin dashboard (English only)
-│   │   ├── (dashboard)/    ← Dashboard, bookings, slots management
+│   ├── admin/              ← Protected admin dashboard (bilingual EN/繁中)
+│   │   ├── (dashboard)/    ← Dashboard, bookings, slots, announcements, gallery
 │   │   └── login/          ← Admin login
 │   ├── api/                ← API routes (booking, time-slots, cancel, contact)
 │   ├── layout.tsx          ← Root layout (fonts, metadata)
 │   └── globals.css         ← Tailwind v4 config + colour palette
 ├── components/
+│   ├── AnnouncementBanner.tsx ← Homepage announcement rotating banner
 │   └── layout/             ← Navigation, Footer
 ├── lib/
 │   ├── supabase/           ← Supabase clients (browser, server, admin)

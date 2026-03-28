@@ -1,8 +1,16 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod/v4'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Announcement } from '@/types'
+
+const announcementSchema = z.object({
+  title_en: z.string().min(1).max(200),
+  title_zh: z.string().min(1).max(200),
+  content_en: z.string().min(1).max(2000),
+  content_zh: z.string().min(1).max(2000),
+})
 
 function revalidate() {
   revalidatePath('/admin/announcements')
@@ -26,6 +34,9 @@ export async function createAnnouncement(formData: {
   content_en: string
   content_zh: string
 }): Promise<{ success: boolean; error?: string }> {
+  const parsed = announcementSchema.safeParse(formData)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0].message }
+
   const supabase = createAdminClient()
 
   // Get max sort_order to append at end
@@ -38,10 +49,10 @@ export async function createAnnouncement(formData: {
   const nextOrder = (existing?.[0]?.sort_order ?? 0) + 1
 
   const { error } = await supabase.from('announcements').insert({
-    title_en: formData.title_en.trim(),
-    title_zh: formData.title_zh.trim(),
-    content_en: formData.content_en.trim(),
-    content_zh: formData.content_zh.trim(),
+    title_en: parsed.data.title_en.trim(),
+    title_zh: parsed.data.title_zh.trim(),
+    content_en: parsed.data.content_en.trim(),
+    content_zh: parsed.data.content_zh.trim(),
     is_active: true,
     sort_order: nextOrder,
   })
@@ -61,15 +72,18 @@ export async function updateAnnouncement(
     content_zh: string
   }
 ): Promise<{ success: boolean; error?: string }> {
+  const parsed = announcementSchema.safeParse(formData)
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0].message }
+
   const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('announcements')
     .update({
-      title_en: formData.title_en.trim(),
-      title_zh: formData.title_zh.trim(),
-      content_en: formData.content_en.trim(),
-      content_zh: formData.content_zh.trim(),
+      title_en: parsed.data.title_en.trim(),
+      title_zh: parsed.data.title_zh.trim(),
+      content_en: parsed.data.content_en.trim(),
+      content_zh: parsed.data.content_zh.trim(),
     })
     .eq('id', id)
 
