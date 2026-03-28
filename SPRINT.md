@@ -260,22 +260,24 @@ Each developer answers:
 | Build homepage announcement banner component (rotating, bilingual) | Developer 1 | ✅ Done |
 | Add announcement-related translation keys to `en.json` / `zh-TW.json` | Developer 1 | ✅ Done |
 | **Gallery** | | |
-| Create Supabase Storage bucket `gallery` (public access) | Developer 1 | ⏳ Pending |
-| Build admin gallery page (`/admin/gallery`) with image upload/delete | Developer 1 | ⏳ Pending |
-| Implement gallery server actions (upload to Storage + insert metadata, delete) | Developer 1 | ⏳ Pending |
-| Add gallery sidebar nav item in `AdminSidebar.tsx` | Developer 1 | ⏳ Pending |
-| Build homepage Gallery section (dynamic, from database) | Developer 2 | ⏳ Pending |
-| Replace About page hardcoded gallery with dynamic gallery data | Developer 2 | ⏳ Pending |
-| Configure Supabase Storage domain in `next.config.ts` for `next/image` | Developer 1 | ⏳ Pending |
-| Add gallery-related translation keys to `en.json` / `zh-TW.json` | Developer 2 | ⏳ Pending |
+| Create Supabase Storage bucket `gallery` (public access, 2MB limit) | Developer 1 | ✅ Done |
+| Build admin gallery page (`/admin/gallery`) with image upload/delete/caption | Developer 1 | ✅ Done |
+| Implement gallery server actions (upload, updateCaption, delete) | Developer 1 | ✅ Done |
+| Add gallery sidebar nav item in `AdminSidebar.tsx` | Developer 1 | ✅ Done |
+| Build standalone Gallery page (`/gallery`) with masonry layout + lightbox | Developer 1 | ✅ Done |
+| Build homepage Gallery preview section (6 images + "View All" link) | Developer 1 | ✅ Done |
+| Add Gallery link to public navigation bar | Developer 1 | ✅ Done |
+| Configure Supabase Storage domain in `next.config.ts` for `next/image` | Developer 1 | ✅ Done |
+| Implement client-side image compression (Canvas API, ≤ 2MB) | Developer 1 | ✅ Done |
+| Add gallery-related translation keys to `en.json` / `zh-TW.json` | Developer 1 | ✅ Done |
 | Responsive testing for announcements banner and gallery section | Both | ⏳ Pending |
 
 **Definition of Done:**
 - [x] Admin can create, edit, toggle, and delete bilingual announcements
 - [x] Homepage displays active announcements as a rotating top banner in the visitor's locale
-- [ ] Admin can upload and delete gallery images via Supabase Storage
-- [ ] Homepage displays a dynamic Gallery section with images from the database
-- [ ] About page gallery is replaced by the same dynamic data source
+- [x] Admin can upload, edit captions, and delete gallery images via Supabase Storage
+- [x] Standalone Gallery page with masonry layout and lightbox
+- [x] Homepage displays Gallery preview (6 images) with link to full gallery
 - [ ] All new UI is responsive on mobile, tablet, and desktop
 
 ---

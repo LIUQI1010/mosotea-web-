@@ -1,7 +1,10 @@
 "use client"
 
+import { useState, useEffect } from 'react'
 import { useTranslations } from "next-intl"
+import Image from 'next/image'
 import { Link } from "@/i18n/navigation"
+import { createClient } from '@/lib/supabase/client'
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 import { AnnouncementBanner } from "@/components/AnnouncementBanner"
@@ -304,6 +307,64 @@ function TestimonialsSection() {
   )
 }
 
+// Gallery Section
+function GallerySection() {
+  const t = useTranslations("home.gallery")
+  const [images, setImages] = useState<{ id: string; url: string; caption: string | null }[]>([])
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('gallery')
+      .select('id, url, caption')
+      .order('uploaded_at', { ascending: false })
+      .limit(6)
+      .then(({ data }) => {
+        if (data && data.length > 0) setImages(data)
+      })
+  }, [])
+
+  if (images.length === 0) return null
+
+  return (
+    <section className="py-20 sm:py-28 px-4 bg-cream">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-4">
+            {t("title")}
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          {images.map((image) => (
+            <div
+              key={image.id}
+              className="aspect-[4/3] overflow-hidden rounded-lg"
+            >
+              <Image
+                src={image.url}
+                alt={image.caption ?? ''}
+                width={600}
+                height={450}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/gallery"
+            className="inline-block px-8 py-3 text-base font-medium rounded border-2 border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground transition-colors"
+          >
+            {t("viewAll")}
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // Main Page
 export default function HomePage() {
   return (
@@ -315,6 +376,7 @@ export default function HomePage() {
       <IntroductionSection />
       <FeaturedExperiences />
       <TestimonialsSection />
+      <GallerySection />
       <Footer />
     </main>
   )

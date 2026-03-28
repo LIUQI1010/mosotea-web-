@@ -308,47 +308,6 @@ function HostSection() {
     )
 }
 
-// Gallery Section
-function GallerySection() {
-    const t = useTranslations("about")
-
-    const galleryImages = [
-        { src: "/images/gallery-1.jpg", alt: "Traditional tea ceremony utensils" },
-        { src: "/images/gallery-2.jpg", alt: "Zen garden corner" },
-        { src: "/images/gallery-3.jpg", alt: "Tea being poured" },
-        { src: "/images/gallery-4.jpg", alt: "Tea room interior with ikebana" },
-        { src: "/images/gallery-5.jpg", alt: "Guests during tea ceremony" },
-        { src: "/images/gallery-6.jpg", alt: "Garden tea pavilion" },
-    ]
-
-    return (
-        <section className="py-20 sm:py-28 px-4 bg-off-white">
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-12">
-                    <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-tea-brown mb-3">
-                        {t("gallery.title")}
-                    </h2>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-                    {galleryImages.map((image, index) => (
-                        <div
-                            key={index}
-                            className="aspect-[4/3] overflow-hidden rounded-lg"
-                        >
-                            <img
-                                src={image.src}
-                                alt={image.alt}
-                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
-}
-
 // CTA Section
 function CTASection() {
     const t = useTranslations("about")
@@ -383,7 +342,6 @@ export default function AboutPage() {
             <PhilosophySection />
             <WhatToExpectSection />
             <HostSection />
-            <GallerySection />
             <CTASection />
             <Footer />
         </main>

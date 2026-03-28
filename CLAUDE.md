@@ -54,6 +54,8 @@ mosotea-web-/
 │   │   │   ├── terms/
 │   │   │   │   ├── layout.tsx      ← Terms of Service metadata
 │   │   │   │   └── page.tsx        ← Terms of Service (/terms)
+│   │   │   ├── gallery/
+│   │   │   │   └── page.tsx        ← Gallery page with masonry layout + lightbox (/gallery)
 │   │   │   └── cancel/
 │   │   │       └── [token]/
 │   │   │           └── page.tsx    ← Customer self-cancellation (/cancel/[token])
@@ -362,14 +364,19 @@ time_slots ──── bookings
 - Users can dismiss the banner via a centered "Dismiss" / "關閉通知" link below the content
 
 ### Gallery Rules
-- Gallery images are stored in **Supabase Storage** (bucket: `gallery`)
+- Gallery images are stored in **Supabase Storage** (bucket: `gallery`, public, 2MB file size limit)
 - The `gallery` table stores metadata (url, filename, caption)
-- Homepage displays a Gallery section showing images from the database
-- The About page's previous hardcoded gallery is replaced by this dynamic gallery
-- Caption is single-language (not bilingual)
-- Admin can upload images, edit captions, and delete images
+- **Standalone Gallery page** (`/gallery`) displays all images in a **CSS columns masonry layout** (1/2/3/4 columns responsive) with click-to-enlarge lightbox and left/right navigation
+- Homepage displays a Gallery preview section (latest 6 images in standard grid) with "View All Photos" link to `/gallery`
+- Gallery page is accessible via the **navigation bar** (between About and Contact)
+- About page does **not** display gallery images (removed)
+- Caption is single-language (not bilingual), overlaid on image bottom with gradient background
+- Admin can upload images (drag & drop or click), edit captions, and delete images
+- **Client-side image compression**: images are automatically compressed to ≤ 2MB before upload using Canvas API (max dimension 2048px, progressive JPEG quality reduction)
+- Admin gallery displays images in a compact grid (3/4/6 columns, square aspect ratio) with caption overlay
 - Deleting an image removes both the Storage file and the database record
-- `next/image` is used for optimized loading (requires Supabase Storage domain in `next.config.ts`)
+- `next/image` is used for optimized loading (Supabase Storage domain configured in `next.config.ts`)
+- `next.config.ts` sets `experimental.serverActions.bodySizeLimit: '3mb'` for image upload
 
 ---
 
@@ -525,7 +532,7 @@ Admin operations use Next.js Server Actions instead of API routes:
 - `src/app/admin/(dashboard)/bookings/_actions.ts` — `getBookings`, `confirmBooking`, `cancelBooking`, `createBooking`, `updateBooking`, `getAvailableSlots`
 - `src/app/admin/(dashboard)/slots/_actions.ts` — `generateSlots`, `toggleSlot`
 - `src/app/admin/(dashboard)/announcements/_actions.ts` — `getAnnouncements`, `createAnnouncement`, `updateAnnouncement`, `deleteAnnouncement`, `toggleAnnouncement`, `reorderAnnouncements`
-- `src/app/admin/(dashboard)/gallery/_actions.ts` — `getGalleryImages`, `uploadImage`, `deleteImage`
+- `src/app/admin/(dashboard)/gallery/_actions.ts` — `getGalleryImages`, `uploadImage`, `updateCaption`, `deleteImage`
 
 ---
 
@@ -726,4 +733,4 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Sprint 2 | Booking system + cancellation emails | ✅ Done |
 | Sprint 3 | Admin dashboard + self-cancellation | ✅ Done |
 | Sprint 4 | Testing, performance, launch | 🔄 In Progress |
-| Sprint 5 | Announcements + Gallery management | ⏳ Pending |
+| Sprint 5 | Announcements + Gallery management | 🔄 In Progress |
