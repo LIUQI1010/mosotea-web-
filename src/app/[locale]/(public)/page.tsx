@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
+import { AnnouncementBanner } from "@/components/AnnouncementBanner"
 
 // Hero Section
 function HeroSection() {
@@ -308,7 +309,9 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
       <Navigation />
+      <AnnouncementBanner />
       <HeroSection />
+
       <IntroductionSection />
       <FeaturedExperiences />
       <TestimonialsSection />
