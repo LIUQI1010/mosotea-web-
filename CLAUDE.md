@@ -80,9 +80,12 @@ mosotea-web-/
 │   │   │   │   ├── announcements/
 │   │   │   │   │   ├── page.tsx    ← Announcement management (/admin/announcements)
 │   │   │   │   │   └── _actions.ts ← Server actions: CRUD announcements, toggle active
-│   │   │   │   └── gallery/
-│   │   │   │       ├── page.tsx    ← Gallery image management (/admin/gallery)
-│   │   │   │       └── _actions.ts ← Server actions: upload/delete images
+│   │   │   │   ├── gallery/
+│   │   │   │   │   ├── page.tsx    ← Gallery image management (/admin/gallery)
+│   │   │   │   │   └── _actions.ts ← Server actions: upload/delete images
+│   │   │   │   └── email-templates/
+│   │   │   │       ├── page.tsx    ← Email template management (/admin/email-templates)
+│   │   │   │       └── _actions.ts ← Server actions: CRUD email templates
 │   │   │   ├── login/
 │   │   │   │   └── page.tsx        ← Admin login (/admin/login)
 │   │   ├── api/                    ← API Routes (server-side only)
@@ -112,7 +115,7 @@ mosotea-web-/
 │   │   │   └── emails.ts           ← All email sending functions (4 types)
 │   │   └── token.ts                ← Cancellation token generation & verification (HMAC-SHA256)
 │   ├── types/
-│   │   └── index.ts                ← Shared TypeScript types (TimeSlot, Booking, Gallery, etc.)
+│   │   └── index.ts                ← Shared TypeScript types (TimeSlot, Booking, Gallery, EmailTemplate, etc.)
 │   └── i18n/
 │       ├── routing.ts              ← Locale routing config (en, zh-TW)
 │       ├── request.ts              ← Message loading per locale
@@ -186,6 +189,7 @@ CANCELLATION_TOKEN_SECRET=        # Random 32-byte hex string for signing cancel
 | `bookings` | Stores customer booking records |
 | `gallery` | Stores image metadata (files in Supabase Storage) |
 | `announcements` | Stores bilingual announcements displayed on the homepage |
+| `email_templates` | Stores admin-editable email templates for customer-facing emails |
 
 ### Table: `time_slots`
 
@@ -285,6 +289,51 @@ create table announcements (
 - Bilingual: `title_en`/`content_en` for English, `title_zh`/`content_zh` for Traditional Chinese
 - Displayed in the visitor's current locale
 
+### Table: `email_templates`
+
+Stores admin-editable email templates for customer-facing emails. When a template exists for a given type, it overrides the default hardcoded content.
+
+```sql
+create table email_templates (
+  id uuid primary key default gen_random_uuid(),
+  type text not null unique,
+  subject_en text not null,
+  subject_zh text not null,
+  body_en text not null,
+  body_zh text not null,
+  updated_at timestamptz default now()
+);
+```
+
+**Template types:**
+
+| `type` | Corresponding Function | Description |
+|---|---|---|
+| `booking_received` | `sendBookingReceived` | Sent to customer after booking submission (status: pending) |
+| `booking_confirmed` | `sendBookingConfirmation` | Sent to customer after admin confirms booking |
+| `cancellation_confirmation` | `sendCancellationConfirmation` | Sent to customer when booking is cancelled |
+
+**Available placeholder variables:**
+
+| Variable | Description | Available in |
+|---|---|---|
+| `{{customer_name}}` | Customer's name | All templates |
+| `{{date_time}}` | Formatted booking date & time (locale-aware) | All templates |
+| `{{guest_count}}` | Number of guests | All templates |
+| `{{total_price}}` | Total price (e.g. `NZ$150`) | `booking_received`, `booking_confirmed` |
+| `{{cancellation_url}}` | Self-cancellation link | `booking_received`, `booking_confirmed` |
+
+**Email template rules:**
+- Only the 3 customer-facing email types are editable (owner notification emails are not editable)
+- Each template has bilingual subject and body (`_en` / `_zh`)
+- Body content supports basic HTML for formatting
+- Placeholders are replaced at send time with actual booking data
+- If no template record exists for a type, the system falls back to the hardcoded default in `emails.ts`
+- The `type` column has a unique constraint — only one template per email type
+- Admin can edit subject line and body content for each template
+- Admin can preview templates with sample data before saving
+- Admin can reset a template to default by deleting the record
+
 ### Table Relationships
 
 ```
@@ -313,6 +362,8 @@ time_slots ──── bookings
 | `gallery` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
 | `announcements` | SELECT | All users (anon) |
 | `announcements` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
+| `email_templates` | SELECT | Authenticated only (admin) |
+| `email_templates` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
 
 ---
 
@@ -367,7 +418,10 @@ time_slots ──── bookings
 - Gallery images are stored in **Supabase Storage** (bucket: `gallery`, public, 2MB file size limit)
 - The `gallery` table stores metadata (url, filename, caption)
 - **Standalone Gallery page** (`/gallery`) displays all images in a **CSS columns masonry layout** (1/2/3/4 columns responsive) with click-to-enlarge lightbox and left/right navigation
-- Homepage displays a Gallery preview section (latest 6 images in standard grid) with "View All Photos" link to `/gallery`
+- **Gallery page loading UX:** skeleton screen (12 varied-height pulse blocks) → hidden preload container loads all images → entire grid fades in at once (800ms transition). This avoids masonry reflow jitter that occurs with sequential image reveal in CSS columns layout.
+- **Homepage Gallery preview:** latest 6 images in standard grid with skeleton placeholders while loading, individual image fade-in on load
+- **Lightbox:** full-screen overlay with close/prev/next navigation, caption overlaid on image bottom with gradient background (`from-black/70`)
+- **Accessibility:** image buttons have `aria-label`, lightbox has `role="dialog"` and `aria-label`, close/prev/next buttons have `aria-label`, preload container has `aria-hidden="true"`
 - Gallery page is accessible via the **navigation bar** (between About and Contact)
 - About page does **not** display gallery images (removed)
 - Caption is single-language (not bilingual), overlaid on image bottom with gradient background
@@ -377,6 +431,17 @@ time_slots ──── bookings
 - Deleting an image removes both the Storage file and the database record
 - `next/image` is used for optimized loading (Supabase Storage domain configured in `next.config.ts`)
 - `next.config.ts` sets `experimental.serverActions.bodySizeLimit: '3mb'` for image upload
+
+### Email Template Rules
+- Admin can customize the subject and body of 3 customer-facing email types: `booking_received`, `booking_confirmed`, `cancellation_confirmation`
+- Owner notification emails (`sendBookingNotification`, `sendCancellationNotice`) are **not** editable
+- Templates are bilingual: separate subject and body for English and Traditional Chinese
+- Body supports basic HTML (styled inline — consistent with existing email design)
+- Placeholders (e.g. `{{customer_name}}`, `{{date_time}}`) are replaced at send time
+- If no custom template exists in the database, the hardcoded default in `emails.ts` is used
+- Admin can preview a template with sample data before saving
+- Admin can reset to default by deleting the custom template record
+- Email template management page is accessible from the admin sidebar (`/admin/email-templates`)
 
 ---
 
@@ -533,6 +598,7 @@ Admin operations use Next.js Server Actions instead of API routes:
 - `src/app/admin/(dashboard)/slots/_actions.ts` — `generateSlots`, `toggleSlot`
 - `src/app/admin/(dashboard)/announcements/_actions.ts` — `getAnnouncements`, `createAnnouncement`, `updateAnnouncement`, `deleteAnnouncement`, `toggleAnnouncement`, `reorderAnnouncements`
 - `src/app/admin/(dashboard)/gallery/_actions.ts` — `getGalleryImages`, `uploadImage`, `updateCaption`, `deleteImage`
+- `src/app/admin/(dashboard)/email-templates/_actions.ts` — `getEmailTemplates`, `getEmailTemplate`, `upsertEmailTemplate`, `deleteEmailTemplate`
 
 ---
 
@@ -603,6 +669,12 @@ import type { Booking } from '@/types'
 - Use Tailwind utility classes only — no custom CSS unless absolutely necessary
 - Mobile-first responsive design: `sm:` `md:` `lg:` breakpoints
 - Custom colors available: `tea-brown`, `cream`, `bamboo-green`, `off-white`
+
+### Form Input Validation
+- **All form inputs that accept user text must have length limits** — both client-side (`maxLength` HTML attribute) and server-side (Zod `.max()` or equivalent check)
+- Public-facing forms (booking, contact) are highest priority — they are directly exposed to the internet
+- Admin forms (announcements, gallery, email templates, etc.) must also be validated server-side in Server Actions
+- Recommended limits: names ≤ 100, email ≤ 100, phone ≤ 20, short text (titles/captions) ≤ 200, long text (messages/content) ≤ 2000, email body HTML ≤ 10000
 
 ### API Routes
 - Always validate request body with `zod`
@@ -734,3 +806,4 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Sprint 3 | Admin dashboard + self-cancellation | ✅ Done |
 | Sprint 4 | Testing, performance, launch | 🔄 In Progress |
 | Sprint 5 | Announcements + Gallery management | 🔄 In Progress |
+| Sprint 6 | Email template management | ⏳ Planned |

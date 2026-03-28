@@ -80,7 +80,12 @@
     "title": "Gallery",
     "subtitle": "A glimpse into the world of Moso Tea — our space, our craft, and the moments we share.",
     "loading": "Loading...",
-    "noImages": "Gallery coming soon"
+    "noImages": "Gallery coming soon",
+    "viewImage": "View image {number}",
+    "lightboxLabel": "Image viewer",
+    "close": "Close",
+    "previous": "Previous image",
+    "next": "Next image"
   },
   "about": {
     "hero": {

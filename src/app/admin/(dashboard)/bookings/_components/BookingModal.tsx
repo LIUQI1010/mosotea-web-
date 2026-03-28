@@ -169,7 +169,7 @@ export function BookingModal({
         <div>
           <label className={labelClass}>{t('customerName')}</label>
           {mode === 'create' ? (
-            <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required className={inputClass} placeholder={t('namePlaceholder')} />
+            <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required maxLength={30} className={inputClass} placeholder={t('namePlaceholder')} />
           ) : (
             <div className={readonlyClass}>{customerName}</div>
           )}
@@ -186,7 +186,7 @@ export function BookingModal({
         {mode === 'create' && (
           <div>
             <label className={labelClass}>{t('email')}</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} placeholder="customer@example.com" />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required maxLength={100} className={inputClass} placeholder="customer@example.com" />
           </div>
         )}
 
@@ -194,7 +194,7 @@ export function BookingModal({
         {mode === 'create' && (
           <div>
             <label className={labelClass}>{t('phone')} <span className="font-normal text-muted-foreground">{t('phoneOptional')}</span></label>
-            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="021 xxx xxxx" />
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} className={inputClass} placeholder="021 xxx xxxx" />
           </div>
         )}
 
@@ -210,7 +210,7 @@ export function BookingModal({
         {/* Special requests */}
         <div>
           <label className={labelClass}>{t('specialRequests')} <span className="font-normal text-muted-foreground">{t('specialRequestsOptional')}</span></label>
-          <textarea value={specialRequests} onChange={(e) => setSpecialRequests(e.target.value)} rows={3} className={`${inputClass} resize-none`} />
+          <textarea value={specialRequests} onChange={(e) => setSpecialRequests(e.target.value)} rows={3} maxLength={200} className={`${inputClass} resize-none`} />
         </div>
 
         {/* Send email — create only */}

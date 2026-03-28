@@ -257,6 +257,7 @@ function AnnouncementModal({
                 type="text"
                 value={titleEn}
                 onChange={(e) => setTitleEn(e.target.value)}
+                maxLength={200}
                 className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
                 placeholder={t('titleEnPlaceholder')}
               />
@@ -269,6 +270,7 @@ function AnnouncementModal({
                 type="text"
                 value={titleZh}
                 onChange={(e) => setTitleZh(e.target.value)}
+                maxLength={200}
                 className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
                 placeholder={t('titleZhPlaceholder')}
               />
@@ -284,6 +286,7 @@ function AnnouncementModal({
                 value={contentEn}
                 onChange={(e) => setContentEn(e.target.value)}
                 rows={3}
+                maxLength={2000}
                 className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none resize-none"
                 placeholder={t('contentEnPlaceholder')}
               />
@@ -296,6 +299,7 @@ function AnnouncementModal({
                 value={contentZh}
                 onChange={(e) => setContentZh(e.target.value)}
                 rows={3}
+                maxLength={2000}
                 className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none resize-none"
                 placeholder={t('contentZhPlaceholder')}
               />

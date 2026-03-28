@@ -7,10 +7,10 @@ const FROM_EMAIL = 'Moso Tea <noreply@mosotea.co.nz>'
 const OWNER_EMAIL = process.env.OWNER_EMAIL || 'hello@mosotea.co.nz'
 
 const contactSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.email('Invalid email address'),
-  phone: z.string().optional(),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
+  name: z.string().min(1, 'Name is required').max(100),
+  email: z.email('Invalid email address').max(100),
+  phone: z.string().max(20).optional(),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(2000),
 })
 
 export async function POST(request: Request) {

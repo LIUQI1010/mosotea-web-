@@ -232,6 +232,7 @@ Each developer answers:
 | Submit sitemap to Google Search Console | Developer 1 | ✅ Done |
 | Set up Google Business Profile | Developer 2 | ✅ Done |
 | Add bilingual support (EN/繁中) to admin dashboard | Developer 1 | ✅ Done |
+| Add input length limits to all forms (HTML maxLength + server-side Zod) | Developer 1 | ✅ Done |
 | Client User Acceptance Testing (UAT) | Both | ⏳ Pending |
 | Finalise README and project documentation | Both | ✅ Done |
 | Deliver admin credentials and user guide to client | Developer 1 | ⏳ Pending |
@@ -270,6 +271,12 @@ Each developer answers:
 | Configure Supabase Storage domain in `next.config.ts` for `next/image` | Developer 1 | ✅ Done |
 | Implement client-side image compression (Canvas API, ≤ 2MB) | Developer 1 | ✅ Done |
 | Add gallery-related translation keys to `en.json` / `zh-TW.json` | Developer 1 | ✅ Done |
+| **Gallery UX Optimisation** | | |
+| Add skeleton loading screens for gallery page and homepage gallery section | Developer 1 | ✅ Done |
+| Implement preload-all-then-fade-in loading strategy (avoids masonry reflow jitter) | Developer 1 | ✅ Done |
+| Add accessibility attributes to gallery (aria-labels, dialog role, keyboard nav) | Developer 1 | ✅ Done |
+| Move lightbox caption to gradient overlay on image | Developer 1 | ✅ Done |
+| Add homepage gallery individual image fade-in with skeleton placeholders | Developer 1 | ✅ Done |
 | Responsive testing for announcements banner and gallery section | Both | ⏳ Pending |
 
 **Definition of Done:**
@@ -278,7 +285,39 @@ Each developer answers:
 - [x] Admin can upload, edit captions, and delete gallery images via Supabase Storage
 - [x] Standalone Gallery page with masonry layout and lightbox
 - [x] Homepage displays Gallery preview (6 images) with link to full gallery
+- [x] Gallery loading UX: skeleton screens + preload-all fade-in (no layout jitter)
+- [x] Gallery accessibility: aria-labels, dialog role, keyboard navigation
 - [ ] All new UI is responsive on mobile, tablet, and desktop
+
+---
+
+## Sprint 6 — Email Template Management
+
+> **Goal:** Admin can customize the content of customer-facing booking emails via the admin dashboard, with bilingual support, placeholder variables, and live preview.
+
+| Task | Owner | Status |
+|---|---|---|
+| Create `email_templates` table in Supabase (with RLS policies) | Developer 1 | ⏳ Pending |
+| Add `EmailTemplate` type to `src/types/index.ts` | Developer 1 | ⏳ Pending |
+| Build admin email templates page (`/admin/email-templates`) | Developer 1 | ⏳ Pending |
+| Implement email template server actions (get, upsert, delete) | Developer 1 | ⏳ Pending |
+| Add email templates sidebar nav item in `AdminSidebar.tsx` | Developer 1 | ⏳ Pending |
+| Build template editor with placeholder variable insertion | Developer 1 | ⏳ Pending |
+| Build email preview with sample data | Developer 1 | ⏳ Pending |
+| Integrate template loading into `emails.ts` send functions | Developer 1 | ⏳ Pending |
+| Implement placeholder variable replacement at send time | Developer 1 | ⏳ Pending |
+| Implement "Reset to Default" functionality | Developer 1 | ⏳ Pending |
+| Add email template translation keys to `en.json` / `zh-TW.json` | Developer 1 | ⏳ Pending |
+| End-to-end testing: edit template → send booking → verify email content | Both | ⏳ Pending |
+
+**Definition of Done:**
+- [ ] Admin can edit subject and body for 3 customer-facing email types (booking_received, booking_confirmed, cancellation_confirmation)
+- [ ] Templates support bilingual content (EN / zh-TW)
+- [ ] Placeholder variables (customer_name, date_time, guest_count, total_price, cancellation_url) are correctly replaced at send time
+- [ ] Admin can preview email with sample data before saving
+- [ ] Admin can reset template to default by deleting the custom record
+- [ ] Fallback to hardcoded default when no custom template exists
+- [ ] Email template page is accessible from admin sidebar
 
 ---
 
@@ -293,6 +332,7 @@ Each developer answers:
 | Sprint 3 | 1 week | Admin dashboard + customer self-cancellation + bug fixes |
 | Sprint 4 | 1 week | Testing, performance, launch |
 | Sprint 5 | 1 week | Announcements + Gallery management |
+| Sprint 6 | 1 week | Email template management |
 
 ---
 

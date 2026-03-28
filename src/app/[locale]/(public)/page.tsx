@@ -307,10 +307,32 @@ function TestimonialsSection() {
   )
 }
 
+// Gallery Image with fade-in
+function GalleryImage({ image }: { image: { url: string; caption: string | null } }) {
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <div className="aspect-[4/3] overflow-hidden rounded-lg relative bg-border/50">
+      {!loaded && (
+        <div className="absolute inset-0 animate-pulse bg-border/50 rounded-lg" />
+      )}
+      <Image
+        src={image.url}
+        alt={image.caption ?? ''}
+        width={600}
+        height={450}
+        className={`w-full h-full object-cover hover:scale-105 transition-all duration-500 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
+  )
+}
+
 // Gallery Section
 function GallerySection() {
   const t = useTranslations("home.gallery")
   const [images, setImages] = useState<{ id: string; url: string; caption: string | null }[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
@@ -321,10 +343,11 @@ function GallerySection() {
       .limit(6)
       .then(({ data }) => {
         if (data && data.length > 0) setImages(data)
+        setLoading(false)
       })
   }, [])
 
-  if (images.length === 0) return null
+  if (!loading && images.length === 0) return null
 
   return (
     <section className="py-20 sm:py-28 px-4 bg-cream">
@@ -336,20 +359,14 @@ function GallerySection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {images.map((image) => (
-            <div
-              key={image.id}
-              className="aspect-[4/3] overflow-hidden rounded-lg"
-            >
-              <Image
-                src={image.url}
-                alt={image.caption ?? ''}
-                width={600}
-                height={450}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-          ))}
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="aspect-[4/3] rounded-lg bg-border/50 animate-pulse" />
+              ))
+            : images.map((image) => (
+                <GalleryImage key={image.id} image={image} />
+              ))
+          }
         </div>
 
         <div className="mt-10 text-center">
