@@ -40,3 +40,14 @@ export interface Gallery {
     caption: string | null
     uploaded_at: string
 }
+
+export interface Announcement {
+    id: string
+    title_en: string
+    title_zh: string
+    content_en: string
+    content_zh: string
+    is_active: boolean
+    sort_order: number
+    created_at: string
+}

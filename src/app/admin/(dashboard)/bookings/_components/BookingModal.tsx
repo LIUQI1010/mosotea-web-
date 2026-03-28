@@ -1,31 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { Modal } from './Modal'
 import type { AvailableSlot } from '../_actions'
 
 const NZ_TZ = 'Pacific/Auckland'
-
-function formatSlotOption(slot: AvailableSlot): string {
-  const date = new Date(slot.start_time)
-  const dateStr = new Intl.DateTimeFormat('zh-CN', {
-    timeZone: NZ_TZ,
-    month: 'numeric',
-    day: 'numeric',
-  }).format(date)
-
-  const hour = Number(
-    new Intl.DateTimeFormat('en-GB', {
-      timeZone: NZ_TZ,
-      hour: '2-digit',
-      hour12: false,
-    }).format(date)
-  )
-  const timeRange = hour < 12 ? '10:00–11:30' : '14:00–15:30'
-  const remaining = slot.max_guests - slot.booked_guests
-
-  return `${dateStr} ${timeRange}（${remaining}位空位）`
-}
 
 interface BookingData {
   id: string
@@ -74,6 +54,9 @@ export function BookingModal({
   availableSlots,
   onSubmit,
 }: BookingModalProps) {
+  const t = useTranslations('admin.bookingModal')
+  const locale = useLocale()
+
   const [timeSlotId, setTimeSlotId] = useState(() =>
     mode === 'edit' && booking ? booking.time_slots.id : availableSlots[0]?.id ?? ''
   )
@@ -110,6 +93,29 @@ export function BookingModal({
       : selectedSlot.max_guests - selectedSlot.booked_guests
     : 8
 
+  const dateLocale = locale === 'zh-TW' ? 'zh-CN' : 'en-NZ'
+
+  function formatSlotOption(slot: AvailableSlot): string {
+    const date = new Date(slot.start_time)
+    const dateStr = new Intl.DateTimeFormat(dateLocale, {
+      timeZone: NZ_TZ,
+      month: 'numeric',
+      day: 'numeric',
+    }).format(date)
+
+    const hour = Number(
+      new Intl.DateTimeFormat('en-GB', {
+        timeZone: NZ_TZ,
+        hour: '2-digit',
+        hour12: false,
+      }).format(date)
+    )
+    const timeRange = hour < 12 ? '10:00–11:30' : '14:00–15:30'
+    const remaining = slot.max_guests - slot.booked_guests
+
+    return `${dateStr} ${timeRange} ${t('remainingSlots', { count: remaining })}`
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -126,7 +132,7 @@ export function BookingModal({
   const editSlotLabel = booking
     ? (() => {
         const date = new Date(booking.time_slots.start_time)
-        const dateStr = new Intl.DateTimeFormat('zh-CN', { timeZone: NZ_TZ, month: 'numeric', day: 'numeric' }).format(date)
+        const dateStr = new Intl.DateTimeFormat(dateLocale, { timeZone: NZ_TZ, month: 'numeric', day: 'numeric' }).format(date)
         const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: NZ_TZ, hour: '2-digit', hour12: false }).format(date))
         return `${dateStr} ${hour < 12 ? '10:00–11:30' : '14:00–15:30'}`
       })()
@@ -135,13 +141,13 @@ export function BookingModal({
   return (
     <Modal open={open} onClose={onClose}>
       <h2 className="font-serif text-lg font-semibold text-foreground">
-        {mode === 'create' ? '新增預約' : '編輯預約'}
+        {mode === 'create' ? t('createTitle') : t('editTitle')}
       </h2>
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         {/* Slot */}
         <div>
-          <label className={labelClass}>場次</label>
+          <label className={labelClass}>{t('slot')}</label>
           {mode === 'create' ? (
             <select
               value={timeSlotId}
@@ -149,7 +155,7 @@ export function BookingModal({
               required
               className={inputClass}
             >
-              <option value="" disabled>請選擇場次</option>
+              <option value="" disabled>{t('selectSlot')}</option>
               {availableSlots.map((slot) => (
                 <option key={slot.id} value={slot.id}>{formatSlotOption(slot)}</option>
               ))}
@@ -161,9 +167,9 @@ export function BookingModal({
 
         {/* Customer name */}
         <div>
-          <label className={labelClass}>客戶姓名</label>
+          <label className={labelClass}>{t('customerName')}</label>
           {mode === 'create' ? (
-            <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required className={inputClass} placeholder="請輸入姓名" />
+            <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required className={inputClass} placeholder={t('namePlaceholder')} />
           ) : (
             <div className={readonlyClass}>{customerName}</div>
           )}
@@ -171,15 +177,15 @@ export function BookingModal({
 
         {/* Guest count */}
         <div>
-          <label className={labelClass}>人數</label>
+          <label className={labelClass}>{t('guestCount')}</label>
           <input type="number" value={guestCount} onChange={(e) => setGuestCount(Number(e.target.value))} min={1} max={maxAllowed} required className={inputClass} />
-          <p className="mt-1 text-xs text-muted-foreground">最多 {maxAllowed} 人</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t('maxGuests', { count: maxAllowed })}</p>
         </div>
 
         {/* Email — create only */}
         {mode === 'create' && (
           <div>
-            <label className={labelClass}>電郵</label>
+            <label className={labelClass}>{t('email')}</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className={inputClass} placeholder="customer@example.com" />
           </div>
         )}
@@ -187,14 +193,14 @@ export function BookingModal({
         {/* Phone — create only */}
         {mode === 'create' && (
           <div>
-            <label className={labelClass}>電話 <span className="font-normal text-muted-foreground">（選填）</span></label>
+            <label className={labelClass}>{t('phone')} <span className="font-normal text-muted-foreground">{t('phoneOptional')}</span></label>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} placeholder="021 xxx xxxx" />
           </div>
         )}
 
         {/* Language */}
         <div>
-          <label className={labelClass}>語言偏好</label>
+          <label className={labelClass}>{t('language')}</label>
           <select value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className={inputClass}>
             <option value="en">English</option>
             <option value="zh-TW">繁體中文</option>
@@ -203,7 +209,7 @@ export function BookingModal({
 
         {/* Special requests */}
         <div>
-          <label className={labelClass}>特殊需求 <span className="font-normal text-muted-foreground">（選填）</span></label>
+          <label className={labelClass}>{t('specialRequests')} <span className="font-normal text-muted-foreground">{t('specialRequestsOptional')}</span></label>
           <textarea value={specialRequests} onChange={(e) => setSpecialRequests(e.target.value)} rows={3} className={`${inputClass} resize-none`} />
         </div>
 
@@ -211,7 +217,7 @@ export function BookingModal({
         {mode === 'create' && (
           <label className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground">
             <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="rounded border-border accent-tea-brown" />
-            傳送確認電郵給客戶
+            {t('sendEmail')}
           </label>
         )}
 
@@ -223,10 +229,10 @@ export function BookingModal({
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-2">
           <button type="button" onClick={onClose} disabled={loading} className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-cream">
-            取消
+            {t('cancelBtn')}
           </button>
           <button type="submit" disabled={loading} className="rounded-lg bg-tea-brown px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50">
-            {loading ? '儲存中...' : mode === 'create' ? '儲存' : '儲存修改'}
+            {loading ? t('saving') : mode === 'create' ? t('save') : t('saveChanges')}
           </button>
         </div>
       </form>

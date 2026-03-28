@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useTranslations, useLocale } from 'next-intl'
 import { generateSlots, toggleSlot } from './_actions'
 import type { SlotBooking } from './page'
 
@@ -26,16 +27,16 @@ function getSlotStatus(slot: Slot): SlotStatus {
   return 'empty'
 }
 
-const statusConfig: Record<SlotStatus, { label: string; labelFn?: (r: number) => string; className: string }> = {
-  full:      { label: '已滿',   className: 'bg-red-50 text-red-600 border border-red-100' },
-  available: { label: '有空位', labelFn: (r) => `有空位（${r}位）`, className: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20' },
-  empty:     { label: '空閒',   className: 'bg-cream text-muted-foreground border border-border' },
-  disabled:  { label: '已停用', className: 'bg-red-50 text-red-400 border border-red-100' },
+const statusClassNames: Record<SlotStatus, string> = {
+  full:      'bg-red-50 text-red-600 border border-red-100',
+  available: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20',
+  empty:     'bg-cream text-muted-foreground border border-border',
+  disabled:  'bg-red-50 text-red-400 border border-red-100',
 }
 
-const bookingStatusConfig: Record<string, { label: string; className: string }> = {
-  pending:   { label: '待確認', className: 'bg-tea-brown/10 text-tea-brown border border-tea-brown/20' },
-  confirmed: { label: '已確認', className: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20' },
+const bookingStatusClassNames: Record<string, string> = {
+  pending:   'bg-tea-brown/10 text-tea-brown border border-tea-brown/20',
+  confirmed: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20',
 }
 
 const langLabel: Record<string, string> = { en: 'EN', 'zh-TW': '中' }
@@ -53,26 +54,6 @@ function isSlotMorning(startTime: string): boolean {
 function formatSlotTime(startTime: string): string {
   return isSlotMorning(startTime) ? '10:00 – 11:30' : '14:00 – 15:30'
 }
-function formatDateChinese(dateStr: string): string {
-  const date = new Date(`${dateStr}T12:00:00`)
-  const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-  return `${date.getMonth() + 1}月${date.getDate()}日 週${weekdays[date.getDay()]}`
-}
-function getWeekLabel(dateStr: string, todayStr: string): string {
-  const date = new Date(`${dateStr}T12:00:00`)
-  const today = new Date(`${todayStr}T12:00:00`)
-  const getMonday = (d: Date) => { const day = d.getDay(); const off = day === 0 ? -6 : 1 - day; const m = new Date(d); m.setDate(d.getDate() + off); return m }
-  const dateMonday = getMonday(date)
-  const todayMonday = getMonday(today)
-  const diffWeeks = Math.round((dateMonday.getTime() - todayMonday.getTime()) / (7 * 86400000))
-  const sunday = new Date(dateMonday); sunday.setDate(dateMonday.getDate() + 6)
-  const monM = dateMonday.getMonth() + 1, monD = dateMonday.getDate(), sunM = sunday.getMonth() + 1, sunD = sunday.getDate()
-  const range = monM === sunM ? `${monM}月${monD}日–${sunD}日` : `${monM}月${monD}日–${sunM}月${sunD}日`
-  if (diffWeeks === 0) return `本週 ${range}`
-  if (diffWeeks === 1) return `下週 ${range}`
-  if (diffWeeks === -1) return `上週 ${range}`
-  return range
-}
 function getWeekRange(todayStr: string, offset: number) {
   const today = new Date(`${todayStr}T12:00:00`)
   const day = today.getDay()
@@ -84,9 +65,6 @@ function getWeekRange(todayStr: string, offset: number) {
 function getMonthKey(isoStr: string): string {
   const parts = new Intl.DateTimeFormat('en-CA', { timeZone: NZ_TZ, year: 'numeric', month: '2-digit' }).formatToParts(new Date(isoStr))
   return `${parts.find(p => p.type === 'year')?.value}-${parts.find(p => p.type === 'month')?.value}`
-}
-function formatMonthLabel(key: string): string {
-  const [y, m] = key.split('-'); return `${y}年${Number(m)}月`
 }
 
 // ── Calendar types ──
@@ -125,13 +103,17 @@ function buildCalendarDays(yearMonth: string, slotMap: Map<string, { morning?: S
   return days
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TranslationFn = ReturnType<typeof useTranslations<'admin.slots'>> & ((...args: any[]) => string)
+
 // ── Slot cell ──
 
 function SlotCell({
-  slot, type, isSelected, onSelect,
+  slot, type, isSelected, onSelect, t,
 }: {
   slot: Slot | undefined; type: 'morning' | 'afternoon'; isSelected: boolean
   onSelect: (slot: Slot, type: 'morning' | 'afternoon') => void
+  t: TranslationFn
 }) {
   if (!slot) return <div className="h-6 rounded bg-cream/60" />
 
@@ -169,7 +151,7 @@ function SlotCell({
         </svg>
       )}
       <span className={`relative z-10 text-[11px] font-medium ${colors.text}`}>
-        {type === 'morning' ? '上午' : '下午'}
+        {type === 'morning' ? t('morning') : t('afternoon')}
       </span>
       <span className={`relative z-10 ml-auto text-[11px] ${colors.text}`}>
         {slot.booked_guests}/{slot.max_guests}
@@ -181,14 +163,15 @@ function SlotCell({
 // ── Detail Sidebar ──
 
 function DetailSidebar({
-  slot, type, bookings, togglingId, onToggle,
+  slot, type, bookings, togglingId, onToggle, t, intlLocale,
 }: {
   slot: Slot; type: 'morning' | 'afternoon'; bookings: SlotBooking[]
   togglingId: string | null; onToggle: (id: string, val: boolean) => void
+  t: TranslationFn; intlLocale: string
 }) {
   const status = getSlotStatus(slot)
   const remaining = slot.max_guests - slot.booked_guests
-  const cfg = statusConfig[status]
+  const statusLabel = getStatusLabel(status, remaining, t)
   const dateStr = getNZDate(slot.start_time)
   const isMorning = type === 'morning'
   const accentBar = isMorning
@@ -202,16 +185,16 @@ function DetailSidebar({
       <div className="border-b border-border bg-cream px-4 py-3.5">
         <div className="mb-1.5 flex items-center gap-2">
           <span className={`h-2 w-2 rounded-full ${accentDot}`} />
-          <span className="text-xs font-medium text-muted-foreground">{formatDateChinese(dateStr)}</span>
+          <span className="text-xs font-medium text-muted-foreground" suppressHydrationWarning>{formatDateLocale(dateStr, intlLocale)}</span>
         </div>
         <p className="font-serif text-lg font-semibold text-foreground">
           {type === 'morning' ? '10:00 – 11:30' : '14:00 – 15:30'}
         </p>
         <div className="mt-2.5 flex items-center gap-2">
-          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>
-            {cfg.labelFn ? cfg.labelFn(remaining) : cfg.label}
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClassNames[status]}`}>
+            {statusLabel}
           </span>
-          <span className="text-xs text-muted-foreground">{slot.booked_guests}/{slot.max_guests} 已預約</span>
+          <span className="text-xs text-muted-foreground">{t('booked', { booked: slot.booked_guests, max: slot.max_guests })}</span>
         </div>
         <div className="mt-3 h-1.5 w-full rounded-full bg-border">
           <div
@@ -227,7 +210,7 @@ function DetailSidebar({
           href={`/admin/bookings?slot_id=${slot.id}`}
           className="flex-1 rounded-lg border border-border bg-off-white py-1.5 text-center text-xs font-medium text-foreground transition-colors hover:bg-cream"
         >
-          查看全部預約
+          {t('viewAllBookings')}
         </Link>
         <button
           onClick={() => onToggle(slot.id, !slot.is_available)}
@@ -238,28 +221,29 @@ function DetailSidebar({
               : 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20 hover:bg-bamboo-green/20'
           }`}
         >
-          {togglingId === slot.id ? '...' : slot.is_available ? '停用此場次' : '啟用此場次'}
+          {togglingId === slot.id ? '...' : slot.is_available ? t('disableSlot') : t('enableSlot')}
         </button>
       </div>
 
       {/* Booking list */}
       <div className="flex-1 overflow-y-auto p-4">
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          預約清單（{bookings.length}）
+          {t('bookingList', { count: bookings.length })}
         </p>
         {bookings.length === 0 ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">暫無預約</p>
+          <p className="py-6 text-center text-xs text-muted-foreground">{t('noBookings')}</p>
         ) : (
           <div className="space-y-2">
             {bookings.map((b) => {
-              const bCfg = bookingStatusConfig[b.status] ?? bookingStatusConfig.pending
+              const bClassName = bookingStatusClassNames[b.status] ?? bookingStatusClassNames.pending
+              const bLabel = b.status === 'confirmed' ? t('statusConfirmed') : t('statusPending')
               return (
                 <div key={b.id} className="rounded-xl border border-border bg-cream p-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-foreground">{b.customer_name}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${bCfg.className}`}>{bCfg.label}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${bClassName}`}>{bLabel}</span>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">{b.guest_count}人 · {langLabel[b.preferred_language] ?? b.preferred_language}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{b.guest_count} {intlLocale === 'zh-TW' ? '人' : (b.guest_count === 1 ? 'guest' : 'guests')} · {langLabel[b.preferred_language] ?? b.preferred_language}</p>
                   <p className="mt-0.5 truncate text-xs text-muted-foreground">{b.email}</p>
                 </div>
               )
@@ -269,6 +253,67 @@ function DetailSidebar({
       </div>
     </div>
   )
+}
+
+// ── Locale-aware helpers ──
+
+function formatDateLocale(dateStr: string, intlLocale: string): string {
+  const date = new Date(`${dateStr}T12:00:00`)
+  if (intlLocale === 'zh-TW') {
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    return `${date.getMonth() + 1}月${date.getDate()}日 週${weekdays[date.getDay()]}`
+  }
+  return new Intl.DateTimeFormat('en-NZ', { month: 'short', day: 'numeric', weekday: 'short' }).format(date)
+}
+
+function getWeekLabelLocale(dateStr: string, todayStr: string, intlLocale: string, t: TranslationFn): string {
+  const date = new Date(`${dateStr}T12:00:00`)
+  const today = new Date(`${todayStr}T12:00:00`)
+  const getMonday = (d: Date) => { const day = d.getDay(); const off = day === 0 ? -6 : 1 - day; const m = new Date(d); m.setDate(d.getDate() + off); return m }
+  const dateMonday = getMonday(date)
+  const todayMonday = getMonday(today)
+  const diffWeeks = Math.round((dateMonday.getTime() - todayMonday.getTime()) / (7 * 86400000))
+  const sunday = new Date(dateMonday); sunday.setDate(dateMonday.getDate() + 6)
+
+  let range: string
+  if (intlLocale === 'zh-TW') {
+    const monM = dateMonday.getMonth() + 1, monD = dateMonday.getDate(), sunM = sunday.getMonth() + 1, sunD = sunday.getDate()
+    range = monM === sunM ? `${monM}月${monD}日–${sunD}日` : `${monM}月${monD}日–${sunM}月${sunD}日`
+  } else {
+    const fmt = new Intl.DateTimeFormat('en-NZ', { month: 'short', day: 'numeric' })
+    range = `${fmt.format(dateMonday)} – ${fmt.format(sunday)}`
+  }
+
+  if (diffWeeks === 0) return t('thisWeek', { range })
+  if (diffWeeks === 1) return t('nextWeek', { range })
+  if (diffWeeks === -1) return t('lastWeek', { range })
+  return range
+}
+
+function formatMonthLabelLocale(key: string, intlLocale: string): string {
+  const [y, m] = key.split('-')
+  if (intlLocale === 'zh-TW') {
+    return `${y}年${Number(m)}月`
+  }
+  const date = new Date(Number(y), Number(m) - 1, 1)
+  return new Intl.DateTimeFormat('en-NZ', { year: 'numeric', month: 'long' }).format(date)
+}
+
+function formatLatestDateLocale(ds: string, intlLocale: string): string {
+  const d = new Date(`${ds}T12:00:00`)
+  if (intlLocale === 'zh-TW') {
+    return `${d.getMonth() + 1}月${d.getDate()}日`
+  }
+  return new Intl.DateTimeFormat('en-NZ', { month: 'short', day: 'numeric' }).format(d)
+}
+
+function getStatusLabel(status: SlotStatus, remaining: number, t: TranslationFn): string {
+  switch (status) {
+    case 'full': return t('full')
+    case 'available': return t('availableCount', { count: remaining })
+    case 'empty': return t('empty')
+    case 'disabled': return t('disabled')
+  }
 }
 
 // ── Main ──
@@ -283,6 +328,10 @@ interface SlotsClientProps {
 }
 
 export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemaining, todayStr, initialSlotId }: SlotsClientProps) {
+  const t = useTranslations('admin.slots')
+  const locale = useLocale()
+  const intlLocale = locale === 'zh-TW' ? 'zh-TW' : 'en-NZ'
+
   const [activeTab, setActiveTab] = useState<FilterTab>(() => {
     if (!initialSlotId) return 'this_week'
     const slot = slots.find((s) => s.id === initialSlotId)
@@ -317,16 +366,16 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
   const handleGenerate = () => {
     startGenerating(async () => {
       const result = await generateSlots()
-      if (result.error) showToast(`生成失敗：${result.error}`, 'error')
-      else if (result.created === 0) showToast('已是最新，無需生成', 'success')
-      else showToast(`成功生成 ${result.created} 個場次`, 'success')
+      if (result.error) showToast(t('generateFailed', { error: result.error }), 'error')
+      else if (result.created === 0) showToast(t('alreadyUpToDate'), 'success')
+      else showToast(t('generateSuccess', { count: result.created }), 'success')
     })
   }
 
   const handleToggle = async (slotId: string, newAvailability: boolean) => {
     setTogglingId(slotId)
     const result = await toggleSlot(slotId, newAvailability)
-    if (!result.success) showToast(result.error ?? '操作失敗', 'error')
+    if (!result.success) showToast(result.error ?? t('operationFailed'), 'error')
     setTogglingId(null)
   }
 
@@ -359,19 +408,19 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
   let currentWeekLabel = ''
   for (const slot of filteredSlots) {
     const dateStr = getNZDate(slot.start_time)
-    const wl = getWeekLabel(dateStr, todayStr)
+    const wl = getWeekLabelLocale(dateStr, todayStr, intlLocale, t)
     if (wl !== currentWeekLabel) { grouped.push({ weekLabel: wl, slots: [] }); currentWeekLabel = wl }
     grouped[grouped.length - 1].slots.push(slot)
   }
 
   const tabs: { key: FilterTab; label: string }[] = [
-    { key: 'this_week', label: '本週' },
-    { key: 'all',       label: '全部' },
-    { key: 'disabled',  label: '已停用' },
+    { key: 'this_week', label: t('tabThisWeek') },
+    { key: 'all',       label: t('tabAll') },
+    { key: 'disabled',  label: t('tabDisabled') },
   ]
 
-  const formatLatestDate = (ds: string) => { const d = new Date(`${ds}T12:00:00`); return `${d.getMonth() + 1}月${d.getDate()}日` }
-  const weekdayHeaders = ['一', '二', '三', '四', '五', '六', '日']
+  const formatLatestDate = (ds: string) => formatLatestDateLocale(ds, intlLocale)
+  const weekdayHeaders = [t('weekdays.0'), t('weekdays.1'), t('weekdays.2'), t('weekdays.3'), t('weekdays.4'), t('weekdays.5'), t('weekdays.6')]
   const isUpToDate = daysRemaining <= 0
 
   return (
@@ -389,21 +438,21 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
 
       {/* Topbar */}
       <div className="mb-6">
-        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">場次管理</p>
-        <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">時間段管理</h1>
+        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">{t('management')}</p>
+        <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">{t('title')}</h1>
       </div>
 
       {/* Generation Banner */}
       <div className={`mb-6 flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 ${
         isUpToDate ? 'border-bamboo-green/20 bg-bamboo-green/5' : 'border-border bg-off-white'
       }`}>
-        <p className="text-sm text-foreground">
+        <p className="text-sm text-foreground" suppressHydrationWarning>
           {isUpToDate
-            ? `已生成至 ${latestDateStr ? formatLatestDate(latestDateStr) : '—'}，未來 30 天場次齊全`
+            ? t('upToDate', { date: latestDateStr ? formatLatestDate(latestDateStr) : '—' })
             : latestDateStr
-              ? `目前已生成至 ${formatLatestDate(latestDateStr)} · 還差 ${daysRemaining} 天未生成`
-              : '尚未生成任何場次'}
-          {!isUpToDate && <span className="ml-0 mt-1 block text-muted-foreground sm:ml-2 sm:mt-0 sm:inline">（一鍵生成從今天起未來 30 天的場次）</span>}
+              ? t('generatedUntil', { date: formatLatestDate(latestDateStr), days: daysRemaining })
+              : t('noSlotsGenerated')}
+          {!isUpToDate && <span className="ml-0 mt-1 block text-muted-foreground sm:ml-2 sm:mt-0 sm:inline">{t('generateHint')}</span>}
         </p>
         <button
           onClick={handleGenerate}
@@ -414,7 +463,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
               : 'bg-tea-brown text-primary-foreground hover:opacity-90'
           }`}
         >
-          {isGenerating ? '生成中...' : isUpToDate ? '已是最新' : '一鍵生成'}
+          {isGenerating ? t('generating') : isUpToDate ? t('generated') : t('generateButton')}
         </button>
       </div>
 
@@ -437,13 +486,13 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
         </div>
         {activeTab === 'all' && (
           <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-tea-brown" /> 上午</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-bamboo-green" /> 下午</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-tea-brown" /> {t('morningLegend')}</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-full bg-bamboo-green" /> {t('afternoonLegend')}</span>
           </div>
         )}
       </div>
 
-      {/* ═══ Calendar View ═══ */}
+      {/* Calendar View */}
       {activeTab === 'all' && (
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
@@ -453,13 +502,13 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                   onClick={() => { const i = allMonths.indexOf(currentMonth); if (i > 0) setCurrentMonth(allMonths[i - 1]) }}
                   disabled={allMonths.indexOf(currentMonth) <= 0}
                   className="rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-cream disabled:opacity-30"
-                >← 上月</button>
-                <span className="font-serif text-base font-semibold text-foreground">{formatMonthLabel(currentMonth)}</span>
+                >{t('prevMonth')}</button>
+                <span className="font-serif text-base font-semibold text-foreground" suppressHydrationWarning>{formatMonthLabelLocale(currentMonth, intlLocale)}</span>
                 <button
                   onClick={() => { const i = allMonths.indexOf(currentMonth); if (i < allMonths.length - 1) setCurrentMonth(allMonths[i + 1]) }}
                   disabled={allMonths.indexOf(currentMonth) >= allMonths.length - 1}
                   className="rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-cream disabled:opacity-30"
-                >下月 →</button>
+                >{t('nextMonth')}</button>
               </div>
             )}
 
@@ -488,8 +537,8 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                     </div>
                     {day.isCurrentMonth && (
                       <div className="space-y-0.5">
-                        <SlotCell slot={day.morning} type="morning" isSelected={!!day.morning && selectedSlot?.slot.id === day.morning.id} onSelect={handleSelectSlot} />
-                        <SlotCell slot={day.afternoon} type="afternoon" isSelected={!!day.afternoon && selectedSlot?.slot.id === day.afternoon.id} onSelect={handleSelectSlot} />
+                        <SlotCell slot={day.morning} type="morning" isSelected={!!day.morning && selectedSlot?.slot.id === day.morning.id} onSelect={handleSelectSlot} t={t} />
+                        <SlotCell slot={day.afternoon} type="afternoon" isSelected={!!day.afternoon && selectedSlot?.slot.id === day.afternoon.id} onSelect={handleSelectSlot} t={t} />
                       </div>
                     )}
                   </div>
@@ -503,7 +552,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
             <div className="mb-4 hidden h-[38px] lg:block" />
             <div className="overflow-hidden rounded-2xl border border-border bg-off-white lg:sticky lg:top-8" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
               {selectedSlot ? (
-                <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} />
+                <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} t={t} intlLocale={intlLocale} />
               ) : (
                 <div className="flex h-[200px] flex-col items-center justify-center p-6 text-center lg:h-[300px]">
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-cream">
@@ -511,7 +560,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                     </svg>
                   </div>
-                  <p className="text-sm text-muted-foreground">點擊日曆中的場次<br />查看詳情和預約資訊</p>
+                  <p className="text-sm text-muted-foreground">{t('selectSlotHint').split('\n').map((line, idx) => <span key={idx}>{line}{idx === 0 && <br />}</span>)}</p>
                 </div>
               )}
             </div>
@@ -519,24 +568,24 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
         </div>
       )}
 
-      {/* ═══ Table View + Sidebar ═══ */}
+      {/* Table View + Sidebar */}
       {activeTab !== 'all' && (
         <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1">
             {filteredSlots.length === 0 ? (
-              <div className="rounded-2xl border border-border bg-off-white py-12 text-center text-sm text-muted-foreground">暫無場次資料</div>
+              <div className="rounded-2xl border border-border bg-off-white py-12 text-center text-sm text-muted-foreground">{t('noSlots')}</div>
             ) : (
               <div className="space-y-4">
                 {grouped.map((group) => (
                   <div key={group.weekLabel}>
-                    <p className="mb-2 px-1 text-sm font-semibold text-foreground">{group.weekLabel}</p>
+                    <p className="mb-2 px-1 text-sm font-semibold text-foreground" suppressHydrationWarning>{group.weekLabel}</p>
 
                     {/* Mobile: Card View */}
                     <div className="space-y-2 md:hidden">
                       {group.slots.map((slot) => {
                         const status = getSlotStatus(slot)
-                        const config = statusConfig[status]
                         const remaining = slot.max_guests - slot.booked_guests
+                        const statusLabel = getStatusLabel(status, remaining, t)
                         const pct = (slot.booked_guests / slot.max_guests) * 100
                         const dateStr = getNZDate(slot.start_time)
                         const isMorning = isSlotMorning(slot.start_time)
@@ -551,11 +600,11 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                           >
                             <div className="mb-2 flex items-center justify-between">
                               <div>
-                                <p className="text-sm font-medium text-foreground">{formatDateChinese(dateStr)}</p>
+                                <p className="text-sm font-medium text-foreground" suppressHydrationWarning>{formatDateLocale(dateStr, intlLocale)}</p>
                                 <p className="mt-0.5 text-xs text-muted-foreground">{formatSlotTime(slot.start_time)}</p>
                               </div>
-                              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
-                                {config.labelFn ? config.labelFn(remaining) : config.label}
+                              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClassNames[status]}`}>
+                                {statusLabel}
                               </span>
                             </div>
                             <div className="flex items-center gap-2.5">
@@ -576,7 +625,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                                       : 'border border-bamboo-green/20 bg-bamboo-green/10 text-bamboo-green hover:bg-bamboo-green/20'
                                   }`}
                                 >
-                                  {togglingId === slot.id ? '...' : slot.is_available ? '停用' : '啟用'}
+                                  {togglingId === slot.id ? '...' : slot.is_available ? t('disable') : t('enable')}
                                 </button>
                               </div>
                             </div>
@@ -588,14 +637,14 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                     {/* Desktop: Table View */}
                     <div className="hidden overflow-hidden rounded-2xl border border-border bg-off-white md:block">
                       <div className="grid grid-cols-[1.4fr_1.1fr_1.6fr_1.1fr_0.9fr] items-center gap-2 border-b border-border bg-cream px-5 py-3 text-center">
-                        {['日期', '時段', '容量', '狀態', '操作'].map(h => (
+                        {[t('headerDate'), t('headerSlot'), t('headerCapacity'), t('headerStatus'), t('headerActions')].map(h => (
                           <span key={h} className="text-xs font-medium text-muted-foreground">{h}</span>
                         ))}
                       </div>
                       {group.slots.map((slot) => {
                         const status = getSlotStatus(slot)
-                        const config = statusConfig[status]
                         const remaining = slot.max_guests - slot.booked_guests
+                        const statusLabel = getStatusLabel(status, remaining, t)
                         const pct = (slot.booked_guests / slot.max_guests) * 100
                         const dateStr = getNZDate(slot.start_time)
                         const isMorning = isSlotMorning(slot.start_time)
@@ -608,7 +657,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                               isActive ? 'bg-tea-brown/5' : 'hover:bg-cream'
                             }`}
                           >
-                            <span className="text-sm text-foreground">{formatDateChinese(dateStr)}</span>
+                            <span className="text-sm text-foreground" suppressHydrationWarning>{formatDateLocale(dateStr, intlLocale)}</span>
                             <span className="text-sm text-muted-foreground">{formatSlotTime(slot.start_time)}</span>
                             <div className="flex items-center justify-center gap-2.5">
                               <div className="h-1.5 w-20 rounded-full bg-border">
@@ -620,8 +669,8 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                               <span className="text-xs text-muted-foreground">{slot.booked_guests}/{slot.max_guests}</span>
                             </div>
                             <div className="flex justify-center">
-                              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}>
-                                {config.labelFn ? config.labelFn(remaining) : config.label}
+                              <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClassNames[status]}`}>
+                                {statusLabel}
                               </span>
                             </div>
                             <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
@@ -634,7 +683,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                                     : 'border border-bamboo-green/20 bg-bamboo-green/10 text-bamboo-green hover:bg-bamboo-green/20'
                                 }`}
                               >
-                                {togglingId === slot.id ? '...' : slot.is_available ? '停用' : '啟用'}
+                                {togglingId === slot.id ? '...' : slot.is_available ? t('disable') : t('enable')}
                               </button>
                             </div>
                           </div>
@@ -652,7 +701,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
             <div className="hidden h-7 lg:block" />
             <div className="overflow-hidden rounded-2xl border border-border bg-off-white lg:sticky lg:top-8" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
               {selectedSlot ? (
-                <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} />
+                <DetailSidebar slot={selectedSlot.slot} type={selectedSlot.type} bookings={bookingsBySlot[selectedSlot.slot.id] ?? []} togglingId={togglingId} onToggle={handleToggle} t={t} intlLocale={intlLocale} />
               ) : (
                 <div className="flex h-[200px] flex-col items-center justify-center p-6 text-center lg:h-[300px]">
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-cream">
@@ -660,7 +709,7 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
                     </svg>
                   </div>
-                  <p className="text-sm text-muted-foreground">點擊場次卡片<br />查看詳情和預約資訊</p>
+                  <p className="text-sm text-muted-foreground">{t('selectSlotCardHint').split('\n').map((line, idx) => <span key={idx}>{line}{idx === 0 && <br />}</span>)}</p>
                 </div>
               )}
             </div>

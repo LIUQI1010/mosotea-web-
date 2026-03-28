@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Modal } from './Modal'
 
 interface ConfirmCancelModalProps {
@@ -16,6 +17,7 @@ export function ConfirmCancelModal({
   onConfirm,
   customerName,
 }: ConfirmCancelModalProps) {
+  const t = useTranslations('admin.confirmCancel')
   const [loading, setLoading] = useState(false)
 
   const handleConfirm = async () => {
@@ -26,9 +28,9 @@ export function ConfirmCancelModal({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <h2 className="font-serif text-lg font-semibold text-foreground">確認取消預約</h2>
+      <h2 className="font-serif text-lg font-semibold text-foreground">{t('title')}</h2>
       <p className="mt-3 text-sm text-muted-foreground">
-        確認取消 <span className="font-medium text-foreground">{customerName}</span> 的預約？取消後無法恢復，名額將自動釋放。
+        {t('message', { name: customerName })}
       </p>
       <div className="mt-6 flex justify-end gap-3">
         <button
@@ -36,14 +38,14 @@ export function ConfirmCancelModal({
           disabled={loading}
           className="rounded-lg border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-cream"
         >
-          返回
+          {t('back')}
         </button>
         <button
           onClick={handleConfirm}
           disabled={loading}
           className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? '取消中...' : '確認取消'}
+          {loading ? t('cancelling') : t('confirm')}
         </button>
       </div>
     </Modal>

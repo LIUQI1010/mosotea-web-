@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import { BookingModal } from './BookingModal'
 import { ConfirmCancelModal } from './ConfirmCancelModal'
 import {
@@ -16,20 +17,6 @@ import type { BookingRow, AvailableSlot } from '../_actions'
 const NZ_TZ = 'Pacific/Auckland'
 
 type FilterTab = 'all' | 'pending' | 'confirmed' | 'today' | 'cancelled'
-
-function formatSlotDateTime(startTime: string): { date: string; weekday: string; time: string } {
-  const d = new Date(startTime)
-  const date = new Intl.DateTimeFormat('zh-TW', { timeZone: NZ_TZ, month: 'numeric', day: 'numeric' }).format(d)
-  const weekday = new Intl.DateTimeFormat('zh-TW', { timeZone: NZ_TZ, weekday: 'short' }).format(d)
-  const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: NZ_TZ, hour: '2-digit', hour12: false }).format(d))
-  return { date, weekday, time: hour < 12 ? '10:00–11:30' : '14:00–15:30' }
-}
-
-const statusConfig: Record<string, { label: string; className: string }> = {
-  pending:   { label: '待確認', className: 'bg-tea-brown/10 text-tea-brown border border-tea-brown/20' },
-  confirmed: { label: '已確認', className: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20' },
-  cancelled: { label: '已取消', className: 'bg-cream text-muted-foreground border border-border' },
-}
 
 const langLabel: Record<string, string> = { en: 'EN', 'zh-TW': '中' }
 
@@ -80,11 +67,6 @@ function buildBookingCalendarDays(
   return days
 }
 
-function formatCalendarMonthLabel(key: string): string {
-  const [y, m] = key.split('-')
-  return `${y}年${Number(m)}月`
-}
-
 interface BookingsClientProps {
   bookings: BookingRow[]
   pendingCount: number
@@ -96,6 +78,44 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
   const router = useRouter()
   const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
+  const t = useTranslations('admin.bookings')
+  const locale = useLocale()
+
+  const intlLocale = locale === 'zh-TW' ? 'zh-TW' : 'en-NZ'
+
+  function formatSlotDateTime(startTime: string): { date: string; weekday: string; time: string } {
+    const d = new Date(startTime)
+    const date = new Intl.DateTimeFormat(intlLocale, { timeZone: NZ_TZ, month: 'numeric', day: 'numeric' }).format(d)
+    const weekday = new Intl.DateTimeFormat(intlLocale, { timeZone: NZ_TZ, weekday: 'short' }).format(d)
+    const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: NZ_TZ, hour: '2-digit', hour12: false }).format(d))
+    return { date, weekday, time: hour < 12 ? '10:00–11:30' : '14:00–15:30' }
+  }
+
+  function formatCalendarMonthLabel(key: string): string {
+    const [y, m] = key.split('-')
+    if (locale === 'zh-TW') {
+      return `${y}年${Number(m)}月`
+    }
+    return new Intl.DateTimeFormat('en', { year: 'numeric', month: 'long' }).format(new Date(Number(y), Number(m) - 1))
+  }
+
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    pending:   { label: t('tabPending'), className: 'bg-tea-brown/10 text-tea-brown border border-tea-brown/20' },
+    confirmed: { label: t('tabConfirmed'), className: 'bg-bamboo-green/10 text-bamboo-green border border-bamboo-green/20' },
+    cancelled: { label: t('tabCancelled'), className: 'bg-cream text-muted-foreground border border-border' },
+  }
+
+  const tabs: { key: FilterTab; label: string; count?: number }[] = [
+    { key: 'all',       label: t('tabAll') },
+    { key: 'pending',   label: t('tabPending'), count: pendingCount },
+    { key: 'confirmed', label: t('tabConfirmed') },
+    { key: 'today',     label: t('tabToday') },
+    { key: 'cancelled', label: t('tabCancelled') },
+  ]
+
+  const weekdays = [t('weekdays.0'), t('weekdays.1'), t('weekdays.2'), t('weekdays.3'), t('weekdays.4'), t('weekdays.5'), t('weekdays.6')]
+
+  const tableHeaders = [t('headerName'), t('headerEmail'), t('headerPhone'), t('headerDate'), t('headerWeekday'), t('headerSlot'), t('headerGuests'), t('headerLang'), t('headerRequests'), t('headerStatus'), t('headerActions')]
 
   const initialTab = searchParams.get('status') as FilterTab | null
   const [activeTab, setActiveTab] = useState<FilterTab>(initialTab === 'pending' ? 'pending' : 'all')
@@ -154,10 +174,10 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
     const result = await confirmBooking(bookingId)
     setConfirmingId(null)
     if (result.success) {
-      showToast('預約已確認，確認電郵已發送', 'success')
+      showToast(t('toastConfirmed'), 'success')
       startTransition(() => router.refresh())
     } else {
-      showToast(result.error ?? '操作失敗', 'error')
+      showToast(result.error ?? t('toastError'), 'error')
     }
   }
 
@@ -166,10 +186,10 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
     const result = await cancelBooking(cancelTarget.id)
     setCancelTarget(null)
     if (result.success) {
-      showToast('預約已取消', 'success')
+      showToast(t('toastCancelled'), 'success')
       startTransition(() => router.refresh())
     } else {
-      showToast(result.error ?? '操作失敗', 'error')
+      showToast(result.error ?? t('toastError'), 'error')
     }
   }
 
@@ -191,24 +211,16 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
   }): Promise<{ error?: string }> => {
     if (modalMode === 'create') {
       const result = await createBooking({ timeSlotId: data.timeSlotId, customerName: data.customerName, email: data.email, phone: data.phone, guestCount: data.guestCount, specialRequests: data.specialRequests, preferredLanguage: data.preferredLanguage, sendEmail: data.sendEmail })
-      if (result.success) { showToast('預約建立成功', 'success'); startTransition(() => router.refresh()); return {} }
+      if (result.success) { showToast(t('toastCreated'), 'success'); startTransition(() => router.refresh()); return {} }
       return { error: result.error }
     }
     if (modalMode === 'edit' && editingBooking) {
       const result = await updateBooking(editingBooking.id, { guestCount: data.guestCount, specialRequests: data.specialRequests, preferredLanguage: data.preferredLanguage })
-      if (result.success) { showToast('預約已更新', 'success'); startTransition(() => router.refresh()); return {} }
+      if (result.success) { showToast(t('toastUpdated'), 'success'); startTransition(() => router.refresh()); return {} }
       return { error: result.error }
     }
     return {}
   }
-
-  const tabs: { key: FilterTab; label: string; count?: number }[] = [
-    { key: 'all',       label: '全部' },
-    { key: 'pending',   label: '待確認', count: pendingCount },
-    { key: 'confirmed', label: '已確認' },
-    { key: 'today',     label: '今天' },
-    { key: 'cancelled', label: '已取消' },
-  ]
 
   return (
     <div>
@@ -226,14 +238,14 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
       {/* Topbar */}
       <div className="mb-6 flex items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">預約管理</p>
-          <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">預約列表</h1>
+          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">{t('management')}</p>
+          <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">{t('title')}</h1>
         </div>
         <button
           onClick={openCreateModal}
           className="shrink-0 rounded-lg bg-tea-brown px-3 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:px-4"
         >
-          ＋ 新增預約
+          {t('newBooking')}
         </button>
       </div>
 
@@ -241,10 +253,10 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
       {pendingCount > 0 && (
         <div className="mb-6 flex flex-col gap-2 rounded-2xl border border-tea-brown/20 bg-tea-brown/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <p className="text-sm text-tea-brown">
-            有 <span className="font-semibold">{pendingCount}</span> 筆待確認預約，請及時處理
+            {t('pendingBanner', { count: pendingCount })}
           </p>
           <button onClick={() => setActiveTab('pending')} className="text-sm font-medium text-tea-brown underline-offset-2 hover:underline">
-            只看待確認
+            {t('viewPending')}
           </button>
         </div>
       )}
@@ -279,7 +291,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="搜尋姓名或電郵..."
+            placeholder={t('searchPlaceholder')}
             className="w-full rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-tea-brown focus:ring-2 focus:ring-tea-brown/20 sm:w-56"
           />
         )}
@@ -297,22 +309,22 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                 disabled={allCalendarMonths.indexOf(calendarMonth) <= 0}
                 className="rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-cream disabled:opacity-30"
               >
-                ← 上月
+                {t('prevMonth')}
               </button>
-              <span className="font-serif text-base font-semibold text-foreground">{formatCalendarMonthLabel(calendarMonth)}</span>
+              <span className="font-serif text-base font-semibold text-foreground" suppressHydrationWarning>{formatCalendarMonthLabel(calendarMonth)}</span>
               <button
                 onClick={() => { const i = allCalendarMonths.indexOf(calendarMonth); if (i < allCalendarMonths.length - 1) setCalendarMonth(allCalendarMonths[i + 1]) }}
                 disabled={allCalendarMonths.indexOf(calendarMonth) >= allCalendarMonths.length - 1}
                 className="rounded-lg border border-border bg-off-white px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-cream disabled:opacity-30"
               >
-                下月 →
+                {t('nextMonth')}
               </button>
             </div>
 
             {/* Calendar Grid */}
             <div className="overflow-hidden rounded-2xl border border-border bg-off-white" style={{ touchAction: 'manipulation' }}>
               <div className="grid grid-cols-7 border-b border-border bg-cream">
-                {['一', '二', '三', '四', '五', '六', '日'].map((d) => (
+                {weekdays.map((d) => (
                   <div key={d} className="py-2.5 text-center text-xs font-medium text-muted-foreground">{d}</div>
                 ))}
               </div>
@@ -371,7 +383,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                                     : 'bg-cream text-muted-foreground line-through'
                               }`}
                             >
-                              {b.customer_name} {b.guest_count}人
+                              {b.customer_name} {t('guestCount', { count: b.guest_count })}
                             </div>
                           ))}
                           {day.bookings.length > 3 && (
@@ -396,11 +408,11 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
               {selectedCalendarDate && selectedDateBookings.length > 0 ? (
                 <div className="flex h-full flex-col">
                   <div className="border-b border-border bg-cream px-4 py-3.5">
-                    <p className="font-serif text-sm font-semibold text-foreground">
-                      {new Intl.DateTimeFormat('zh-TW', { timeZone: NZ_TZ, month: 'numeric', day: 'numeric', weekday: 'short' }).format(new Date(`${selectedCalendarDate}T12:00:00`))}
+                    <p className="font-serif text-sm font-semibold text-foreground" suppressHydrationWarning>
+                      {new Intl.DateTimeFormat(intlLocale, { timeZone: NZ_TZ, month: 'numeric', day: 'numeric', weekday: 'short' }).format(new Date(`${selectedCalendarDate}T12:00:00`))}
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {selectedDateBookings.filter((b) => b.status !== 'cancelled').reduce((s, b) => s + b.guest_count, 0)} 人 · {selectedDateBookings.filter((b) => b.status === 'pending').length} 待確認
+                      {t('guestCount', { count: selectedDateBookings.filter((b) => b.status !== 'cancelled').reduce((s, b) => s + b.guest_count, 0) })} · {t('pendingCount', { count: selectedDateBookings.filter((b) => b.status === 'pending').length })}
                     </p>
                   </div>
 
@@ -411,7 +423,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                       return (
                         <div key={session}>
                           <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                            {session === 'morning' ? '上午 10:00–11:30' : '下午 14:00–15:30'}
+                            {session === 'morning' ? t('morning') : t('afternoon')}
                           </p>
                           <div className="space-y-2">
                             {sessionBookings.map((b) => {
@@ -427,7 +439,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                                     <span className="text-sm font-medium text-foreground">{b.customer_name}</span>
                                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${cfg.className}`}>{cfg.label}</span>
                                   </div>
-                                  <p className="text-xs text-muted-foreground">{b.guest_count}人 · {langLabel[b.preferred_language] ?? b.preferred_language}</p>
+                                  <p className="text-xs text-muted-foreground">{t('guestCount', { count: b.guest_count })} · {langLabel[b.preferred_language] ?? b.preferred_language}</p>
                                   <p className="mt-0.5 truncate text-xs text-muted-foreground">{b.email}</p>
                                   {!isCancelled && (
                                     <div className="mt-2.5 flex gap-1.5">
@@ -437,20 +449,20 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                                           disabled={confirmingId === b.id}
                                           className="rounded-md bg-bamboo-green/10 px-2 py-1 text-xs font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/20 disabled:opacity-50"
                                         >
-                                          {confirmingId === b.id ? '...' : '✓ 確認'}
+                                          {confirmingId === b.id ? '...' : t('confirm')}
                                         </button>
                                       )}
                                       <button
                                         onClick={() => openEditModal(b)}
                                         className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-off-white"
                                       >
-                                        編輯
+                                        {t('edit')}
                                       </button>
                                       <button
                                         onClick={() => setCancelTarget(b)}
                                         className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500"
                                       >
-                                        取消
+                                        {t('cancel')}
                                       </button>
                                     </div>
                                   )}
@@ -470,7 +482,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                     </svg>
                   </div>
-                  <p className="text-sm text-muted-foreground">點擊日曆中的日期<br />查看當天預約詳情</p>
+                  <p className="text-sm text-muted-foreground">{t('selectDate')}</p>
                 </div>
               )}
             </div>
@@ -482,7 +494,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
       {activeTab !== 'all' && (
         <>
           {filtered.length === 0 ? (
-            <div className="rounded-2xl border border-border bg-off-white py-12 text-center text-sm text-muted-foreground">暫無預約記錄</div>
+            <div className="rounded-2xl border border-border bg-off-white py-12 text-center text-sm text-muted-foreground">{t('noBookings')}</div>
           ) : (
             <>
               {/* Mobile: Card View */}
@@ -510,7 +522,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                         <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.className}`}>{cfg.label}</span>
                       </div>
                       <div className="space-y-0.5 text-xs text-muted-foreground">
-                        <p>{booking.guest_count}人 · {langLabel[booking.preferred_language] ?? booking.preferred_language}</p>
+                        <p>{t('guestCount', { count: booking.guest_count })} · {langLabel[booking.preferred_language] ?? booking.preferred_language}</p>
                         <p className="truncate">{booking.email}</p>
                         {booking.phone && <p>{booking.phone}</p>}
                         {booking.special_requests && <p className="truncate" title={booking.special_requests}>{booking.special_requests}</p>}
@@ -523,11 +535,11 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                               disabled={confirmingId === booking.id}
                               className="rounded-md bg-bamboo-green/10 px-3 py-1.5 text-xs font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/20 disabled:opacity-50"
                             >
-                              {confirmingId === booking.id ? '...' : '✓ 確認'}
+                              {confirmingId === booking.id ? '...' : t('confirm')}
                             </button>
                           )}
-                          <button onClick={() => openEditModal(booking)} className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-cream">編輯</button>
-                          <button onClick={() => setCancelTarget(booking)} className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">取消</button>
+                          <button onClick={() => openEditModal(booking)} className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-cream">{t('edit')}</button>
+                          <button onClick={() => setCancelTarget(booking)} className="rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">{t('cancel')}</button>
                         </div>
                       )}
                     </div>
@@ -538,7 +550,7 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
               {/* Desktop: Table View */}
               <div className="hidden overflow-x-auto rounded-2xl border border-border bg-off-white lg:block">
                 <div className="grid min-w-[1100px] grid-cols-[1fr_1.5fr_1fr_70px_50px_90px_45px_42px_1.2fr_65px_1.3fr] gap-2 border-b border-border bg-cream px-5 py-3 text-center">
-                  {['姓名','電郵','電話','日期','星期','時段','人數','語言','特殊需求','狀態','操作'].map((h) => (
+                  {tableHeaders.map((h) => (
                     <span key={h} className="text-xs font-medium text-muted-foreground">{h}</span>
                   ))}
                 </div>
@@ -575,13 +587,13 @@ export function BookingsClient({ bookings, pendingCount, todayStr, initialSlotDa
                             disabled={confirmingId === booking.id}
                             className="whitespace-nowrap rounded-md bg-bamboo-green/10 px-2 py-1 text-xs font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/20 disabled:opacity-50"
                           >
-                            {confirmingId === booking.id ? '...' : '✓ 確認'}
+                            {confirmingId === booking.id ? '...' : t('confirm')}
                           </button>
                         )}
                         {!isCancelled && (
                           <>
-                            <button onClick={() => openEditModal(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-cream">編輯</button>
-                            <button onClick={() => setCancelTarget(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">取消</button>
+                            <button onClick={() => openEditModal(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-cream">{t('edit')}</button>
+                            <button onClick={() => setCancelTarget(booking)} className="whitespace-nowrap rounded-md border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-red-100 hover:bg-red-50 hover:text-red-500">{t('cancel')}</button>
                           </>
                         )}
                         {isCancelled && <span className="text-xs text-muted-foreground/30">—</span>}

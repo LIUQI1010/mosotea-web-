@@ -16,6 +16,7 @@ export function Navigation() {
         { href: "/" as const, label: t("home") },
         { href: "/workshop" as const, label: t("experiences") },
         { href: "/about" as const, label: t("about") },
+        { href: "/gallery" as const, label: t("gallery") },
         { href: "/contact" as const, label: t("contact") },
     ]
 

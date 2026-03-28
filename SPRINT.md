@@ -231,6 +231,7 @@ Each developer answers:
 | End-to-end booking and cancellation flow regression test | Both | ✅ Done |
 | Submit sitemap to Google Search Console | Developer 1 | ✅ Done |
 | Set up Google Business Profile | Developer 2 | ✅ Done |
+| Add bilingual support (EN/繁中) to admin dashboard | Developer 1 | ✅ Done |
 | Client User Acceptance Testing (UAT) | Both | ⏳ Pending |
 | Finalise README and project documentation | Both | ✅ Done |
 | Deliver admin credentials and user guide to client | Developer 1 | ⏳ Pending |
@@ -244,6 +245,43 @@ Each developer answers:
 
 ---
 
+## Sprint 5 — Announcements & Gallery
+
+> **Goal:** Admin can publish bilingual announcements displayed on the homepage, and manage gallery images dynamically via Supabase Storage.
+
+| Task | Owner | Status |
+|---|---|---|
+| **Announcements** | | |
+| Create `announcements` table in Supabase (with RLS policies) | Developer 1 | ✅ Done |
+| Add `Announcement` type to `src/types/index.ts` | Developer 1 | ✅ Done |
+| Build admin announcements page (`/admin/announcements`) | Developer 1 | ✅ Done |
+| Implement announcements server actions (CRUD + toggle active) | Developer 1 | ✅ Done |
+| Add announcements sidebar nav item in `AdminSidebar.tsx` | Developer 1 | ✅ Done |
+| Build homepage announcement banner component (rotating, bilingual) | Developer 1 | ✅ Done |
+| Add announcement-related translation keys to `en.json` / `zh-TW.json` | Developer 1 | ✅ Done |
+| **Gallery** | | |
+| Create Supabase Storage bucket `gallery` (public access, 2MB limit) | Developer 1 | ✅ Done |
+| Build admin gallery page (`/admin/gallery`) with image upload/delete/caption | Developer 1 | ✅ Done |
+| Implement gallery server actions (upload, updateCaption, delete) | Developer 1 | ✅ Done |
+| Add gallery sidebar nav item in `AdminSidebar.tsx` | Developer 1 | ✅ Done |
+| Build standalone Gallery page (`/gallery`) with masonry layout + lightbox | Developer 1 | ✅ Done |
+| Build homepage Gallery preview section (6 images + "View All" link) | Developer 1 | ✅ Done |
+| Add Gallery link to public navigation bar | Developer 1 | ✅ Done |
+| Configure Supabase Storage domain in `next.config.ts` for `next/image` | Developer 1 | ✅ Done |
+| Implement client-side image compression (Canvas API, ≤ 2MB) | Developer 1 | ✅ Done |
+| Add gallery-related translation keys to `en.json` / `zh-TW.json` | Developer 1 | ✅ Done |
+| Responsive testing for announcements banner and gallery section | Both | ⏳ Pending |
+
+**Definition of Done:**
+- [x] Admin can create, edit, toggle, and delete bilingual announcements
+- [x] Homepage displays active announcements as a rotating top banner in the visitor's locale
+- [x] Admin can upload, edit captions, and delete gallery images via Supabase Storage
+- [x] Standalone Gallery page with masonry layout and lightbox
+- [x] Homepage displays Gallery preview (6 images) with link to full gallery
+- [ ] All new UI is responsive on mobile, tablet, and desktop
+
+---
+
 ## Sprint Summary
 
 | Phase | Duration | Key Deliverable |
@@ -254,6 +292,7 @@ Each developer answers:
 | Sprint 2 | 1 week | Full booking system with cancellation link |
 | Sprint 3 | 1 week | Admin dashboard + customer self-cancellation + bug fixes |
 | Sprint 4 | 1 week | Testing, performance, launch |
+| Sprint 5 | 1 week | Announcements + Gallery management |
 
 ---
 

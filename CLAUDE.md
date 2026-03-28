@@ -54,23 +54,35 @@ mosotea-web-/
 │   │   │   ├── terms/
 │   │   │   │   ├── layout.tsx      ← Terms of Service metadata
 │   │   │   │   └── page.tsx        ← Terms of Service (/terms)
+│   │   │   ├── gallery/
+│   │   │   │   └── page.tsx        ← Gallery page with masonry layout + lightbox (/gallery)
 │   │   │   └── cancel/
 │   │   │       └── [token]/
 │   │   │           └── page.tsx    ← Customer self-cancellation (/cancel/[token])
 │   │   ├── [locale]/
 │   │   │   └── not-found.tsx       ← 404 Not Found page
-│   │   ├── admin/                  ← Protected admin dashboard (English only, no locale)
+│   │   ├── admin/                  ← Protected admin dashboard (bilingual via cookie, no locale segment)
+│   │   │   ├── _actions/
+│   │   │   │   ├── auth.ts         ← Server actions: login/logout
+│   │   │   │   └── locale.ts       ← Server actions: get/set admin locale (cookie-based)
 │   │   │   ├── (dashboard)/
 │   │   │   │   ├── layout.tsx      ← Dashboard layout with sidebar
 │   │   │   │   ├── loading.tsx     ← Shared loading state for all admin pages
-│   │   │   │   ├── page.tsx        ← Dashboard with stats (/admin)
-│   │   │   │   ├── AdminSidebar.tsx ← Sidebar navigation component
+│   │   │   │   ├── page.tsx        ← Dashboard data fetching (server component)
+│   │   │   │   ├── DashboardClient.tsx ← Dashboard UI with translations (client component)
+│   │   │   │   ├── AdminSidebar.tsx ← Sidebar navigation + language switcher
 │   │   │   │   ├── bookings/
 │   │   │   │   │   ├── page.tsx    ← Booking list with calendar view (/admin/bookings)
 │   │   │   │   │   └── _actions.ts ← Server actions: confirm, cancel, create, update bookings
-│   │   │   │   └── slots/
-│   │   │   │       ├── page.tsx    ← Time slot management (/admin/slots)
-│   │   │   │       └── _actions.ts ← Server actions: generate slots, toggle availability
+│   │   │   │   ├── slots/
+│   │   │   │   │   ├── page.tsx    ← Time slot management (/admin/slots)
+│   │   │   │   │   └── _actions.ts ← Server actions: generate slots, toggle availability
+│   │   │   │   ├── announcements/
+│   │   │   │   │   ├── page.tsx    ← Announcement management (/admin/announcements)
+│   │   │   │   │   └── _actions.ts ← Server actions: CRUD announcements, toggle active
+│   │   │   │   └── gallery/
+│   │   │   │       ├── page.tsx    ← Gallery image management (/admin/gallery)
+│   │   │   │       └── _actions.ts ← Server actions: upload/delete images
 │   │   │   ├── login/
 │   │   │   │   └── page.tsx        ← Admin login (/admin/login)
 │   │   ├── api/                    ← API Routes (server-side only)
@@ -87,6 +99,7 @@ mosotea-web-/
 │   │   ├── globals.css             ← Tailwind v4 config + Moso Tea color palette
 │   │   └── layout.tsx              ← Root layout (fonts, metadata)
 │   ├── components/
+│   │   ├── AnnouncementBanner.tsx  ← Homepage announcement rotating banner (fixed, bilingual, swipeable)
 │   │   └── layout/
 │   │       ├── Navigation.tsx      ← Global navigation bar
 │   │       └── Footer.tsx          ← Global footer
@@ -172,6 +185,7 @@ CANCELLATION_TOKEN_SECRET=        # Random 32-byte hex string for signing cancel
 | `time_slots` | Stores bookable time slots |
 | `bookings` | Stores customer booking records |
 | `gallery` | Stores image metadata (files in Supabase Storage) |
+| `announcements` | Stores bilingual announcements displayed on the homepage |
 
 ### Table: `time_slots`
 
@@ -246,6 +260,31 @@ create table gallery (
 );
 ```
 
+### Table: `announcements`
+
+Stores announcements created by admin. Displayed as a rotating banner on the homepage.
+
+```sql
+create table announcements (
+  id uuid primary key default gen_random_uuid(),
+  title_en text not null,
+  title_zh text not null,
+  content_en text not null,
+  content_zh text not null,
+  is_active boolean default true,
+  sort_order int not null default 0,
+  created_at timestamptz default now()
+);
+```
+
+**Announcement rules:**
+- Multiple announcements can be active simultaneously
+- Homepage displays active announcements as a top banner below the navigation bar
+- When multiple announcements are active, they rotate automatically (fade out one, fade in the next)
+- Admin can toggle `is_active` to show/hide individual announcements
+- Bilingual: `title_en`/`content_en` for English, `title_zh`/`content_zh` for Traditional Chinese
+- Displayed in the visitor's current locale
+
 ### Table Relationships
 
 ```
@@ -272,6 +311,8 @@ time_slots ──── bookings
 | `bookings` | SELECT / UPDATE | Authenticated only (admin) |
 | `gallery` | SELECT | All users (anon) |
 | `gallery` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
+| `announcements` | SELECT | All users (anon) |
+| `announcements` | INSERT / UPDATE / DELETE | Authenticated only (admin) |
 
 ---
 
@@ -300,9 +341,42 @@ time_slots ──── bookings
 ### Admin Rules
 - Admin dashboard only accessible to authenticated users (Supabase Auth)
 - Unauthenticated users redirected to `/admin/login`
+- Admin dashboard supports bilingual switching (English / Traditional Chinese)
+- Admin locale is stored in a cookie (`admin_locale`), default: `zh-TW`
+- Language switcher is located in the admin sidebar (same visual style as public navigation)
 - Admin can confirm, cancel, and view all bookings
 - Admin can add, remove, and toggle availability of time slots
 - Admin can generate next 30 days of time slots in bulk
+- Admin can create, edit, toggle, and delete announcements (bilingual)
+- Admin can upload, delete, and manage gallery images (Supabase Storage)
+
+### Announcement Rules
+- Announcements are displayed as a **fixed top banner** on the homepage, positioned below the navigation bar (`fixed top-16 z-40`)
+- Multiple announcements can be active at the same time
+- When multiple are active, they **rotate automatically** every 5 seconds with fade transition
+- Users can manually switch announcements via **left/right arrows**, **clickable dot indicators**, or **touch swipe** (mobile)
+- Manual interaction resets the auto-rotate timer
+- `sort_order` controls the display order; admin can **drag to reorder** using `@dnd-kit` in the admin dashboard
+- New announcements are appended at the end (`sort_order = max + 1`)
+- Each announcement has bilingual content (`title_en`/`content_en` and `title_zh`/`content_zh`)
+- The homepage displays the announcement in the visitor's **current locale**
+- Admin can toggle `is_active` to show/hide announcements without deleting them
+- Users can dismiss the banner via a centered "Dismiss" / "關閉通知" link below the content
+
+### Gallery Rules
+- Gallery images are stored in **Supabase Storage** (bucket: `gallery`, public, 2MB file size limit)
+- The `gallery` table stores metadata (url, filename, caption)
+- **Standalone Gallery page** (`/gallery`) displays all images in a **CSS columns masonry layout** (1/2/3/4 columns responsive) with click-to-enlarge lightbox and left/right navigation
+- Homepage displays a Gallery preview section (latest 6 images in standard grid) with "View All Photos" link to `/gallery`
+- Gallery page is accessible via the **navigation bar** (between About and Contact)
+- About page does **not** display gallery images (removed)
+- Caption is single-language (not bilingual), overlaid on image bottom with gradient background
+- Admin can upload images (drag & drop or click), edit captions, and delete images
+- **Client-side image compression**: images are automatically compressed to ≤ 2MB before upload using Canvas API (max dimension 2048px, progressive JPEG quality reduction)
+- Admin gallery displays images in a compact grid (3/4/6 columns, square aspect ratio) with caption overlay
+- Deleting an image removes both the Storage file and the database record
+- `next/image` is used for optimized loading (Supabase Storage domain configured in `next.config.ts`)
+- `next.config.ts` sets `experimental.serverActions.bodySizeLimit: '3mb'` for image upload
 
 ---
 
@@ -457,6 +531,8 @@ Admin operations use Next.js Server Actions instead of API routes:
 
 - `src/app/admin/(dashboard)/bookings/_actions.ts` — `getBookings`, `confirmBooking`, `cancelBooking`, `createBooking`, `updateBooking`, `getAvailableSlots`
 - `src/app/admin/(dashboard)/slots/_actions.ts` — `generateSlots`, `toggleSlot`
+- `src/app/admin/(dashboard)/announcements/_actions.ts` — `getAnnouncements`, `createAnnouncement`, `updateAnnouncement`, `deleteAnnouncement`, `toggleAnnouncement`, `reorderAnnouncements`
+- `src/app/admin/(dashboard)/gallery/_actions.ts` — `getGalleryImages`, `uploadImage`, `updateCaption`, `deleteImage`
 
 ---
 
@@ -487,7 +563,10 @@ Admin operations use Next.js Server Actions instead of API routes:
   4. Add all user-facing strings to `messages/en.json` and `messages/zh-TW.json`
   5. Do NOT add `Zh` suffix keys (e.g., `titleZh`, `labelZh`) — each locale has its own complete translation file
 - All public page content, form labels, error messages, and emails must be translated
-- Admin dashboard is **English only** (no locale segment needed)
+- Admin dashboard supports **bilingual switching** (English / Traditional Chinese) via cookie-based locale
+- Admin does **not** use URL-based locale routing (no `[locale]` segment) — locale is stored in `admin_locale` cookie
+- Admin layout wraps children with `NextIntlClientProvider` using the cookie locale
+- Admin translation keys are under the `admin` namespace in `messages/en.json` and `messages/zh-TW.json`
 - Translation files: `messages/en.json` and `messages/zh-TW.json`
 - i18n config: `src/i18n/routing.ts`, `src/i18n/request.ts`, `src/i18n/navigation.ts`
 
@@ -654,3 +733,4 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Sprint 2 | Booking system + cancellation emails | ✅ Done |
 | Sprint 3 | Admin dashboard + self-cancellation | ✅ Done |
 | Sprint 4 | Testing, performance, launch | 🔄 In Progress |
+| Sprint 5 | Announcements + Gallery management | 🔄 In Progress |
