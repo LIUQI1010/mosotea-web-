@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition, useCallback, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { getGalleryImages, uploadImage, updateCaption, deleteImage } from './_actions'
+import { getGalleryImages, uploadImage, updateCaption, deleteImage, setFeatured, reorderFeatured } from './_actions'
 import type { Gallery } from '@/types'
 
 function PlusIcon({ className }: { className?: string }) {
@@ -26,6 +26,38 @@ function PencilIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+    </svg>
+  )
+}
+
+function StarIcon({ className, filled }: { className?: string; filled?: boolean }) {
+  return (
+    <svg className={className} fill={filled ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+    </svg>
+  )
+}
+
+function ChevronLeftIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+  )
+}
+
+function ChevronRightIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+    </svg>
+  )
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
     </svg>
   )
 }
@@ -237,6 +269,89 @@ function DeleteModal({ onClose, onConfirm, deleting, t }: {
   )
 }
 
+// Featured strip — shows selected homepage images with ordering controls
+function FeaturedStrip({
+  featured,
+  onMove,
+  onRemove,
+  t,
+}: {
+  featured: Gallery[]
+  onMove: (id: string, direction: 'left' | 'right') => void
+  onRemove: (id: string) => void
+  t: ReturnType<typeof useTranslations<'admin.gallery'>>
+}) {
+  if (featured.length === 0) {
+    return (
+      <div className="rounded-lg border-2 border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        {t('featuredEmpty')}
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-2">
+      {featured.map((image, index) => (
+        <div
+          key={image.id}
+          className="relative flex-shrink-0 w-28 rounded-lg border-2 border-tea-brown overflow-hidden bg-off-white"
+        >
+          <div className="aspect-square relative">
+            <Image
+              src={image.url}
+              alt={image.caption ?? image.filename}
+              fill
+              className="object-cover"
+              sizes="112px"
+            />
+            {/* Order badge */}
+            <span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-tea-brown text-[10px] font-bold text-white">
+              {index + 1}
+            </span>
+            {/* Remove button */}
+            <button
+              onClick={() => onRemove(image.id)}
+              className="absolute top-1 right-1 rounded-full bg-black/50 p-0.5 text-white hover:bg-black/70 transition-colors"
+              title={t('unfeatured')}
+            >
+              <XIcon className="h-3 w-3" />
+            </button>
+          </div>
+          {/* Move arrows */}
+          <div className="flex items-center justify-center gap-1 py-1 bg-cream">
+            <button
+              onClick={() => onMove(image.id, 'left')}
+              disabled={index === 0}
+              className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+            >
+              <ChevronLeftIcon className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => onMove(image.id, 'right')}
+              disabled={index === featured.length - 1}
+              className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
+            >
+              <ChevronRightIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      ))}
+      {/* Empty slots */}
+      {Array.from({ length: 6 - featured.length }).map((_, i) => (
+        <div
+          key={`empty-${i}`}
+          className="flex-shrink-0 w-28 rounded-lg border-2 border-dashed border-border"
+        >
+          <div className="aspect-square flex items-center justify-center">
+            <span className="text-xs text-muted-foreground/30">{featured.length + i + 1}</span>
+          </div>
+          <div className="py-1 bg-transparent"><div className="h-[22px]" /></div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function GalleryPage() {
   const t = useTranslations('admin.gallery')
   const [images, setImages] = useState<Gallery[]>([])
@@ -263,6 +378,12 @@ export default function GalleryPage() {
     setToast(msg)
     setTimeout(() => setToast(''), 3000)
   }
+
+  const featured = images
+    .filter((img) => img.featured_order !== null)
+    .sort((a, b) => (a.featured_order ?? 0) - (b.featured_order ?? 0))
+
+  const featuredIds = new Set(featured.map((img) => img.id))
 
   const handleUpload = async (file: File) => {
     setUploading(true)
@@ -304,6 +425,50 @@ export default function GalleryPage() {
     }
   }
 
+  const handleToggleFeatured = async (image: Gallery) => {
+    const isFeatured = image.featured_order !== null
+    const result = await setFeatured(image.id, !isFeatured)
+    if (result.success) {
+      showToast(isFeatured ? t('toastUnfeatured') : t('toastFeatured'))
+      loadData()
+    } else if (result.error === 'MAX_FEATURED') {
+      showToast(t('maxFeatured'))
+    } else {
+      showToast(result.error ?? t('toastError'))
+    }
+  }
+
+  const handleMove = async (id: string, direction: 'left' | 'right') => {
+    const idx = featured.findIndex((img) => img.id === id)
+    if (idx < 0) return
+    const swapIdx = direction === 'left' ? idx - 1 : idx + 1
+    if (swapIdx < 0 || swapIdx >= featured.length) return
+
+    // Optimistic reorder
+    const newOrder = [...featured]
+    const temp = newOrder[idx]
+    newOrder[idx] = newOrder[swapIdx]
+    newOrder[swapIdx] = temp
+
+    const orderedIds = newOrder.map((img) => img.id)
+    const result = await reorderFeatured(orderedIds)
+    if (result.success) {
+      loadData()
+    } else {
+      showToast(t('toastError'))
+    }
+  }
+
+  const handleRemoveFeatured = async (id: string) => {
+    const result = await setFeatured(id, false)
+    if (result.success) {
+      showToast(t('toastUnfeatured'))
+      loadData()
+    } else {
+      showToast(t('toastError'))
+    }
+  }
+
   return (
     <div>
       {/* Header */}
@@ -314,6 +479,20 @@ export default function GalleryPage() {
         <h1 className="mt-1 font-serif text-2xl font-semibold text-foreground">
           {t('title')}
         </h1>
+      </div>
+
+      {/* Featured section */}
+      <div className="mb-6">
+        <h2 className="text-sm font-medium text-foreground mb-2">
+          {t('featuredTitle', { count: featured.length })}
+        </h2>
+        <p className="text-xs text-muted-foreground mb-3">{t('featuredHint')}</p>
+        <FeaturedStrip
+          featured={featured}
+          onMove={handleMove}
+          onRemove={handleRemoveFeatured}
+          t={t}
+        />
       </div>
 
       {/* Upload area */}
@@ -334,42 +513,63 @@ export default function GalleryPage() {
       {/* Image grid */}
       {!loading && images.length > 0 && (
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
-          {images.map((image) => (
-            <div key={image.id} className="group relative overflow-hidden rounded-lg border border-border bg-off-white">
-              <div className="aspect-square relative">
-                <Image
-                  src={image.url}
-                  alt={image.caption ?? image.filename}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-                {/* Caption overlay at bottom */}
-                {image.caption && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-2 pb-1.5 pt-4">
-                    <p className="text-[10px] leading-tight text-white truncate">{image.caption}</p>
+          {images.map((image) => {
+            const isFeatured = featuredIds.has(image.id)
+            return (
+              <div key={image.id} className={`group relative overflow-hidden rounded-lg border bg-off-white ${isFeatured ? 'border-tea-brown ring-2 ring-tea-brown/20' : 'border-border'}`}>
+                <div className="aspect-square relative">
+                  <Image
+                    src={image.url}
+                    alt={image.caption ?? image.filename}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
+                  {/* Featured star */}
+                  <button
+                    onClick={() => handleToggleFeatured(image)}
+                    className={`absolute top-1.5 left-1.5 z-10 rounded-full p-1 transition-all ${
+                      isFeatured
+                        ? 'text-yellow-400 bg-black/40 hover:bg-black/50'
+                        : 'text-white/50 bg-black/20 opacity-0 group-hover:opacity-100 hover:text-yellow-400 hover:bg-black/40'
+                    }`}
+                    title={isFeatured ? t('unfeatured') : t('featured')}
+                  >
+                    <StarIcon className="h-4 w-4" filled={isFeatured} />
+                  </button>
+                  {/* Featured order badge */}
+                  {isFeatured && image.featured_order !== null && (
+                    <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-tea-brown text-[10px] font-bold text-white">
+                      {image.featured_order}
+                    </span>
+                  )}
+                  {/* Caption overlay at bottom */}
+                  {image.caption && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-2 pb-1.5 pt-4">
+                      <p className="text-[10px] leading-tight text-white truncate">{image.caption}</p>
+                    </div>
+                  )}
+                  {/* Hover overlay with actions */}
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/0 opacity-0 transition-all group-hover:bg-foreground/40 group-hover:opacity-100">
+                    <button
+                      onClick={() => setCaptionTarget(image)}
+                      className="rounded-full bg-white/90 p-2 text-foreground shadow hover:bg-white transition-colors"
+                      title={t('editCaption')}
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(image)}
+                      className="rounded-full bg-white/90 p-2 text-red-600 shadow hover:bg-white transition-colors"
+                      title={t('confirmDelete')}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
                   </div>
-                )}
-                {/* Hover overlay with actions */}
-                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-foreground/0 opacity-0 transition-all group-hover:bg-foreground/40 group-hover:opacity-100">
-                  <button
-                    onClick={() => setCaptionTarget(image)}
-                    className="rounded-full bg-white/90 p-2 text-foreground shadow hover:bg-white transition-colors"
-                    title={t('editCaption')}
-                  >
-                    <PencilIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteTarget(image)}
-                    className="rounded-full bg-white/90 p-2 text-red-600 shadow hover:bg-white transition-colors"
-                    title={t('confirmDelete')}
-                  >
-                    <TrashIcon className="h-4 w-4" />
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

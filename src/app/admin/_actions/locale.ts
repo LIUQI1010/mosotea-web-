@@ -1,9 +1,10 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import type { Locale } from '@/i18n/routing'
 
-export async function setAdminLocale(locale: Locale): Promise<void> {
+export type AdminLocale = 'en' | 'zh-TW'
+
+export async function setAdminLocale(locale: AdminLocale): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.set('admin_locale', locale, {
     httpOnly: false,
@@ -14,7 +15,7 @@ export async function setAdminLocale(locale: Locale): Promise<void> {
   })
 }
 
-export async function getAdminLocale(): Promise<Locale> {
+export async function getAdminLocale(): Promise<AdminLocale> {
   const cookieStore = await cookies()
   const locale = cookieStore.get('admin_locale')?.value
   if (locale === 'en' || locale === 'zh-TW') return locale

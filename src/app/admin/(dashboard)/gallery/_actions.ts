@@ -96,6 +96,69 @@ export async function updateCaption(
   return { success: true }
 }
 
+export async function setFeatured(
+  id: string,
+  featured: boolean
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+
+  if (featured) {
+    // Check the 6-image limit
+    const { data: existing } = await supabase
+      .from('gallery')
+      .select('id, featured_order')
+      .not('featured_order', 'is', null)
+      .order('featured_order', { ascending: true })
+
+    if (existing && existing.length >= 6) {
+      return { success: false, error: 'MAX_FEATURED' }
+    }
+
+    // Assign next order number
+    const maxOrder = existing && existing.length > 0
+      ? Math.max(...existing.map((r: { featured_order: number }) => r.featured_order))
+      : 0
+
+    const { error } = await supabase
+      .from('gallery')
+      .update({ featured_order: maxOrder + 1 })
+      .eq('id', id)
+
+    if (error) return { success: false, error: error.message }
+  } else {
+    // Remove from featured
+    const { error } = await supabase
+      .from('gallery')
+      .update({ featured_order: null })
+      .eq('id', id)
+
+    if (error) return { success: false, error: error.message }
+  }
+
+  revalidate()
+  return { success: true }
+}
+
+export async function reorderFeatured(
+  orderedIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+
+  const updates = orderedIds.map((id, index) =>
+    supabase
+      .from('gallery')
+      .update({ featured_order: index + 1 })
+      .eq('id', id)
+  )
+
+  const results = await Promise.all(updates)
+  const failed = results.find((r) => r.error)
+  if (failed?.error) return { success: false, error: failed.error.message }
+
+  revalidate()
+  return { success: true }
+}
+
 export async function deleteImage(
   id: string,
   filename: string

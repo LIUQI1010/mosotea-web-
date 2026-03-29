@@ -8,7 +8,7 @@
     "bookNow": "Book Now"
   },
   "footer": {
-    "description": "Bringing the ancient art of tea ceremony to Wellington. Experience tranquility, mindfulness, and the beauty of tea culture.",
+    "description": "Bringing the art of tea ceremony to Wellington. Experience tranquility, mindfulness, and the beauty of tea culture.",
     "navigation": "Navigation",
     "contact": "Contact",
     "address1": "69 Crowther Road",
@@ -29,22 +29,22 @@
     "hero": {
       "title": "Experience the Art of Tea",
       "titleZh": "體驗茶道之美",
-      "description": "Discover the ancient traditions of tea ceremony in Wellington, where every cup tells a story of mindfulness and connection.",
+      "description": "Discover the traditions of tea ceremony in Wellington, where every cup tells a story of mindfulness and connection.",
       "cta": "Book an Experience"
     },
     "intro": {
       "title": "Why Moso Tea",
-      "description": "We bring the ancient art of tea ceremony to New Zealand, creating moments of peace and connection in our carefully curated space.",
+      "description": "We bring the art of tea ceremony to New Zealand, creating moments of peace and connection in our carefully curated space.",
       "feature1Title": "Tea Culture",
       "feature1Description": "Rooted in centuries of tradition, we bring the art and philosophy of tea ceremony to life — one mindful cup at a time.",
       "feature2Title": "Tea Space",
-      "feature2Description": "Nestled in the hills of Wainuiomata, our farm studio is a place where time slows down and the outside world quietly falls away.",
+      "feature2Description": "Nestled in the hills of Wainuiomata, our workshop is a place where time slows down and the outside world quietly falls away.",
       "feature3Title": "Tea Experience",
-      "feature3Description": "From the first scent of leaves to the last sip, every session is crafted to be unhurried, intimate, and deeply personal."
+      "feature3Description": "From the first scent of leaves to the last sip, every session is crafted to be unhurried, and deeply personal."
     },
     "experiences": {
-      "title": "Our Experience",
-      "subtitle": "A single, unhurried journey through the world of tea — guided, hands-on, and deeply personal.",
+      "title": "Our Workshops",
+      "subtitle": "A single, immersive journey through the world of tea — guided, hands-on, and deeply personal.",
       "teaJourney": {
         "title": "Tea Journey",
         "description": "Learn the story of tea — its culture, its trees, and the art of brewing — guided by your host."
@@ -94,10 +94,10 @@
     },
     "story": {
       "title": "A Journey of Tea",
-      "p1": "Moso Tea was born from a simple yet profound love for the art of tea ceremony. Founded in 2021, our studio has become a sanctuary for those seeking moments of stillness in Wainuiomata, Wellington.",
-      "p2": "The name \"Moso\" carries two quiet meanings. In Taiwanese, moso means slow — an invitation to pause, to breathe, and to be present. It is also the name of the moso bamboo, a plant we deeply admire not for its dramatic growth, but for its stillness and resilience. The bamboo stands quietly through all seasons, rooted and unhurried. Our tea trees came to us by chance, much like the bamboo — an unexpected gift that found its way into our lives and shaped everything that followed.",
+      "p1": "Moso Tea was born from a simple yet profound love for the art of tea ceremony. Founded in 2021, our workshop has become a sanctuary for those seeking moments of stillness in Wainuiomata, Wellington.",
+      "p2": "The name \"Moso\" carries two quiet meanings. In Taiwanese dialect, moso means slow — an invitation to pause, to breathe, and to be present. It is also the name of the moso bamboo, a plant we deeply admire not for its dramatic growth, but for its stillness and resilience. The bamboo stands quietly through all seasons and rooted and unhurried. Our tea trees came to us by chance, much like the bamboo — an unexpected gift that found its way into our lives and shaped everything that followed.",
       "p3": "What began as a small gathering of tea enthusiasts has grown into a beloved space where people from all walks of life come together to experience the meditative beauty of tea culture.",
-      "p4": "Our lifestyle farm studio in Wainuiomata offers a rare opportunity to step away from the pace of everyday life and immerse yourself in an ancient tradition — one that celebrates the simple, unhurried act of preparing and sharing tea."
+      "p4": "Our lifestyle block workshop in Wainuiomata offers a rare opportunity to step away from the pace of everyday life and immerse yourself in a tradition — one that celebrates the simple, unhurried act of preparing and sharing tea."
     },
     "philosophy": {
       "quote": "In the simple act of making tea, we find a path to presence. Each cup is an invitation to slow down, to breathe, and to connect with the moment.",
@@ -106,15 +106,15 @@
     "expect": {
       "title": "What to Expect",
       "titleZh": "體驗流程",
-      "item1Title": "Guided by an Expert",
+      "item1Title": "Guided by an host",
       "item1TitleZh": "專家引導",
-      "item1Description": "Our certified tea masters bring years of training and deep cultural knowledge to every session.",
+      "item1Description": "Our experienced tea masters guide you through a deep cultural knowledge to every session.",
       "item2Title": "Tranquil Setting",
       "item2TitleZh": "安靜環境",
-      "item2Description": "A quiet, peaceful space where you can slow down, focus on the moment, and enjoy an unhurried tea experience.",
+      "item2Description": "A quiet, peaceful space where you can slow down, focus on the moment, and enjoy a state of calm and balanced tea experience.",
       "item3Title": "All Materials Provided",
       "item3TitleZh": "提供所有材料",
-      "item3Description": "Premium teas, traditional utensils, and light refreshments are included in every experience.",
+      "item3Description": "Premium teas and traditional utensils are included in every experience.",
       "item4Title": "Unhurried Pace",
       "item4TitleZh": "從容不迫",
       "item4Description": "Our sessions are designed to give you time to fully absorb and appreciate each moment."
@@ -122,19 +122,19 @@
     "host": {
       "title": "The People Behind Moso Tea",
       "founder1": {
-        "name": "Joyce Peng",
+        "name": "Jenson",
         "role": "Co-Founder",
-        "description": "Joyce is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — her warmth and gentle guidance make every guest feel at home from the very first cup."
+        "description": "Jenson is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — her warmth and gentle guidance make every guest feel at home from the very first cup."
       },
       "founder2": {
-        "name": "Jenson Lin",
+        "name": "Joyce",
         "role": "Co-Founder",
-        "description": "Jenson tends to the tea garden and oversees the making of every leaf. His quiet dedication to the land and the craft is what gives Moso Tea its roots — quite literally."
+        "description": "Joyce tends to the tea garden and oversees the making of every leaf. His quiet dedication to the land and the craft is what gives Moso Tea its roots — quite literally."
       },
       "founder3": {
-        "name": "Liyin Lin",
+        "name": "Lynn",
         "role": "Co-Founder",
-        "description": "Liyin grew up surrounded by tea. Now she shares that world with guests in her own words, bridging cultures and making the art of tea feel accessible, engaging, and alive."
+        "description": "Lynn grew up surrounded by tea. Now she shares that world with guests in her own words, bridging cultures and making the art of tea feel accessible, engaging, and alive."
       }
     },
     "gallery": {
@@ -150,7 +150,7 @@
   },
   "experiences": {
     "hero": {
-      "title": "The Workshop",
+      "title": "The Workshops",
       "description": "One experience. Two parts. A complete journey through the world of tea."
     },
     "part01": "Part 01",
@@ -208,11 +208,11 @@
     "hero": {
       "title": "Get in Touch",
       "titleZh": "聯絡我們",
-      "description": "We would love to hear from you. Whether you have questions about our experiences, need help planning a special event, or simply want to say hello."
+      "description": "We would love to hear from you. Whether you have questions about our workshops, need help planning a special event, or simply want to say hello."
     },
     "info": {
       "title": "Contact Information",
-      "description": "Visit us in our peaceful garden studio or reach out through any of the channels below.",
+      "description": "Visit us in our peaceful garden workshop or reach out through any of the channels below.",
       "address": "Address",
       "email": "Email",
       "phone": "Phone",
@@ -304,7 +304,7 @@
     },
     "back": "Back",
     "continue": "Continue",
-    "confirm": "Confirm Booking",
+    "confirm": "Submit Booking",
     "submitting": "Submitting...",
     "error": {
       "title": "Something Went Wrong",
@@ -530,6 +530,32 @@
       "prevMonth": "← Prev",
       "nextMonth": "Next →",
       "operationFailed": "Operation failed",
+      "disableRangeButton": "Batch Disable",
+      "disableRangeTitle": "Batch Disable Slots",
+      "disableRangeHint": "Disabled slots will not be available for booking",
+      "disableRangeFrom": "From",
+      "disableRangeTo": "To",
+      "disableRangeSessions": "Sessions",
+      "disableRangeMorning": "Morning (10:00–11:30)",
+      "disableRangeAfternoon": "Afternoon (14:00–15:30)",
+      "disableRangeConfirm": "Disable",
+      "disableRangeDisabling": "Disabling...",
+      "disableRangeCancel": "Cancel",
+      "disableRangeSuccess": "Disabled {disabled} slots",
+      "disableRangeSkipped": " ({skipped} skipped – have active bookings)",
+      "disableRangePreview": "{count, plural, =0 {No available slots in this range} one {1 slot will be disabled} other {# slots will be disabled}}",
+      "disableRangeNoneFound": "No available slots found in that range",
+      "disableRangeSelectSession": "Please select at least one session",
+      "enableRangeButton": "Batch Enable",
+      "enableRangeTitle": "Batch Enable Slots",
+      "enableRangeHint": "Re-enable disabled slots for booking",
+      "enableRangeConfirm": "Enable",
+      "enableRangeEnabling": "Enabling...",
+      "enableRangeEnabledCount": "Enabled {count} slots",
+      "enableRangeCreatedCount": "Created {count} new slots",
+      "enableRangeSeparator": ", ",
+      "enableRangePreview": "{count, plural, =0 {All slots in this range are already active} one {1 slot will be enabled/created} other {# slots will be enabled/created}}",
+      "enableRangeNoneFound": "All slots in that range are already active",
       "statusPending": "Pending",
       "statusConfirmed": "Confirmed",
       "weekdays": {
@@ -573,6 +599,15 @@
       "dragHint": "Use arrows to reorder — the order here controls the display order on the homepage",
       "moveUp": "Move up",
       "moveDown": "Move down",
+      "expiryLabel": "Validity Period",
+      "expiryNone": "No expiry",
+      "expiryDaysOption": "Valid for days",
+      "expiryDateOption": "Valid until date",
+      "expiryDaysUnit": "days",
+      "expiryDaysRequired": "Please enter the number of valid days",
+      "expiryDateRequired": "Please select an expiry date",
+      "expired": "Expired",
+      "expiresAt": "Expires: {date}",
       "toastActivated": "Announcement activated",
       "toastDeactivated": "Announcement deactivated",
       "toastDeleted": "Announcement deleted",
@@ -603,7 +638,15 @@
       "toastUploaded": "Image uploaded",
       "toastDeleted": "Image deleted",
       "toastCaptionUpdated": "Caption updated",
-      "toastError": "Operation failed"
+      "toastFeatured": "Added to homepage",
+      "toastUnfeatured": "Removed from homepage",
+      "toastError": "Operation failed",
+      "featuredTitle": "Homepage Images ({count}/6)",
+      "featuredHint": "Click ★ on any image below to add it here. Use arrows to reorder.",
+      "featuredEmpty": "No homepage images selected — click ★ on images below to add",
+      "maxFeatured": "Maximum 6 homepage images — remove one first",
+      "featured": "Show on homepage",
+      "unfeatured": "Remove from homepage"
     }
   }
 }

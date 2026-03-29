@@ -1,15 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslations, useLocale } from "next-intl"
-import { Link, useRouter, usePathname } from "@/i18n/navigation"
-import type { Locale } from "@/i18n/routing"
+import { useTranslations } from "next-intl"
+import { Link, usePathname } from "@/i18n/navigation"
 
 export function Navigation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const t = useTranslations("navigation")
-    const locale = useLocale() as Locale
-    const router = useRouter()
     const pathname = usePathname()
 
     const navLinks = [
@@ -19,10 +16,6 @@ export function Navigation() {
         { href: "/gallery" as const, label: t("gallery") },
         { href: "/contact" as const, label: t("contact") },
     ]
-
-    const switchLocale = (newLocale: Locale) => {
-        router.replace(pathname, { locale: newLocale })
-    }
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 bg-off-white/95 backdrop-blur-sm border-b border-border">
@@ -49,25 +42,8 @@ export function Navigation() {
                         ))}
                     </div>
 
-                    {/* Right Side - Language Toggle & CTA */}
+                    {/* Right Side - CTA */}
                     <div className="hidden md:flex items-center gap-4">
-                        <div className="flex items-center gap-1 text-sm">
-                            <button
-                                onClick={() => switchLocale("en")}
-                                className={`px-2 py-1 transition-colors ${locale === "en" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
-                                    }`}
-                            >
-                                EN
-                            </button>
-                            <span className="text-border">|</span>
-                            <button
-                                onClick={() => switchLocale("zh-TW")}
-                                className={`px-2 py-1 transition-colors ${locale === "zh-TW" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
-                                    }`}
-                            >
-                                繁中
-                            </button>
-                        </div>
                         <Link
                             href="/book"
                             className="bg-tea-brown text-primary-foreground px-5 py-2 text-sm font-medium rounded hover:bg-tea-brown/90 transition-colors"
@@ -116,23 +92,6 @@ export function Navigation() {
                                     {link.label}
                                 </Link>
                             ))}
-                            <div className="flex items-center gap-1 py-2">
-                                <button
-                                    onClick={() => switchLocale("en")}
-                                    className={`px-2 py-1 text-sm transition-colors ${locale === "en" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
-                                        }`}
-                                >
-                                    EN
-                                </button>
-                                <span className="text-border">|</span>
-                                <button
-                                    onClick={() => switchLocale("zh-TW")}
-                                    className={`px-2 py-1 text-sm transition-colors ${locale === "zh-TW" ? "text-tea-brown font-semibold" : "text-muted-foreground/50 hover:text-muted-foreground"
-                                        }`}
-                                >
-                                    繁中
-                                </button>
-                            </div>
                             <Link
                                 href="/book"
                                 className="bg-tea-brown text-primary-foreground px-5 py-2.5 text-sm font-medium rounded text-center hover:bg-tea-brown/90 transition-colors"

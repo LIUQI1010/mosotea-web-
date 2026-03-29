@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
-import { generateSlots, toggleSlot } from './_actions'
+import { generateSlots, toggleSlot, disableDateRange, enableDateRange } from './_actions'
 import type { SlotBooking } from './page'
 
 const NZ_TZ = 'Pacific/Auckland'
@@ -356,6 +356,11 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [isGenerating, startGenerating] = useTransition()
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [rangeModalMode, setRangeModalMode] = useState<'disable' | 'enable' | null>(null)
+  const [rangeFrom, setRangeFrom] = useState(todayStr)
+  const [rangeTo, setRangeTo] = useState(todayStr)
+  const [rangeSessions, setRangeSessions] = useState<('morning' | 'afternoon')[]>(['morning', 'afternoon'])
+  const [isRangeSubmitting, startRangeSubmit] = useTransition()
 
   const allMonths = [...new Set(slots.map(s => getMonthKey(s.start_time)))].sort()
 
@@ -381,6 +386,63 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
 
   const handleSelectSlot = (slot: Slot, type: 'morning' | 'afternoon') => {
     setSelectedSlot(selectedSlot?.slot.id === slot.id ? null : { slot, type })
+  }
+
+  // Preview: count slots matching the selected range/sessions/mode
+  const rangePreviewCount = (() => {
+    if (rangeModalMode === 'disable') {
+      return slots.filter((slot) => {
+        if (!slot.is_available) return false
+        const dateStr = getNZDate(slot.start_time)
+        if (dateStr < rangeFrom || dateStr > rangeTo) return false
+        const isMorning = isSlotMorning(slot.start_time)
+        return (isMorning && rangeSessions.includes('morning')) || (!isMorning && rangeSessions.includes('afternoon'))
+      }).length
+    }
+    // Enable mode: count disabled slots + missing slots in range
+    const rangeSlotMap = new Map<string, { morning?: boolean; afternoon?: boolean }>()
+    for (const slot of slots) {
+      const dateStr = getNZDate(slot.start_time)
+      if (dateStr < rangeFrom || dateStr > rangeTo) continue
+      const entry = rangeSlotMap.get(dateStr) ?? {}
+      if (isSlotMorning(slot.start_time)) entry.morning = slot.is_available
+      else entry.afternoon = slot.is_available
+      rangeSlotMap.set(dateStr, entry)
+    }
+    let count = 0
+    let d = rangeFrom
+    while (d <= rangeTo) {
+      const entry = rangeSlotMap.get(d)
+      for (const session of rangeSessions) {
+        const available = session === 'morning' ? entry?.morning : entry?.afternoon
+        if (available === undefined || available === false) count++ // missing or disabled
+      }
+      const [cy, cm, cd] = d.split('-').map(Number)
+      d = new Date(Date.UTC(cy, cm - 1, cd + 1)).toISOString().slice(0, 10)
+    }
+    return count
+  })()
+
+  const handleRangeSubmit = () => {
+    if (rangeSessions.length === 0) { showToast(t('disableRangeSelectSession'), 'error'); return }
+    startRangeSubmit(async () => {
+      if (rangeModalMode === 'disable') {
+        const result = await disableDateRange(rangeFrom, rangeTo, rangeSessions)
+        if (result.error) { showToast(result.error, 'error'); return }
+        if (result.disabled === 0 && result.skipped === 0) { showToast(t('disableRangeNoneFound'), 'error'); return }
+        const skippedNote = result.skipped > 0 ? t('disableRangeSkipped', { skipped: result.skipped }) : ''
+        showToast(t('disableRangeSuccess', { disabled: result.disabled }) + skippedNote, 'success')
+      } else {
+        const result = await enableDateRange(rangeFrom, rangeTo, rangeSessions)
+        if (result.error) { showToast(result.error, 'error'); return }
+        if (result.enabled === 0 && result.created === 0) { showToast(t('enableRangeNoneFound'), 'error'); return }
+        const parts: string[] = []
+        if (result.enabled > 0) parts.push(t('enableRangeEnabledCount', { count: result.enabled }))
+        if (result.created > 0) parts.push(t('enableRangeCreatedCount', { count: result.created }))
+        showToast(parts.join(t('enableRangeSeparator')), 'success')
+      }
+      setRangeModalMode(null)
+    })
   }
 
   const slotMap = new Map<string, { morning?: Slot; afternoon?: Slot }>()
@@ -437,10 +499,113 @@ export function SlotsClient({ slots, bookingsBySlot, latestDateStr, daysRemainin
       )}
 
       {/* Topbar */}
-      <div className="mb-6">
-        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">{t('management')}</p>
-        <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">{t('title')}</h1>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">{t('management')}</p>
+          <h1 className="font-serif text-2xl font-semibold text-foreground sm:text-3xl">{t('title')}</h1>
+        </div>
+        <div className="mt-1 flex shrink-0 gap-2">
+          <button
+            onClick={() => setRangeModalMode('enable')}
+            className="rounded-lg border border-bamboo-green/30 bg-bamboo-green/5 px-4 py-2 text-sm font-medium text-bamboo-green transition-colors hover:bg-bamboo-green/10"
+          >
+            {t('enableRangeButton')}
+          </button>
+          <button
+            onClick={() => setRangeModalMode('disable')}
+            className="rounded-lg border border-border bg-off-white px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-cream hover:text-foreground"
+          >
+            {t('disableRangeButton')}
+          </button>
+        </div>
       </div>
+
+      {/* Batch Enable/Disable Modal */}
+      {rangeModalMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setRangeModalMode(null)}>
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-off-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-serif text-lg font-semibold text-foreground">
+              {rangeModalMode === 'disable' ? t('disableRangeTitle') : t('enableRangeTitle')}
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {rangeModalMode === 'disable' ? t('disableRangeHint') : t('enableRangeHint')}
+            </p>
+
+            <div className="mt-5 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t('disableRangeFrom')}</label>
+                  <input
+                    type="date"
+                    value={rangeFrom}
+                    min={todayStr}
+                    onChange={(e) => { setRangeFrom(e.target.value); if (e.target.value > rangeTo) setRangeTo(e.target.value) }}
+                    className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-tea-brown/40"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t('disableRangeTo')}</label>
+                  <input
+                    type="date"
+                    value={rangeTo}
+                    min={rangeFrom}
+                    onChange={(e) => setRangeTo(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-tea-brown/40"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">{t('disableRangeSessions')}</p>
+                <div className="space-y-2">
+                  {(['morning', 'afternoon'] as const).map((session) => (
+                    <label key={session} className="flex cursor-pointer items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        checked={rangeSessions.includes(session)}
+                        onChange={(e) => setRangeSessions(e.target.checked ? [...rangeSessions, session] : rangeSessions.filter((s) => s !== session))}
+                        className="h-4 w-4 rounded border-border accent-tea-brown"
+                      />
+                      <span className="text-sm text-foreground">{session === 'morning' ? t('disableRangeMorning') : t('disableRangeAfternoon')}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Preview count */}
+            <div className={`mt-4 rounded-lg px-3 py-2 text-xs ${
+              rangePreviewCount > 0
+                ? rangeModalMode === 'disable' ? 'bg-red-50 text-red-600' : 'bg-bamboo-green/10 text-bamboo-green'
+                : 'bg-cream text-muted-foreground'
+            }`}>
+              {rangeModalMode === 'disable'
+                ? t('disableRangePreview', { count: rangePreviewCount })
+                : t('enableRangePreview', { count: rangePreviewCount })}
+            </div>
+
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => setRangeModalMode(null)}
+                className="flex-1 rounded-lg border border-border bg-off-white py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-cream"
+              >
+                {t('disableRangeCancel')}
+              </button>
+              <button
+                onClick={handleRangeSubmit}
+                disabled={isRangeSubmitting || rangeSessions.length === 0 || rangePreviewCount === 0}
+                className={`flex-1 rounded-lg py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50 ${
+                  rangeModalMode === 'disable' ? 'bg-red-500' : 'bg-bamboo-green'
+                }`}
+              >
+                {isRangeSubmitting
+                  ? (rangeModalMode === 'disable' ? t('disableRangeDisabling') : t('enableRangeEnabling'))
+                  : (rangeModalMode === 'disable' ? t('disableRangeConfirm') : t('enableRangeConfirm'))}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Generation Banner */}
       <div className={`mb-6 flex flex-col gap-3 rounded-2xl border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 ${

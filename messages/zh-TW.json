@@ -8,7 +8,7 @@
     "bookNow": "立即預約"
   },
   "footer": {
-    "description": "將古老的茶道藝術帶到威靈頓。體驗寧靜、正念與茶文化之美。",
+    "description": "將茶道藝術帶到威靈頓。體驗寧靜、正念與茶文化之美。",
     "navigation": "導航",
     "contact": "聯絡方式",
     "address1": "69 Crowther Road",
@@ -29,12 +29,12 @@
     "hero": {
       "title": "體驗茶道之美",
       "titleZh": "Experience the Art of Tea",
-      "description": "在威靈頓探索古老的茶道傳統，每一杯茶都訴說著正念與連結的故事。",
+      "description": "在威靈頓探索茶道傳統，每一杯茶都訴說著正念與連結的故事。",
       "cta": "預約體驗"
     },
     "intro": {
       "title": "為什麼選擇 Moso Tea",
-      "description": "我們將古老的茶道藝術帶到紐西蘭，在精心策劃的空間中創造寧靜與連結的時刻。",
+      "description": "我們將茶道藝術帶到紐西蘭，在精心策劃的空間中創造寧靜與連結的時刻。",
       "feature1Title": "茶文化",
       "feature1Description": "植根於數百年的傳統，我們將茶道的藝術與哲學帶入生活——每一杯，都是一次正念的相遇。",
       "feature2Title": "茶空間",
@@ -97,7 +97,7 @@
       "p1": "Moso Tea 誕生於對茶道藝術簡單而深刻的熱愛。我們的工作室於2021年創立，坐落在威靈頓的 Wainuiomata，成為了那些尋求片刻寧靜之人的心靈歸所。",
       "p2": "「Moso」這個名字，藏著兩層安靜的含義。在台灣話裡，moso 是「慢」的意思——一份邀請，邀請你放慢腳步，呼吸，回到當下。它同時也是孟宗竹的名字，一種我們深深欣賞的植物。我們喜愛它，不是因為它驚人的爆發，而是它的沉靜與堅韌。竹子在四季中靜靜佇立，紮根大地，從不急躁。我們的茶樹，也是在一個偶然的機緣下與竹子一同來到我們的生活——一份意外的禮物，悄悄改變了一切。",
       "p3": "從最初一小群茶愛好者的聚會，這裡逐漸成為了一個溫暖的空間，讓來自各地的人們相聚，共同感受茶文化那份靜謐的美好。",
-      "p4": "我們位於 Wainuiomata 的生活農場工作室，提供了一個難得的機會，讓你從日常的節奏中抽身，沉浸在這門古老的傳統之中——一份關於慢慢泡茶、靜靜分享的藝術。"
+      "p4": "我們位於 Wainuiomata 的生活農場工作室，提供了一個難得的機會，讓你從日常的節奏中抽身，沉浸在這門傳統之中——一份關於慢慢泡茶、靜靜分享的藝術。"
     },
     "philosophy": {
       "quote": "在泡茶的簡單動作中，我們找到了通往當下的道路。每一杯茶都是一份邀請，讓我們放慢腳步，深呼吸，與當下連結。",
@@ -530,6 +530,32 @@
       "prevMonth": "← 上月",
       "nextMonth": "下月 →",
       "operationFailed": "操作失敗",
+      "disableRangeButton": "批量禁用",
+      "disableRangeTitle": "批量禁用時段",
+      "disableRangeHint": "禁用後，該時段將不對客戶開放預約",
+      "disableRangeFrom": "開始日期",
+      "disableRangeTo": "結束日期",
+      "disableRangeSessions": "場次",
+      "disableRangeMorning": "上午場（10:00–11:30）",
+      "disableRangeAfternoon": "下午場（14:00–15:30）",
+      "disableRangeConfirm": "確認禁用",
+      "disableRangeDisabling": "禁用中...",
+      "disableRangeCancel": "取消",
+      "disableRangeSuccess": "已禁用 {disabled} 個時段",
+      "disableRangeSkipped": "（{skipped} 個因有效預約而跳過）",
+      "disableRangePreview": "{count, plural, =0 {該範圍內無可用場次} other {將禁用 # 個場次}}",
+      "disableRangeNoneFound": "該時間段內沒有可用的場次",
+      "disableRangeSelectSession": "請至少選擇一個場次",
+      "enableRangeButton": "批量啟用",
+      "enableRangeTitle": "批量啟用時段",
+      "enableRangeHint": "重新啟用已禁用的時段，開放客戶預約",
+      "enableRangeConfirm": "確認啟用",
+      "enableRangeEnabling": "啟用中...",
+      "enableRangeEnabledCount": "已啟用 {count} 個時段",
+      "enableRangeCreatedCount": "新建 {count} 個時段",
+      "enableRangeSeparator": "，",
+      "enableRangePreview": "{count, plural, =0 {該範圍內所有場次均已啟用} other {將啟用/新建 # 個場次}}",
+      "enableRangeNoneFound": "該範圍內所有場次均已啟用",
       "statusPending": "待確認",
       "statusConfirmed": "已確認",
       "weekdays": {
@@ -573,6 +599,15 @@
       "dragHint": "使用箭頭排序 — 此處順序即為首頁展示順序",
       "moveUp": "上移",
       "moveDown": "下移",
+      "expiryLabel": "有效期限",
+      "expiryNone": "永不過期",
+      "expiryDaysOption": "有效天數",
+      "expiryDateOption": "有效日期",
+      "expiryDaysUnit": "天",
+      "expiryDaysRequired": "請輸入有效天數",
+      "expiryDateRequired": "請選擇到期日期",
+      "expired": "已過期",
+      "expiresAt": "到期：{date}",
       "toastActivated": "公告已啟用",
       "toastDeactivated": "公告已停用",
       "toastDeleted": "公告已刪除",
@@ -603,7 +638,15 @@
       "toastUploaded": "圖片已上傳",
       "toastDeleted": "圖片已刪除",
       "toastCaptionUpdated": "說明已更新",
-      "toastError": "操作失敗"
+      "toastFeatured": "已加入首頁展示",
+      "toastUnfeatured": "已從首頁移除",
+      "toastError": "操作失敗",
+      "featuredTitle": "首頁展示圖片（{count}/6）",
+      "featuredHint": "點擊下方圖片的 ★ 加入此處，使用箭頭調整順序",
+      "featuredEmpty": "尚未選擇首頁圖片 — 點擊下方圖片的 ★ 加入",
+      "maxFeatured": "首頁最多展示 6 張圖片，請先移除一張",
+      "featured": "加入首頁展示",
+      "unfeatured": "從首頁移除"
     }
   }
 }

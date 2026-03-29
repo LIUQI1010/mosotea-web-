@@ -53,16 +53,8 @@ export async function generateSlots(): Promise<{ created: number; error?: string
   const [ty, tm, td] = todayStr.split('-').map(Number)
   const targetEndStr = new Date(Date.UTC(ty, tm - 1, td + 30)).toISOString().slice(0, 10)
 
-  // Start from today, or day after latest slot — whichever is later
-  let startDateStr = todayStr
-  if (latestSlot) {
-    const latestDateStr = toNZDateStr(new Date(latestSlot.start_time))
-    const [ly, lm, ld] = latestDateStr.split('-').map(Number)
-    const nextDayStr = new Date(Date.UTC(ly, lm - 1, ld + 1)).toISOString().slice(0, 10)
-    if (nextDayStr > startDateStr) {
-      startDateStr = nextDayStr
-    }
-  }
+  // Always start from today — existingDates handles deduplication
+  const startDateStr = todayStr
 
   // Fetch existing slot dates to avoid duplicates
   const { data: existingSlots } = await supabase
@@ -125,6 +117,143 @@ export async function generateSlots(): Promise<{ created: number; error?: string
   revalidatePath('/admin/slots')
   revalidatePath('/admin')
   return { created: slotsToInsert.length }
+}
+
+export async function disableDateRange(
+  fromDate: string,
+  toDate: string,
+  sessions: ('morning' | 'afternoon')[]
+): Promise<{ disabled: number; skipped: number; error?: string }> {
+  const supabase = createAdminClient()
+
+  const startUTC = new Date(`${fromDate}T00:00:00+13:00`).toISOString()
+  const endUTC = new Date(`${toDate}T23:59:59+12:00`).toISOString()
+
+  const { data: slots, error: fetchError } = await supabase
+    .from('time_slots')
+    .select('id, start_time')
+    .gte('start_time', startUTC)
+    .lte('start_time', endUTC)
+    .eq('is_available', true)
+
+  if (fetchError) return { disabled: 0, skipped: 0, error: fetchError.message }
+  if (!slots || slots.length === 0) return { disabled: 0, skipped: 0 }
+
+  const filtered = slots.filter((s: { id: string; start_time: string }) => {
+    const hour = Number(
+      new Intl.DateTimeFormat('en-GB', { timeZone: NZ_TZ, hour: '2-digit', hour12: false })
+        .format(new Date(s.start_time))
+    )
+    const isMorning = hour < 12
+    return (isMorning && sessions.includes('morning')) || (!isMorning && sessions.includes('afternoon'))
+  })
+
+  const filteredIds = filtered.map((s: { id: string }) => s.id)
+
+  // Batch: find all slots that have active bookings in one query
+  const { data: bookedSlots } = await supabase
+    .from('bookings')
+    .select('time_slot_id')
+    .in('time_slot_id', filteredIds)
+    .neq('status', 'cancelled')
+
+  const bookedSlotIds = new Set(
+    (bookedSlots ?? []).map((b: { time_slot_id: string }) => b.time_slot_id)
+  )
+
+  const toDisable = filteredIds.filter((id: string) => !bookedSlotIds.has(id))
+  const skipped = filteredIds.length - toDisable.length
+
+  if (toDisable.length === 0) return { disabled: 0, skipped }
+
+  const { error: updateError } = await supabase
+    .from('time_slots')
+    .update({ is_available: false })
+    .in('id', toDisable)
+
+  if (updateError) return { disabled: 0, skipped, error: updateError.message }
+
+  revalidatePath('/admin/slots')
+  revalidatePath('/admin')
+  return { disabled: toDisable.length, skipped }
+}
+
+export async function enableDateRange(
+  fromDate: string,
+  toDate: string,
+  sessions: ('morning' | 'afternoon')[]
+): Promise<{ enabled: number; created: number; error?: string }> {
+  const supabase = createAdminClient()
+
+  const startUTC = new Date(`${fromDate}T00:00:00+13:00`).toISOString()
+  const endUTC = new Date(`${toDate}T23:59:59+12:00`).toISOString()
+
+  // Fetch ALL existing slots in the range (both available and disabled)
+  const { data: allSlots, error: fetchError } = await supabase
+    .from('time_slots')
+    .select('id, start_time, is_available')
+    .gte('start_time', startUTC)
+    .lte('start_time', endUTC)
+
+  if (fetchError) return { enabled: 0, created: 0, error: fetchError.message }
+
+  // Build a map of existing slots: dateStr -> { morning?: Slot, afternoon?: Slot }
+  const existingMap = new Map<string, { morning?: { id: string; is_available: boolean }; afternoon?: { id: string; is_available: boolean } }>()
+  for (const s of allSlots ?? []) {
+    const dateStr = toNZDateStr(new Date(s.start_time))
+    const hour = Number(
+      new Intl.DateTimeFormat('en-GB', { timeZone: NZ_TZ, hour: '2-digit', hour12: false })
+        .format(new Date(s.start_time))
+    )
+    const entry = existingMap.get(dateStr) ?? {}
+    if (hour < 12) entry.morning = { id: s.id, is_available: s.is_available }
+    else entry.afternoon = { id: s.id, is_available: s.is_available }
+    existingMap.set(dateStr, entry)
+  }
+
+  // Walk each date in range, collect IDs to re-enable and slots to create
+  const toEnable: string[] = []
+  const toInsert: { start_time: string; end_time: string; max_guests: number; booked_guests: number; is_available: boolean }[] = []
+
+  let currentDateStr = fromDate
+  while (currentDateStr <= toDate) {
+    const entry = existingMap.get(currentDateStr)
+
+    for (const session of sessions) {
+      const slot = session === 'morning' ? entry?.morning : entry?.afternoon
+      if (slot) {
+        // Slot exists but disabled → re-enable
+        if (!slot.is_available) toEnable.push(slot.id)
+      } else {
+        // Slot doesn't exist → create it
+        const [startH, endH] = session === 'morning' ? ['10:00', '11:30'] : ['14:00', '15:30']
+        toInsert.push({
+          start_time: toNZTime(currentDateStr, startH).toISOString(),
+          end_time: toNZTime(currentDateStr, endH).toISOString(),
+          max_guests: 8,
+          booked_guests: 0,
+          is_available: true,
+        })
+      }
+    }
+
+    const [cy, cm, cd] = currentDateStr.split('-').map(Number)
+    currentDateStr = new Date(Date.UTC(cy, cm - 1, cd + 1)).toISOString().slice(0, 10)
+  }
+
+  // Execute updates
+  if (toEnable.length > 0) {
+    const { error } = await supabase.from('time_slots').update({ is_available: true }).in('id', toEnable)
+    if (error) return { enabled: 0, created: 0, error: error.message }
+  }
+  if (toInsert.length > 0) {
+    const { error } = await supabase.from('time_slots').insert(toInsert)
+    if (error) return { enabled: toEnable.length, created: 0, error: error.message }
+  }
+
+  revalidatePath('/admin/slots')
+  revalidatePath('/admin')
+  return { enabled: toEnable.length, created: toInsert.length }
 }
 
 export async function toggleSlot(

@@ -38,6 +38,7 @@ export interface Gallery {
     url: string
     filename: string
     caption: string | null
+    featured_order: number | null
     uploaded_at: string
 }
 
@@ -49,5 +50,6 @@ export interface Announcement {
     content_zh: string
     is_active: boolean
     sort_order: number
+    expires_at: string | null
     created_at: string
 }

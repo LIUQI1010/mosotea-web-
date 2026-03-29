@@ -5,16 +5,16 @@ import { useTranslations, useLocale } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { login } from '@/app/admin/_actions/auth'
 import { setAdminLocale } from '@/app/admin/_actions/locale'
-import type { Locale } from '@/i18n/routing'
+import type { AdminLocale } from '@/app/admin/_actions/locale'
 
 export default function AdminLoginPage() {
   const [state, formAction, isPending] = useActionState(login, {})
   const t = useTranslations('admin.login')
-  const locale = useLocale() as Locale
+  const locale = useLocale() as AdminLocale
   const router = useRouter()
   const [, startTransition] = useTransition()
 
-  const handleSwitchLocale = (newLocale: Locale) => {
+  const handleSwitchLocale = (newLocale: AdminLocale) => {
     startTransition(async () => {
       await setAdminLocale(newLocale)
       router.refresh()

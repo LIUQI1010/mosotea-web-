@@ -339,7 +339,8 @@ function GallerySection() {
     supabase
       .from('gallery')
       .select('id, url, caption')
-      .order('uploaded_at', { ascending: false })
+      .not('featured_order', 'is', null)
+      .order('featured_order', { ascending: true })
       .limit(6)
       .then(({ data }) => {
         if (data && data.length > 0) setImages(data)

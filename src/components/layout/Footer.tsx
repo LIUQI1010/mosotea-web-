@@ -30,6 +30,9 @@ export function Footer() {
                             <Link href="/about" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                                 {tNav("about")}
                             </Link>
+                            <Link href="/gallery" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+                                {tNav("gallery")}
+                            </Link>
                             <Link href="/contact" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                                 {tNav("contact")}
                             </Link>
