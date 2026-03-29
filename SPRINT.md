@@ -188,7 +188,7 @@ Each developer answers:
 | Build customer self-cancellation page (`/cancel/[token]`) | Developer 1 | ✅ Done |
 | Implement cancellation token lookup API (`GET /api/cancel/lookup`) | Developer 1 | ✅ Done |
 | Responsive design for admin dashboard | Developer 2 | ✅ Done |
-| Write admin user guide for client | Developer 2 | ⏳ Pending |
+| Write admin user guide for client | Developer 2 | ✅ Done |
 | Add Privacy Policy page | Developer 1 | ✅ Done |
 | Add Terms of Service page | Developer 1 | ✅ Done |
 | Fix time slot 2.5h cutoff filter | Developer 1 | ✅ Done |
@@ -211,7 +211,7 @@ Each developer answers:
 - [x] Cancellation within 24 hours shows appropriate error message
 - [x] All cancellation emails send correctly
 - [x] Responsive design for admin dashboard
-- [ ] Admin user guide for client
+- [x] Admin user guide for client
 
 ---
 
@@ -233,16 +233,16 @@ Each developer answers:
 | Set up Google Business Profile | Developer 2 | ✅ Done |
 | Add bilingual support (EN/繁中) to admin dashboard (cookie-based) | Developer 1 | ✅ Done |
 | Add input length limits to all forms (HTML maxLength + server-side Zod) | Developer 1 | ✅ Done |
-| Client User Acceptance Testing (UAT) | Both | ⏳ Pending |
+| Client User Acceptance Testing (UAT) | Both | ✅ Done |
 | Finalise README and project documentation | Both | ✅ Done |
-| Deliver admin credentials and user guide to client | Developer 1 | ⏳ Pending |
+| Deliver admin credentials and user guide to client | Developer 1 | ✅ Done |
 
 **Definition of Done:**
 - [x] Lighthouse scores 90+ for Performance, Accessibility, Best Practices, SEO
-- [ ] Website live on mosotea.co.nz with valid HTTPS
-- [ ] Full booking and cancellation flow tested and working in production
-- [ ] Client has completed UAT and signed delivery acceptance
-- [ ] GitHub README is complete with screenshots and setup instructions
+- [x] Website live on mosotea.co.nz with valid HTTPS
+- [x] Full booking and cancellation flow tested and working in production
+- [x] Client has completed UAT and signed delivery acceptance
+- [x] GitHub README is complete with screenshots and setup instructions
 
 ---
 
@@ -277,7 +277,7 @@ Each developer answers:
 | Add accessibility attributes to gallery (aria-labels, dialog role, keyboard nav) | Developer 1 | ✅ Done |
 | Move lightbox caption to gradient overlay on image | Developer 1 | ✅ Done |
 | Add homepage gallery individual image fade-in with skeleton placeholders | Developer 1 | ✅ Done |
-| Responsive testing for announcements banner and gallery section | Both | ⏳ Pending |
+| Responsive testing for announcements banner and gallery section | Both | ✅ Done |
 
 **Definition of Done:**
 - [x] Admin can create, edit, toggle, and delete announcements
@@ -287,7 +287,7 @@ Each developer answers:
 - [x] Homepage displays Gallery preview (6 images) with link to full gallery
 - [x] Gallery loading UX: skeleton screens + preload-all fade-in (no layout jitter)
 - [x] Gallery accessibility: aria-labels, dialog role, keyboard navigation
-- [ ] All new UI is responsive on mobile, tablet, and desktop
+- [x] All new UI is responsive on mobile, tablet, and desktop
 
 ---
 
