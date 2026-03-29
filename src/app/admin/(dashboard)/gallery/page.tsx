@@ -3,6 +3,22 @@
 import { useState, useEffect, useTransition, useCallback, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  useSortable,
+  horizontalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { getGalleryImages, uploadImage, updateCaption, deleteImage, setFeatured, reorderFeatured } from './_actions'
 import type { Gallery } from '@/types'
 
@@ -38,18 +54,10 @@ function StarIcon({ className, filled }: { className?: string; filled?: boolean 
   )
 }
 
-function ChevronLeftIcon({ className }: { className?: string }) {
+function GripIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-    </svg>
-  )
-}
-
-function ChevronRightIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
     </svg>
   )
 }
@@ -269,18 +277,102 @@ function DeleteModal({ onClose, onConfirm, deleting, t }: {
   )
 }
 
-// Featured strip — shows selected homepage images with ordering controls
+// Sortable featured image item
+function SortableFeaturedItem({
+  image,
+  index,
+  editing,
+  onRemove,
+  t,
+}: {
+  image: Gallery
+  index: number
+  editing: boolean
+  onRemove: (id: string) => void
+  t: ReturnType<typeof useTranslations<'admin.gallery'>>
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: image.id, disabled: !editing })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative flex-shrink-0 w-28 rounded-lg border-2 border-tea-brown overflow-hidden bg-off-white ${editing ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      {...(editing ? { ...attributes, ...listeners } : {})}
+    >
+      <div className="aspect-square relative">
+        <Image
+          src={image.url}
+          alt={image.caption ?? image.filename}
+          fill
+          className="object-cover pointer-events-none"
+          sizes="112px"
+        />
+        {/* Order badge */}
+        <span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-tea-brown text-[10px] font-bold text-white">
+          {index + 1}
+        </span>
+        {/* Remove button — only in edit mode */}
+        {editing && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onRemove(image.id) }}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="absolute top-1 right-1 rounded-full bg-black/50 p-0.5 text-white hover:bg-black/70 transition-colors"
+            title={t('unfeatured')}
+          >
+            <XIcon className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+      {/* Drag handle indicator — only in edit mode */}
+      {editing && (
+        <div className="flex items-center justify-center py-1 bg-cream">
+          <GripIcon className="h-3.5 w-3.5 text-muted-foreground" />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Featured strip — shows selected homepage images with drag-to-reorder in edit mode
 function FeaturedStrip({
   featured,
-  onMove,
+  editing,
+  onReorder,
   onRemove,
   t,
 }: {
   featured: Gallery[]
-  onMove: (id: string, direction: 'left' | 'right') => void
+  editing: boolean
+  onReorder: (activeId: string, overId: string) => void
   onRemove: (id: string) => void
   t: ReturnType<typeof useTranslations<'admin.gallery'>>
 }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      onReorder(active.id as string, over.id as string)
+    }
+  }
+
   if (featured.length === 0) {
     return (
       <div className="rounded-lg border-2 border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -290,65 +382,34 @@ function FeaturedStrip({
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2">
-      {featured.map((image, index) => (
-        <div
-          key={image.id}
-          className="relative flex-shrink-0 w-28 rounded-lg border-2 border-tea-brown overflow-hidden bg-off-white"
-        >
-          <div className="aspect-square relative">
-            <Image
-              src={image.url}
-              alt={image.caption ?? image.filename}
-              fill
-              className="object-cover"
-              sizes="112px"
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={featured.map((img) => img.id)} strategy={horizontalListSortingStrategy}>
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {featured.map((image, index) => (
+            <SortableFeaturedItem
+              key={image.id}
+              image={image}
+              index={index}
+              editing={editing}
+              onRemove={onRemove}
+              t={t}
             />
-            {/* Order badge */}
-            <span className="absolute top-1 left-1 flex h-5 w-5 items-center justify-center rounded-full bg-tea-brown text-[10px] font-bold text-white">
-              {index + 1}
-            </span>
-            {/* Remove button */}
-            <button
-              onClick={() => onRemove(image.id)}
-              className="absolute top-1 right-1 rounded-full bg-black/50 p-0.5 text-white hover:bg-black/70 transition-colors"
-              title={t('unfeatured')}
+          ))}
+          {/* Empty slots — only in edit mode */}
+          {editing && Array.from({ length: 6 - featured.length }).map((_, i) => (
+            <div
+              key={`empty-${i}`}
+              className="flex-shrink-0 w-28 rounded-lg border-2 border-dashed border-border"
             >
-              <XIcon className="h-3 w-3" />
-            </button>
-          </div>
-          {/* Move arrows */}
-          <div className="flex items-center justify-center gap-1 py-1 bg-cream">
-            <button
-              onClick={() => onMove(image.id, 'left')}
-              disabled={index === 0}
-              className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
-            >
-              <ChevronLeftIcon className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => onMove(image.id, 'right')}
-              disabled={index === featured.length - 1}
-              className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20 transition-colors"
-            >
-              <ChevronRightIcon className="h-3.5 w-3.5" />
-            </button>
-          </div>
+              <div className="aspect-square flex items-center justify-center">
+                <span className="text-xs text-muted-foreground/30">{featured.length + i + 1}</span>
+              </div>
+              <div className="py-1 bg-transparent"><div className="h-[22px]" /></div>
+            </div>
+          ))}
         </div>
-      ))}
-      {/* Empty slots */}
-      {Array.from({ length: 6 - featured.length }).map((_, i) => (
-        <div
-          key={`empty-${i}`}
-          className="flex-shrink-0 w-28 rounded-lg border-2 border-dashed border-border"
-        >
-          <div className="aspect-square flex items-center justify-center">
-            <span className="text-xs text-muted-foreground/30">{featured.length + i + 1}</span>
-          </div>
-          <div className="py-1 bg-transparent"><div className="h-[22px]" /></div>
-        </div>
-      ))}
-    </div>
+      </SortableContext>
+    </DndContext>
   )
 }
 
@@ -362,6 +423,11 @@ export default function GalleryPage() {
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState('')
   const [, startTransition] = useTransition()
+
+  // Edit mode for featured images — all changes are local until saved
+  const [editingFeatured, setEditingFeatured] = useState(false)
+  const [draftFeaturedIds, setDraftFeaturedIds] = useState<string[]>([])
+  const [savingFeatured, setSavingFeatured] = useState(false)
 
   const loadData = useCallback(() => {
     getGalleryImages().then((data) => {
@@ -379,11 +445,79 @@ export default function GalleryPage() {
     setTimeout(() => setToast(''), 3000)
   }
 
-  const featured = images
+  // Compute featured from DB state (read-only view)
+  const dbFeatured = images
     .filter((img) => img.featured_order !== null)
     .sort((a, b) => (a.featured_order ?? 0) - (b.featured_order ?? 0))
 
+  // In edit mode, use draft; otherwise use DB state
+  const featured = editingFeatured
+    ? draftFeaturedIds.map((id) => images.find((img) => img.id === id)).filter(Boolean) as Gallery[]
+    : dbFeatured
+
   const featuredIds = new Set(featured.map((img) => img.id))
+
+  // Check if draft differs from DB
+  const dbFeaturedIds = dbFeatured.map((img) => img.id)
+  const hasFeaturedChanges = editingFeatured && (
+    draftFeaturedIds.length !== dbFeaturedIds.length ||
+    draftFeaturedIds.some((id, i) => id !== dbFeaturedIds[i])
+  )
+
+  const handleEnterEditMode = () => {
+    setDraftFeaturedIds(dbFeatured.map((img) => img.id))
+    setEditingFeatured(true)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingFeatured(false)
+    setDraftFeaturedIds([])
+  }
+
+  const handleSaveFeatured = async () => {
+    setSavingFeatured(true)
+
+    // Determine which images to add, remove, and reorder
+    const toRemove = dbFeaturedIds.filter((id) => !draftFeaturedIds.includes(id))
+    const toAdd = draftFeaturedIds.filter((id) => !dbFeaturedIds.includes(id))
+
+    // Remove unfeatured images
+    for (const id of toRemove) {
+      const result = await setFeatured(id, false)
+      if (!result.success) {
+        showToast(result.error ?? t('toastError'))
+        setSavingFeatured(false)
+        return
+      }
+    }
+
+    // Add newly featured images
+    for (const id of toAdd) {
+      const result = await setFeatured(id, true)
+      if (!result.success) {
+        if (result.error === 'MAX_FEATURED') showToast(t('maxFeatured'))
+        else showToast(result.error ?? t('toastError'))
+        setSavingFeatured(false)
+        return
+      }
+    }
+
+    // Reorder all featured images
+    if (draftFeaturedIds.length > 0) {
+      const result = await reorderFeatured(draftFeaturedIds)
+      if (!result.success) {
+        showToast(result.error ?? t('toastError'))
+        setSavingFeatured(false)
+        return
+      }
+    }
+
+    setSavingFeatured(false)
+    setEditingFeatured(false)
+    setDraftFeaturedIds([])
+    showToast(t('toastFeaturedSaved'))
+    loadData()
+  }
 
   const handleUpload = async (file: File) => {
     setUploading(true)
@@ -418,6 +552,10 @@ export default function GalleryPage() {
     setDeleting(false)
     setDeleteTarget(null)
     if (result.success) {
+      // Also remove from draft if in edit mode
+      if (editingFeatured) {
+        setDraftFeaturedIds((prev) => prev.filter((id) => id !== deleteTarget.id))
+      }
       showToast(t('toastDeleted'))
       loadData()
     } else {
@@ -425,48 +563,34 @@ export default function GalleryPage() {
     }
   }
 
-  const handleToggleFeatured = async (image: Gallery) => {
-    const isFeatured = image.featured_order !== null
-    const result = await setFeatured(image.id, !isFeatured)
-    if (result.success) {
-      showToast(isFeatured ? t('toastUnfeatured') : t('toastFeatured'))
-      loadData()
-    } else if (result.error === 'MAX_FEATURED') {
-      showToast(t('maxFeatured'))
+  // Toggle featured — only works in edit mode, modifies draft locally
+  const handleToggleFeatured = (image: Gallery) => {
+    if (!editingFeatured) return
+    const isFeatured = draftFeaturedIds.includes(image.id)
+    if (isFeatured) {
+      setDraftFeaturedIds((prev) => prev.filter((id) => id !== image.id))
     } else {
-      showToast(result.error ?? t('toastError'))
+      if (draftFeaturedIds.length >= 6) {
+        showToast(t('maxFeatured'))
+        return
+      }
+      setDraftFeaturedIds((prev) => [...prev, image.id])
     }
   }
 
-  const handleMove = async (id: string, direction: 'left' | 'right') => {
-    const idx = featured.findIndex((img) => img.id === id)
-    if (idx < 0) return
-    const swapIdx = direction === 'left' ? idx - 1 : idx + 1
-    if (swapIdx < 0 || swapIdx >= featured.length) return
-
-    // Optimistic reorder
-    const newOrder = [...featured]
-    const temp = newOrder[idx]
-    newOrder[idx] = newOrder[swapIdx]
-    newOrder[swapIdx] = temp
-
-    const orderedIds = newOrder.map((img) => img.id)
-    const result = await reorderFeatured(orderedIds)
-    if (result.success) {
-      loadData()
-    } else {
-      showToast(t('toastError'))
-    }
+  // Reorder featured via drag — local draft only
+  const handleReorder = (activeId: string, overId: string) => {
+    setDraftFeaturedIds((prev) => {
+      const oldIndex = prev.indexOf(activeId)
+      const newIndex = prev.indexOf(overId)
+      if (oldIndex < 0 || newIndex < 0) return prev
+      return arrayMove(prev, oldIndex, newIndex)
+    })
   }
 
-  const handleRemoveFeatured = async (id: string) => {
-    const result = await setFeatured(id, false)
-    if (result.success) {
-      showToast(t('toastUnfeatured'))
-      loadData()
-    } else {
-      showToast(t('toastError'))
-    }
+  // Remove from featured — local draft only
+  const handleRemoveFeatured = (id: string) => {
+    setDraftFeaturedIds((prev) => prev.filter((fid) => fid !== id))
   }
 
   return (
@@ -483,13 +607,44 @@ export default function GalleryPage() {
 
       {/* Featured section */}
       <div className="mb-6">
-        <h2 className="text-sm font-medium text-foreground mb-2">
-          {t('featuredTitle', { count: featured.length })}
-        </h2>
-        <p className="text-xs text-muted-foreground mb-3">{t('featuredHint')}</p>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-sm font-medium text-foreground">
+            {t('featuredTitle', { count: featured.length })}
+          </h2>
+          {!editingFeatured ? (
+            <button
+              onClick={handleEnterEditMode}
+              className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-tea-brown hover:bg-cream transition-colors"
+            >
+              <PencilIcon className="h-3.5 w-3.5" />
+              {t('featuredEdit')}
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleCancelEdit}
+                disabled={savingFeatured}
+                className="rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-cream transition-colors disabled:opacity-50"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleSaveFeatured}
+                disabled={savingFeatured || !hasFeaturedChanges}
+                className="rounded-lg bg-tea-brown px-3 py-1.5 text-xs font-medium text-white hover:bg-tea-brown/90 transition-colors disabled:opacity-50"
+              >
+                {savingFeatured ? t('saving') : t('save')}
+              </button>
+            </div>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground mb-3">
+          {editingFeatured ? t('featuredEditHint') : t('featuredHint')}
+        </p>
         <FeaturedStrip
           featured={featured}
-          onMove={handleMove}
+          editing={editingFeatured}
+          onReorder={handleReorder}
           onRemove={handleRemoveFeatured}
           t={t}
         />
@@ -525,18 +680,24 @@ export default function GalleryPage() {
                     className="object-cover"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
-                  {/* Featured star */}
-                  <button
-                    onClick={() => handleToggleFeatured(image)}
-                    className={`absolute top-1.5 left-1.5 z-10 rounded-full p-1 transition-all ${
-                      isFeatured
-                        ? 'text-yellow-400 bg-black/40 hover:bg-black/50'
-                        : 'text-white/50 bg-black/20 opacity-0 group-hover:opacity-100 hover:text-yellow-400 hover:bg-black/40'
-                    }`}
-                    title={isFeatured ? t('unfeatured') : t('featured')}
-                  >
-                    <StarIcon className="h-4 w-4" filled={isFeatured} />
-                  </button>
+                  {/* Featured star — clickable only in edit mode */}
+                  {editingFeatured ? (
+                    <button
+                      onClick={() => handleToggleFeatured(image)}
+                      className={`absolute top-1.5 left-1.5 z-10 rounded-full p-1 transition-all ${
+                        isFeatured
+                          ? 'text-yellow-400 bg-black/40 hover:bg-black/50'
+                          : 'text-white/50 bg-black/20 opacity-0 group-hover:opacity-100 hover:text-yellow-400 hover:bg-black/40'
+                      }`}
+                      title={isFeatured ? t('unfeatured') : t('featured')}
+                    >
+                      <StarIcon className="h-4 w-4" filled={isFeatured} />
+                    </button>
+                  ) : isFeatured ? (
+                    <span className="absolute top-1.5 left-1.5 z-10 rounded-full p-1 text-yellow-400 bg-black/40">
+                      <StarIcon className="h-4 w-4" filled />
+                    </span>
+                  ) : null}
                   {/* Featured order badge */}
                   {isFeatured && image.featured_order !== null && (
                     <span className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-tea-brown text-[10px] font-bold text-white">

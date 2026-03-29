@@ -44,18 +44,20 @@
     },
     "experiences": {
       "title": "Our Workshops",
-      "subtitle": "A single, immersive journey through the world of tea — guided, hands-on, and deeply personal.",
-      "teaJourney": {
-        "title": "Tea Journey",
-        "description": "Learn the story of tea — its culture, its trees, and the art of brewing — guided by your host."
+      "subtitle": "Two unique experiences — discover the art of tea ceremony or craft your own tea from leaf to cup.",
+      "workshopA": {
+        "title": "Tea Ceremony Experience",
+        "description": "A guided 90-minute journey through tea culture — from our garden to the tea table. Learn the story of tea, explore our tea plants, and experience an authentic Taiwanese-style tea ceremony."
       },
-      "handsOn": {
-        "title": "Hands-on Experience",
-        "description": "Pick, process, brew, and share — experience the full journey of tea with your own hands."
+      "workshopB": {
+        "title": "Tea Making Experience",
+        "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea to take home."
       },
-      "stats": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "statsA": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "statsB": "2 hours  ·  NZD $85 / person  ·  Seasonal",
       "learnMore": "Learn More",
-      "bookNow": "Book Now"
+      "bookNow": "Book Now",
+      "registerInterest": "Register Interest"
     },
     "testimonials": {
       "title": "Guest Reflections",
@@ -150,58 +152,57 @@
   },
   "experiences": {
     "hero": {
-      "title": "The Workshops",
-      "description": "One experience. Two parts. A complete journey through the world of tea."
+      "title": "Our Workshops",
+      "description": "Two unique experiences to discover the world of tea — choose the journey that speaks to you."
     },
-    "part01": "Part 01",
-    "part02": "Part 02",
-    "teaJourney": {
-      "title": "Tea Journey",
+    "workshopA": {
+      "label": "Workshop A",
+      "title": "Tea Ceremony Experience",
+      "subtitle": "90 minutes  ·  Max 8 guests  ·  NZD $75 per person",
+      "description": "A guided journey through tea culture — from our garden to the tea table. Experience an authentic Taiwanese-style tea ceremony in our peaceful space.",
       "items": {
-        "1": "The story and philosophy behind tea culture",
-        "2": "Understanding the tea tree — varieties, seasons, and terroir",
-        "3": "The art of brewing — water temperature, timing, and technique"
-      }
+        "1": "Welcome & introduction to the tea space",
+        "2": "Garden tour — explore our tea plants and learn about Camellia sinensis varieties",
+        "3": "Discover the story of tea: from ancient China to modern tea culture",
+        "4": "Experience the Taiwanese tea ceremony — warming teaware, brewing, and serving",
+        "5": "Learn to appreciate tea: observe the colour, smell the aroma, taste the flavour",
+        "6": "Tea culture stories and open Q&A",
+        "7": "Closing reflections and feedback"
+      },
+      "bookNow": "Book Now"
     },
-    "handsOn": {
-      "title": "Hands-on Experience",
+    "workshopB": {
+      "label": "Workshop B",
+      "title": "Tea Making Experience",
+      "subtitle": "2 hours  ·  NZD $85 / person  ·  Seasonal",
+      "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea. Due to the seasonal nature of tea growth, this experience is only available during harvest periods.",
       "items": {
-        "1": "Walk the tea garden and hand-pick your own leaves",
-        "2": "Learn the traditional process of making tea from scratch",
-        "3": "Brew and taste your own creation",
-        "4": "Share the experience with your group over a final tea ceremony"
-      }
-    },
-    "stats": "90 minutes  ·  Max 8 guests  ·  NZD $75 per person",
-    "bookNow": "Book Now",
-    "included": {
-      "title": "What's Included",
-      "item1Title": "Expert Guidance",
-      "item1Description": "Your host leads every step, sharing knowledge built over years of practice.",
-      "item2Title": "Tea Tree Experience",
-      "item2Description": "Step into our tea garden, learn to read the leaves, and pick them by hand.",
-      "item3Title": "Tea Making Journey",
-      "item3Description": "Transform your freshly picked leaves into finished tea, guided by tradition.",
-      "item4Title": "All Materials Provided",
-      "item4Description": "Everything you need for the ceremony is prepared and waiting for you."
+        "1": "Garden walk and introduction to tea plant varieties",
+        "2": "Hand-pick fresh tea leaves from our garden",
+        "3": "Learn traditional tea processing — withering, rolling, and oxidation",
+        "overnightNote": "The following steps require overnight processing and cannot be completed during the session. Your host will explain the process.",
+        "4": "Fire and dry the tea leaves using traditional techniques",
+        "5": "Brew and taste finished tea from our garden (we prepare a completed batch for you to taste)",
+        "6": "Receive your handmade tea by post once fully processed (NZ domestic only)"
+      },
+      "registerInterest": "Register Interest",
+      "seasonalNote": "This experience depends on tea leaf availability. Register your interest and we will contact you when sessions are available."
     },
     "faq": {
       "title": "Common Questions",
       "q1": "Do I need any prior experience with tea ceremonies?",
-      "a1": "Not at all! Our experience is designed for all levels, from complete beginners to seasoned tea enthusiasts. Your host will guide you through every step, ensuring you feel comfortable and engaged throughout the session.",
+      "a1": "Not at all! Our experiences are designed for all levels, from complete beginners to seasoned tea enthusiasts. Your host will guide you through every step, ensuring you feel comfortable and engaged throughout the session.",
       "q2": "What should I wear?",
-      "a2": "We recommend comfortable, modest clothing in muted colours. You'll be seated on cushions on the floor, so loose-fitting trousers or a long skirt work well. Please remove your shoes upon entering the tea room. Since our experience includes a walk through the tea garden, we also recommend wearing comfortable closed-toe shoes suitable for light outdoor walking.",
+      "a2": "We recommend comfortable, modest clothing in muted colours. You'll be seated on cushions on the floor, so loose-fitting trousers or a long skirt work well. Please remove your shoes upon entering the tea room. Since our experiences include a walk through the tea garden, we also recommend wearing comfortable closed-toe shoes suitable for light outdoor walking.",
       "q3": "Can I book for a special occasion or event?",
-      "a3": "Absolutely! Our workshop is perfect for birthdays, anniversaries, team gatherings, or any special celebration. Contact us to discuss customised arrangements.",
-      "q4": "Is the space wheelchair accessible?",
-      "a4": "Our main tea room is accessible via a ground-level entrance. We can also arrange seating accommodations for guests who may have difficulty sitting on the floor. Please let us know your requirements when booking.",
+      "a3": "Absolutely! Our workshops are perfect for birthdays, anniversaries, team gatherings, or any special celebration. Contact us to discuss customised arrangements.",
       "q5": "What is your cancellation policy?",
       "a5": "We offer full refunds for cancellations made at least 24 hours before your scheduled session. Cancellations within 24 hours may be rescheduled subject to availability. Please contact us if you have any concerns about your booking.",
       "q6": "Do I need to avoid wearing perfume or cologne?",
       "a6": "Yes, we kindly ask all guests to refrain from wearing perfume, cologne, or strongly scented products. The delicate aromas of tea are central to the experience, and strong fragrances can interfere with everyone's enjoyment."
     },
     "ctaTitle": "Ready to Begin Your Tea Journey?",
-    "ctaDescription": "Join us for an unforgettable workshop where tea culture comes alive. Book your session and discover the tranquility that awaits.",
+    "ctaDescription": "Join us for an unforgettable workshop where tea culture comes alive. Book your session or register your interest today.",
     "ctaButton": "Contact Us"
   },
   "contact": {
@@ -250,11 +251,23 @@
   "book": {
     "hero": {
       "title": "Book an Experience",
-      "description": "One experience. Book your place and we'll take care of the rest."
+      "description": "Choose your workshop and book your place — we'll take care of the rest."
     },
     "steps": {
+      "workshop": "Workshop",
       "dateTime": "Date & Time",
       "details": "Your Details"
+    },
+    "step1": {
+      "title": "Choose a Workshop",
+      "description": "Select the experience you'd like to book.",
+      "workshopA": "Tea Ceremony Experience",
+      "workshopADesc": "A guided 90-minute journey through tea culture — garden tour, tea history, and an authentic Taiwanese tea ceremony.",
+      "workshopAStats": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "workshopB": "Tea Making Experience",
+      "workshopBDesc": "A hands-on seasonal workshop — pick fresh tea leaves and learn to process them into your own finished tea.",
+      "workshopBStats": "2 hours  ·  NZD $85 / person  ·  Seasonal",
+      "workshopBNote": "This experience depends on tea leaf availability. Submit your interest and we will contact you when sessions are scheduled."
     },
     "step2": {
       "title": "Choose Date & Time",
@@ -278,7 +291,6 @@
       "guestsMax": "(max {max})",
       "specialRequests": "Special Requests",
       "specialRequestsPlaceholder": "Any dietary requirements, accessibility needs, or special occasions...",
-      "language": "Preferred Language",
       "errorName": "Please enter your name",
       "errorNameShort": "Name must be at least 2 characters",
       "errorNameTooLong": "Name must be 30 characters or fewer",
@@ -295,7 +307,8 @@
     "summary": {
       "title": "Booking Summary",
       "experience": "Experience",
-      "workshopName": "The Workshop",
+      "workshopA": "Tea Ceremony Experience",
+      "workshopB": "Tea Making Experience",
       "date": "Date",
       "time": "Time",
       "guests": "Guests",
@@ -318,6 +331,27 @@
       "title": "Booking Request Received",
       "description": "Thank you for your booking request. We will review your request and send a confirmation email within 24 hours.",
       "returnHome": "Return Home"
+    },
+    "interestSuccess": {
+      "title": "Interest Registered",
+      "description": "Thank you for your interest in our Tea Making Experience. We will contact you when sessions become available during the tea harvest season.",
+      "returnHome": "Return Home"
+    },
+    "interest": {
+      "title": "Register Your Interest",
+      "description": "Tell us about yourself and we'll contact you when the Tea Making Experience is available.",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+64 21 123 4567",
+      "guests": "Estimated Group Size",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your group or any questions you have...",
+      "defaultMessage": "Interested in Workshop B (Tea Making Experience)",
+      "submit": "Submit Interest",
+      "submitting": "Submitting..."
     },
     "whatNext": {
       "title": "What Happens Next",
@@ -642,8 +676,11 @@
       "toastUnfeatured": "Removed from homepage",
       "toastError": "Operation failed",
       "featuredTitle": "Homepage Images ({count}/6)",
-      "featuredHint": "Click ★ on any image below to add it here. Use arrows to reorder.",
-      "featuredEmpty": "No homepage images selected — click ★ on images below to add",
+      "featuredEdit": "Edit",
+      "featuredHint": "Images displayed on the homepage. Click Edit to modify.",
+      "featuredEditHint": "Click ★ on images below to add/remove. Drag to reorder. Save when done.",
+      "featuredEmpty": "No homepage images selected — click Edit, then click ★ on images below to add",
+      "toastFeaturedSaved": "Homepage images updated",
       "maxFeatured": "Maximum 6 homepage images — remove one first",
       "featured": "Show on homepage",
       "unfeatured": "Remove from homepage"

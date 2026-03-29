@@ -126,14 +126,14 @@ Each developer answers:
 | Develop Contact Us page with form UI | Developer 2 |
 | Implement Contact form API Route | Developer 1 |
 | Integrate Resend to send contact form emails | Developer 1 |
-| Implement bilingual support (English / Traditional Chinese) | Developer 1 |
+| Set up next-intl for string management (English only for public pages) | Developer 1 |
 | Configure global SEO metadata for all pages | Developer 1 |
 | Generate sitemap.xml and robots.txt | Developer 1 |
 | Responsive testing on mobile, tablet, and desktop | Both |
 
 **Definition of Done:**
 - [x] All pages render correctly on mobile, tablet, and desktop
-- [x] Language toggle switches all content between English and Traditional Chinese
+- [x] All public pages display in English with next-intl string management
 - [x] Contact form successfully sends email via Resend
 - [x] All pages have correct SEO metadata
 
@@ -231,7 +231,7 @@ Each developer answers:
 | End-to-end booking and cancellation flow regression test | Both | ✅ Done |
 | Submit sitemap to Google Search Console | Developer 1 | ✅ Done |
 | Set up Google Business Profile | Developer 2 | ✅ Done |
-| Add bilingual support (EN/繁中) to admin dashboard | Developer 1 | ✅ Done |
+| Add bilingual support (EN/繁中) to admin dashboard (cookie-based) | Developer 1 | ✅ Done |
 | Add input length limits to all forms (HTML maxLength + server-side Zod) | Developer 1 | ✅ Done |
 | Client User Acceptance Testing (UAT) | Both | ⏳ Pending |
 | Finalise README and project documentation | Both | ✅ Done |
@@ -248,7 +248,7 @@ Each developer answers:
 
 ## Sprint 5 — Announcements & Gallery
 
-> **Goal:** Admin can publish bilingual announcements displayed on the homepage, and manage gallery images dynamically via Supabase Storage.
+> **Goal:** Admin can publish announcements displayed on the homepage, and manage gallery images dynamically via Supabase Storage.
 
 | Task | Owner | Status |
 |---|---|---|
@@ -258,7 +258,7 @@ Each developer answers:
 | Build admin announcements page (`/admin/announcements`) | Developer 1 | ✅ Done |
 | Implement announcements server actions (CRUD + toggle active) | Developer 1 | ✅ Done |
 | Add announcements sidebar nav item in `AdminSidebar.tsx` | Developer 1 | ✅ Done |
-| Build homepage announcement banner component (rotating, bilingual) | Developer 1 | ✅ Done |
+| Build homepage announcement banner component (rotating) | Developer 1 | ✅ Done |
 | Add announcement-related translation keys to `en.json` / `zh-TW.json` | Developer 1 | ✅ Done |
 | **Gallery** | | |
 | Create Supabase Storage bucket `gallery` (public access, 2MB limit) | Developer 1 | ✅ Done |
@@ -280,8 +280,8 @@ Each developer answers:
 | Responsive testing for announcements banner and gallery section | Both | ⏳ Pending |
 
 **Definition of Done:**
-- [x] Admin can create, edit, toggle, and delete bilingual announcements
-- [x] Homepage displays active announcements as a rotating top banner in the visitor's locale
+- [x] Admin can create, edit, toggle, and delete announcements
+- [x] Homepage displays active announcements as a rotating top banner
 - [x] Admin can upload, edit captions, and delete gallery images via Supabase Storage
 - [x] Standalone Gallery page with masonry layout and lightbox
 - [x] Homepage displays Gallery preview (6 images) with link to full gallery
@@ -293,7 +293,7 @@ Each developer answers:
 
 ## Sprint 6 — Email Template Management
 
-> **Goal:** Admin can customize the content of customer-facing booking emails via the admin dashboard, with bilingual support, placeholder variables, and live preview.
+> **Goal:** Admin can customize the content of customer-facing booking emails via the admin dashboard, with placeholder variables and live preview.
 
 | Task | Owner | Status |
 |---|---|---|
@@ -312,7 +312,7 @@ Each developer answers:
 
 **Definition of Done:**
 - [ ] Admin can edit subject and body for 3 customer-facing email types (booking_received, booking_confirmed, cancellation_confirmation)
-- [ ] Templates support bilingual content (EN / zh-TW)
+- [ ] Templates support bilingual content (EN / zh-TW) for email language preference
 - [ ] Placeholder variables (customer_name, date_time, guest_count, total_price, cancellation_url) are correctly replaced at send time
 - [ ] Admin can preview email with sample data before saving
 - [ ] Admin can reset template to default by deleting the custom record
@@ -327,7 +327,7 @@ Each developer answers:
 |---|---|---|
 | Pre-Sprint | ~3 days | Signed PRD, architecture document |
 | Sprint 0 | 1 week | Project scaffolding, approved wireframes |
-| Sprint 1 | 1 week | All information pages live, bilingual support |
+| Sprint 1 | 1 week | All information pages live |
 | Sprint 2 | 1 week | Full booking system with cancellation link |
 | Sprint 3 | 1 week | Admin dashboard + customer self-cancellation + bug fixes |
 | Sprint 4 | 1 week | Testing, performance, launch |
@@ -347,7 +347,7 @@ This project demonstrates the following professional skills:
 | Team Collaboration | Pair development, PR reviews, defined code standards |
 | DevOps & Deployment | Vercel CI/CD, Cloudflare DNS, environment management |
 | SEO & Performance | Lighthouse 90+, sitemap, Google Search Console |
-| Internationalisation (i18n) | English + Traditional Chinese bilingual support |
+| Internationalisation (i18n) | Admin dashboard bilingual support (EN/繁中) |
 | Client Communication | PRD sign-off, UAT, user guide delivery |
 
 **Recommended CV entry:**
@@ -355,6 +355,6 @@ This project demonstrates the following professional skills:
 > Full-Stack Web Developer — Moso Tea (mosotea.co.nz)
 > - Delivered a full commercial website for a New Zealand tea experience studio in a 2-person Agile team
 > - Built with Next.js, TypeScript, Tailwind CSS, Supabase, and Resend
-> - Features include: booking system with self-cancellation, admin dashboard, bilingual support (EN/繁中), and automated email notifications
+> - Features include: dual workshop booking system with self-cancellation, admin dashboard (bilingual EN/繁中), and automated email notifications
 > - Achieved Lighthouse performance score of 90+ across all categories
 > - Managed full project lifecycle from PRD to client sign-off using GitHub Projects and weekly sprints

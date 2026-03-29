@@ -38,7 +38,7 @@ learn about the experiences offered and submit booking requests online.
 mosotea-web-/
 ├── src/
 │   ├── app/
-│   │   ├── [locale]/(public)/      ← Public pages with i18n locale routing
+│   │   ├── [locale]/(public)/      ← Public pages (English only, locale segment used by next-intl)
 │   │   │   ├── page.tsx            ← Home page (/)
 │   │   │   ├── about/
 │   │   │   │   └── page.tsx        ← About Us (/about)
@@ -102,7 +102,7 @@ mosotea-web-/
 │   │   ├── globals.css             ← Tailwind v4 config + Moso Tea color palette
 │   │   └── layout.tsx              ← Root layout (fonts, metadata)
 │   ├── components/
-│   │   ├── AnnouncementBanner.tsx  ← Homepage announcement rotating banner (fixed, bilingual, swipeable)
+│   │   ├── AnnouncementBanner.tsx  ← Homepage announcement rotating banner (fixed, swipeable)
 │   │   └── layout/
 │   │       ├── Navigation.tsx      ← Global navigation bar
 │   │       └── Footer.tsx          ← Global footer
@@ -117,12 +117,12 @@ mosotea-web-/
 │   ├── types/
 │   │   └── index.ts                ← Shared TypeScript types (TimeSlot, Booking, Gallery, EmailTemplate, etc.)
 │   └── i18n/
-│       ├── routing.ts              ← Locale routing config (en, zh-TW)
+│       ├── routing.ts              ← Locale routing config (en only)
 │       ├── request.ts              ← Message loading per locale
 │       └── navigation.ts           ← Locale-aware Link, useRouter, etc.
 ├── messages/
 │   ├── en.json                     ← English translations
-│   └── zh-TW.json                  ← Traditional Chinese translations
+│   └── zh-TW.json                  ← Traditional Chinese translations (admin dashboard only)
 ├── public/                         ← Static assets (images, icons, fonts)
 ├── .env.local                      ← Local environment variables (never commit)
 ├── .env.example                    ← Environment variable template (commit this)
@@ -139,7 +139,7 @@ mosotea-web-/
 |---|---|---|
 | `--tea-brown` / `tea-brown` | `#7C5C3E` | Primary brand color, buttons, headings |
 | `--cream` / `cream` | `#FDF6F0` | Section backgrounds |
-| `--bamboo-green` / `bamboo-green` | `#5C7A5C` | Secondary text, Chinese subtitles |
+| `--bamboo-green` / `bamboo-green` | `#5C7A5C` | Secondary text, accents |
 | `--off-white` / `off-white` | `#FAFAF8` | Page background |
 | `--foreground` | `#3D3D3D` | Body text |
 | `--muted-foreground` | `#6B6B6B` | Secondary text |
@@ -151,7 +151,7 @@ mosotea-web-/
 
 | Variable | Font | Usage |
 |---|---|---|
-| `font-serif` | Cormorant Garamond | Headings, titles, Chinese text |
+| `font-serif` | Cormorant Garamond | Headings, titles |
 | `font-sans` | Inter | Body text, UI elements |
 
 ---
@@ -188,7 +188,7 @@ CANCELLATION_TOKEN_SECRET=        # Random 32-byte hex string for signing cancel
 | `time_slots` | Stores bookable time slots |
 | `bookings` | Stores customer booking records |
 | `gallery` | Stores image metadata (files in Supabase Storage) |
-| `announcements` | Stores bilingual announcements displayed on the homepage |
+| `announcements` | Stores announcements displayed on the homepage (bilingual fields for admin) |
 | `email_templates` | Stores admin-editable email templates for customer-facing emails |
 
 ### Table: `time_slots`
@@ -286,8 +286,8 @@ create table announcements (
 - Homepage displays active announcements as a top banner below the navigation bar
 - When multiple announcements are active, they rotate automatically (fade out one, fade in the next)
 - Admin can toggle `is_active` to show/hide individual announcements
-- Bilingual: `title_en`/`content_en` for English, `title_zh`/`content_zh` for Traditional Chinese
-- Displayed in the visitor's current locale
+- Bilingual fields: `title_en`/`content_en` for English, `title_zh`/`content_zh` for Traditional Chinese (used by admin dashboard)
+- Public pages display English content only
 
 ### Table: `email_templates`
 
@@ -370,7 +370,9 @@ time_slots ──── bookings
 ## Key Business Rules
 
 ### Booking Rules
-- Only one experience offered: **The Workshop** (90 min, NZD $75/person, max 8 guests)
+- Two experiences offered:
+  - **Workshop A — Tea Ceremony Experience** (90 min, NZD $75/person, max 8 guests) — online booking with date/time selection
+  - **Workshop B — Tea Making Experience** (2 hours, NZD $85/person, seasonal) — expression of interest form only (submitted via contact API)
 - Two time slots per day: **10:00–11:30 AM** and **2:00–3:30 PM**
 - A time slot supports up to **8 guests total** across multiple bookings
 - `booked_guests` is automatically updated via database trigger on insert
@@ -409,10 +411,10 @@ time_slots ──── bookings
 - Manual interaction resets the auto-rotate timer
 - `sort_order` controls the display order; admin can **drag to reorder** using `@dnd-kit` in the admin dashboard
 - New announcements are appended at the end (`sort_order = max + 1`)
-- Each announcement has bilingual content (`title_en`/`content_en` and `title_zh`/`content_zh`)
-- The homepage displays the announcement in the visitor's **current locale**
+- Each announcement has bilingual content (`title_en`/`content_en` and `title_zh`/`content_zh`) in the database (for admin use)
+- The homepage displays the English content
 - Admin can toggle `is_active` to show/hide announcements without deleting them
-- Users can dismiss the banner via a centered "Dismiss" / "關閉通知" link below the content
+- Users can dismiss the banner via a centered "Dismiss" link below the content
 
 ### Gallery Rules
 - Gallery images are stored in **Supabase Storage** (bucket: `gallery`, public, 2MB file size limit)
@@ -428,6 +430,7 @@ time_slots ──── bookings
 - Admin can upload images (drag & drop or click), edit captions, and delete images
 - **Client-side image compression**: images are automatically compressed to ≤ 2MB before upload using Canvas API (max dimension 2048px, progressive JPEG quality reduction)
 - Admin gallery displays images in a compact grid (3/4/6 columns, square aspect ratio) with caption overlay
+- **Homepage featured images:** up to 6 images can be selected (★ toggle). Admin uses an **edit mode** — all changes (add/remove/reorder) are local until explicitly saved in batch. Reordering uses **drag-and-drop** via `@dnd-kit`
 - Deleting an image removes both the Storage file and the database record
 - `next/image` is used for optimized loading (Supabase Storage domain configured in `next.config.ts`)
 - `next.config.ts` sets `experimental.serverActions.bodySizeLimit: '3mb'` for image upload
@@ -455,7 +458,7 @@ time_slots ──── bookings
 | `sendCancellationConfirmation` | Customer | When booking is cancelled — by customer self-cancel or by admin |
 | `sendCancellationNotice` | Admin/Owner | When customer self-cancels only (not sent for admin-initiated cancellations) |
 
-All emails respect `preferred_language` — English or Traditional Chinese (zh-TW).
+All emails are sent in English (`preferred_language` defaults to `en`; language selection has been removed from the public booking form).
 
 ---
 
@@ -512,7 +515,7 @@ Submits a new booking request.
   "phone": "string",
   "guests": 1,
   "specialRequests": "string (optional)",
-  "preferredLanguage": "en | zh"
+  "preferredLanguage": "en"
 }
 ```
 
@@ -613,27 +616,18 @@ Admin operations use Next.js Server Actions instead of API routes:
 
 ---
 
-## Bilingual (i18n) Requirements
+## Internationalisation (i18n)
 
-- Default language: **English**
-- Secondary language: **Traditional Chinese (zh-TW)**
-- Library: **next-intl** (v4)
-- Language toggle in navigation bar on all public pages
-- URL-based locale routing: `/about` (English default), `/zh-TW/about` (Chinese)
-- Locale prefix mode: `as-needed` (English has no prefix, zh-TW has prefix)
-- **Single-language display rule:** Each page must only display content in the current locale. Do NOT show both languages simultaneously (e.g., English title with Chinese subtitle). The language switcher in the navigation bar handles locale changes — users switch languages via the toggle, not by seeing both on screen.
-- **All new public pages must support bilingual switching:**
-  1. Place pages under `src/app/[locale]/(public)/`
-  2. Use `useTranslations` (client) or `getTranslations` (server) from `next-intl`
-  3. Use `Link` from `@/i18n/navigation` instead of `next/link`
-  4. Add all user-facing strings to `messages/en.json` and `messages/zh-TW.json`
-  5. Do NOT add `Zh` suffix keys (e.g., `titleZh`, `labelZh`) — each locale has its own complete translation file
-- All public page content, form labels, error messages, and emails must be translated
-- Admin dashboard supports **bilingual switching** (English / Traditional Chinese) via cookie-based locale
+- **Public pages: English only** — no language toggle, no zh-TW locale routing
+- Library: **next-intl** (v4) — used for string management even though only one public locale
+- Locale routing config (`src/i18n/routing.ts`): `locales: ['en']`, `localePrefix: 'as-needed'`
+- Public pages still use `useTranslations` / `getTranslations` from `next-intl` and `Link` from `@/i18n/navigation`
+- All public page strings are in `messages/en.json`
+- **Admin dashboard: bilingual** (English / Traditional Chinese) via cookie-based locale
 - Admin does **not** use URL-based locale routing (no `[locale]` segment) — locale is stored in `admin_locale` cookie
 - Admin layout wraps children with `NextIntlClientProvider` using the cookie locale
 - Admin translation keys are under the `admin` namespace in `messages/en.json` and `messages/zh-TW.json`
-- Translation files: `messages/en.json` and `messages/zh-TW.json`
+- `messages/zh-TW.json` is retained for admin dashboard use only
 - i18n config: `src/i18n/routing.ts`, `src/i18n/request.ts`, `src/i18n/navigation.ts`
 
 ---
@@ -801,7 +795,7 @@ See `SPRINT.md` for the full Agile sprint plan.
 |---|---|---|
 | Pre-Sprint | PRD, requirements, client sign-off | ✅ Done |
 | Sprint 0 | Project setup, DB schema, Figma wireframes | ✅ Done |
-| Sprint 1 | Core information pages + i18n | ✅ Done |
+| Sprint 1 | Core information pages | ✅ Done |
 | Sprint 2 | Booking system + cancellation emails | ✅ Done |
 | Sprint 3 | Admin dashboard + self-cancellation | ✅ Done |
 | Sprint 4 | Testing, performance, launch | 🔄 In Progress |
