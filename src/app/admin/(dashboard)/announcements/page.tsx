@@ -124,31 +124,35 @@ function SortableAnnouncementItem({
         </span>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span
               className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                 ann.is_active
-                  ? 'bg-bamboo-green/10 text-bamboo-green'
+                  ? ann.expires_at && new Date(ann.expires_at) < new Date()
+                    ? 'bg-orange-100 text-orange-600'
+                    : 'bg-bamboo-green/10 text-bamboo-green'
                   : 'bg-gray-100 text-muted-foreground'
               }`}
             >
-              {ann.is_active ? t('active') : t('inactive')}
+              {ann.is_active
+                ? ann.expires_at && new Date(ann.expires_at) < new Date()
+                  ? t('expired')
+                  : t('active')
+                : t('inactive')}
             </span>
             <span className="text-xs text-muted-foreground">
               {new Date(ann.created_at).toLocaleDateString('en-CA')}
             </span>
+            {ann.expires_at && (
+              <span className={`text-xs ${new Date(ann.expires_at) < new Date() ? 'text-orange-500' : 'text-muted-foreground'}`}>
+                {t('expiresAt', { date: new Date(ann.expires_at).toLocaleDateString('en-CA') })}
+              </span>
+            )}
           </div>
 
-          {/* EN */}
-          <div className="mb-2">
+          <div>
             <p className="text-sm font-medium text-foreground">{ann.title_en}</p>
             <p className="text-sm text-muted-foreground">{ann.content_en}</p>
-          </div>
-
-          {/* ZH */}
-          <div>
-            <p className="text-sm font-medium text-foreground">{ann.title_zh}</p>
-            <p className="text-sm text-muted-foreground">{ann.content_zh}</p>
           </div>
         </div>
 
@@ -185,6 +189,19 @@ function SortableAnnouncementItem({
 
 // ── Modal ──
 
+type ExpiryMode = 'none' | 'days' | 'date'
+
+function deriveExpiryState(announcement: Announcement | null): { mode: ExpiryMode; days: string; date: string } {
+  if (!announcement?.expires_at) return { mode: 'none', days: '', date: '' }
+  // If editing, figure out which mode makes sense — default to date mode
+  const expiresDate = new Date(announcement.expires_at)
+  return {
+    mode: 'date',
+    days: '',
+    date: expiresDate.toISOString().slice(0, 10),
+  }
+}
+
 function AnnouncementModal({
   announcement,
   onClose,
@@ -197,18 +214,47 @@ function AnnouncementModal({
   t: ReturnType<typeof useTranslations<'admin.announcements'>>
 }) {
   const [titleEn, setTitleEn] = useState(() => announcement?.title_en ?? '')
-  const [titleZh, setTitleZh] = useState(() => announcement?.title_zh ?? '')
   const [contentEn, setContentEn] = useState(() => announcement?.content_en ?? '')
-  const [contentZh, setContentZh] = useState(() => announcement?.content_zh ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const expiryInit = deriveExpiryState(announcement)
+  const [expiryMode, setExpiryMode] = useState<ExpiryMode>(() => expiryInit.mode)
+  const [expiryDays, setExpiryDays] = useState(() => expiryInit.days)
+  const [expiryDate, setExpiryDate] = useState(() => expiryInit.date)
+
   const isEdit = !!announcement
+
+  const computeExpiresAt = (): string | null => {
+    if (expiryMode === 'none') return null
+    if (expiryMode === 'days') {
+      const days = parseInt(expiryDays, 10)
+      if (!days || days <= 0) return null
+      const d = new Date()
+      d.setDate(d.getDate() + days)
+      d.setHours(23, 59, 59, 999)
+      return d.toISOString()
+    }
+    if (expiryMode === 'date') {
+      if (!expiryDate) return null
+      // End of the selected date in NZ time (use +12 to be safe — covers both NZST and NZDT end-of-day)
+      return new Date(`${expiryDate}T23:59:59+12:00`).toISOString()
+    }
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!titleEn.trim() || !titleZh.trim() || !contentEn.trim() || !contentZh.trim()) {
+    if (!titleEn.trim() || !contentEn.trim()) {
       setError(t('errorRequired'))
+      return
+    }
+    if (expiryMode === 'days' && (!expiryDays || parseInt(expiryDays, 10) <= 0)) {
+      setError(t('expiryDaysRequired'))
+      return
+    }
+    if (expiryMode === 'date' && !expiryDate) {
+      setError(t('expiryDateRequired'))
       return
     }
     setSaving(true)
@@ -216,9 +262,8 @@ function AnnouncementModal({
 
     const formData = {
       title_en: titleEn,
-      title_zh: titleZh,
       content_en: contentEn,
-      content_zh: contentZh,
+      expires_at: computeExpiresAt(),
     }
 
     const result = isEdit
@@ -236,7 +281,7 @@ function AnnouncementModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="w-full max-w-lg rounded-xl bg-off-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-lg rounded-xl bg-off-white shadow-xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="border-b border-border px-6 py-4">
           <h2 className="font-serif text-lg font-semibold text-foreground">
             {isEdit ? t('editTitle') : t('createTitle')}
@@ -248,62 +293,96 @@ function AnnouncementModal({
             <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('titleEn')}
-              </label>
-              <input
-                type="text"
-                value={titleEn}
-                onChange={(e) => setTitleEn(e.target.value)}
-                maxLength={200}
-                className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
-                placeholder={t('titleEnPlaceholder')}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('titleZh')}
-              </label>
-              <input
-                type="text"
-                value={titleZh}
-                onChange={(e) => setTitleZh(e.target.value)}
-                maxLength={200}
-                className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
-                placeholder={t('titleZhPlaceholder')}
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('titleEn')}
+            </label>
+            <input
+              type="text"
+              value={titleEn}
+              onChange={(e) => setTitleEn(e.target.value)}
+              maxLength={200}
+              className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
+              placeholder={t('titleEnPlaceholder')}
+            />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('contentEn')}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              {t('contentEn')}
+            </label>
+            <textarea
+              value={contentEn}
+              onChange={(e) => setContentEn(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none resize-none"
+              placeholder={t('contentEnPlaceholder')}
+            />
+          </div>
+
+          {/* Expiry section */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              {t('expiryLabel')}
+            </label>
+            <div className="flex flex-wrap gap-3 mb-3">
+              <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="expiryMode"
+                  checked={expiryMode === 'none'}
+                  onChange={() => setExpiryMode('none')}
+                  className="accent-tea-brown"
+                />
+                {t('expiryNone')}
               </label>
-              <textarea
-                value={contentEn}
-                onChange={(e) => setContentEn(e.target.value)}
-                rows={3}
-                maxLength={2000}
-                className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none resize-none"
-                placeholder={t('contentEnPlaceholder')}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {t('contentZh')}
+              <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="expiryMode"
+                  checked={expiryMode === 'days'}
+                  onChange={() => setExpiryMode('days')}
+                  className="accent-tea-brown"
+                />
+                {t('expiryDaysOption')}
               </label>
-              <textarea
-                value={contentZh}
-                onChange={(e) => setContentZh(e.target.value)}
-                rows={3}
-                maxLength={2000}
-                className="w-full rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none resize-none"
-                placeholder={t('contentZhPlaceholder')}
-              />
+              <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                <input
+                  type="radio"
+                  name="expiryMode"
+                  checked={expiryMode === 'date'}
+                  onChange={() => setExpiryMode('date')}
+                  className="accent-tea-brown"
+                />
+                {t('expiryDateOption')}
+              </label>
             </div>
+
+            {expiryMode === 'days' && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={expiryDays}
+                  onChange={(e) => setExpiryDays(e.target.value)}
+                  className="w-24 rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
+                  placeholder="7"
+                />
+                <span className="text-sm text-muted-foreground">{t('expiryDaysUnit')}</span>
+              </div>
+            )}
+
+            {expiryMode === 'date' && (
+              <input
+                type="date"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                min={new Date().toISOString().slice(0, 10)}
+                className="rounded-lg border border-border bg-off-white px-3 py-2 text-sm focus:border-tea-brown focus:outline-none"
+              />
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

@@ -1,18 +1,18 @@
 # Moso Tea — mosotea.co.nz
 
-A bilingual (English / Traditional Chinese) website for Moso Tea, a New Zealand-based artisan tea experience studio offering immersive, hands-on tea ceremony sessions in Wellington.
+A website for Moso Tea, a New Zealand-based artisan tea experience studio offering immersive, hands-on tea ceremony and tea making experiences in Wellington.
 
 Built with Next.js, TypeScript, Tailwind CSS, Supabase, and Resend.
 
 ## Features
 
-- **Bilingual support** — English and Traditional Chinese (zh-TW) with URL-based locale routing via next-intl
-- **Online booking system** — Date picker, time slot selection, guest count, and real-time capacity checking
+- **Two workshop experiences** — Tea Ceremony (Workshop A, online booking) and Tea Making (Workshop B, seasonal interest registration)
+- **Online booking system** — Workshop selection, date picker, time slot selection, guest count, and real-time capacity checking
 - **Automated emails** — Booking confirmation, admin notification, and cancellation emails via Resend
 - **Customer self-cancellation** — Secure HMAC-SHA256 token-based cancellation links with 24-hour cutoff
-- **Admin dashboard** — View/confirm/cancel bookings, manage time slots, calendar view, bilingual (EN/繁中), responsive design
+- **Admin dashboard** — View/confirm/cancel bookings, manage time slots, calendar view, bilingual admin UI (EN/繁中), responsive design
 - **Time slot management** — Bulk generation (next 30 days), toggle availability, capacity tracking
-- **Announcement banner** — Admin-managed bilingual announcements with auto-rotation on the homepage
+- **Announcement banner** — Admin-managed announcements with auto-rotation on the homepage
 - **Gallery** — Masonry layout with lightbox, admin image upload with client-side compression, Supabase Storage
 - **Input validation** — All forms have client-side `maxLength` and server-side Zod validation to prevent abuse
 - **SEO optimised** — Sitemap, robots.txt, meta tags for all pages
@@ -117,7 +117,7 @@ create table gallery (
   uploaded_at timestamptz default now()
 );
 
--- Announcements (bilingual, displayed on homepage)
+-- Announcements (displayed on homepage)
 create table announcements (
   id uuid primary key default gen_random_uuid(),
   title_en text not null,
@@ -179,7 +179,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```
 src/
 ├── app/
-│   ├── [locale]/(public)/  ← Public pages with i18n locale routing
+│   ├── [locale]/(public)/  ← Public pages (English only)
 │   │   ├── page.tsx        ← Home page
 │   │   ├── about/          ← About Us
 │   │   ├── workshop/       ← Workshop details
@@ -189,7 +189,7 @@ src/
 │   │   ├── privacy/        ← Privacy Policy
 │   │   ├── terms/          ← Terms of Service
 │   │   └── cancel/[token]/ ← Customer self-cancellation
-│   ├── admin/              ← Protected admin dashboard (bilingual EN/繁中)
+│   ├── admin/              ← Protected admin dashboard (bilingual EN/繁中 via cookie)
 │   │   ├── (dashboard)/    ← Dashboard, bookings, slots, announcements, gallery
 │   │   └── login/          ← Admin login
 │   ├── api/                ← API routes (booking, time-slots, cancel, contact)
@@ -205,8 +205,8 @@ src/
 ├── types/                  ← Shared TypeScript types
 └── i18n/                   ← i18n config (routing, navigation, request)
 messages/
-├── en.json                 ← English translations
-└── zh-TW.json              ← Traditional Chinese translations
+├── en.json                 ← English translations (public pages + admin)
+└── zh-TW.json              ← Traditional Chinese translations (admin dashboard only)
 ```
 
 ## Git Workflow

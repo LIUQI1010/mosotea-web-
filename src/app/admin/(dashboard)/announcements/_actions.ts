@@ -7,9 +7,7 @@ import type { Announcement } from '@/types'
 
 const announcementSchema = z.object({
   title_en: z.string().min(1).max(200),
-  title_zh: z.string().min(1).max(200),
   content_en: z.string().min(1).max(2000),
-  content_zh: z.string().min(1).max(2000),
 })
 
 function revalidate() {
@@ -30,9 +28,8 @@ export async function getAnnouncements(): Promise<Announcement[]> {
 
 export async function createAnnouncement(formData: {
   title_en: string
-  title_zh: string
   content_en: string
-  content_zh: string
+  expires_at?: string | null
 }): Promise<{ success: boolean; error?: string }> {
   const parsed = announcementSchema.safeParse(formData)
   if (!parsed.success) return { success: false, error: parsed.error.issues[0].message }
@@ -48,13 +45,17 @@ export async function createAnnouncement(formData: {
 
   const nextOrder = (existing?.[0]?.sort_order ?? 0) + 1
 
+  const titleEn = parsed.data.title_en.trim()
+  const contentEn = parsed.data.content_en.trim()
+
   const { error } = await supabase.from('announcements').insert({
-    title_en: parsed.data.title_en.trim(),
-    title_zh: parsed.data.title_zh.trim(),
-    content_en: parsed.data.content_en.trim(),
-    content_zh: parsed.data.content_zh.trim(),
+    title_en: titleEn,
+    title_zh: titleEn,
+    content_en: contentEn,
+    content_zh: contentEn,
     is_active: true,
     sort_order: nextOrder,
+    expires_at: formData.expires_at ?? null,
   })
 
   if (error) return { success: false, error: error.message }
@@ -67,9 +68,8 @@ export async function updateAnnouncement(
   id: string,
   formData: {
     title_en: string
-    title_zh: string
     content_en: string
-    content_zh: string
+    expires_at?: string | null
   }
 ): Promise<{ success: boolean; error?: string }> {
   const parsed = announcementSchema.safeParse(formData)
@@ -77,13 +77,17 @@ export async function updateAnnouncement(
 
   const supabase = createAdminClient()
 
+  const titleEn = parsed.data.title_en.trim()
+  const contentEn = parsed.data.content_en.trim()
+
   const { error } = await supabase
     .from('announcements')
     .update({
-      title_en: parsed.data.title_en.trim(),
-      title_zh: parsed.data.title_zh.trim(),
-      content_en: parsed.data.content_en.trim(),
-      content_zh: parsed.data.content_zh.trim(),
+      title_en: titleEn,
+      title_zh: titleEn,
+      content_en: contentEn,
+      content_zh: contentEn,
+      expires_at: formData.expires_at ?? null,
     })
     .eq('id', id)
 

@@ -2,12 +2,16 @@
 
 import { useState, Suspense } from "react"
 import { useTranslations } from "next-intl"
+import { useSearchParams } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 
 // Fixed workshop price
 const PRICE_PER_PERSON = 75
+
+// Workshop type
+type WorkshopType = "A" | "B" | ""
 
 // Available time slot from API
 interface AvailableSlot {
@@ -19,6 +23,7 @@ interface AvailableSlot {
 
 // Form data interface
 interface BookingFormData {
+    workshop: WorkshopType
     date: string
     timeSlotId: string
     timeSlotLabel: string
@@ -28,11 +33,21 @@ interface BookingFormData {
     phone: string
     guests: number
     specialRequests: string
-    preferredLanguage: "en" | "zh"
+    preferredLanguage: "en"
+}
+
+// Interest form data
+interface InterestFormData {
+    fullName: string
+    email: string
+    phone: string
+    guests: number
+    message: string
 }
 
 // Form errors interface
 interface FormErrors {
+    workshop?: string
     date?: string
     timeSlot?: string
     fullName?: string
@@ -40,6 +55,7 @@ interface FormErrors {
     phone?: string
     guests?: string
     specialRequests?: string
+    message?: string
 }
 
 // Page Hero Section
@@ -60,14 +76,19 @@ function PageHero() {
     )
 }
 
-// Step Indicator Component
-function StepIndicator({ currentStep }: { currentStep: number }) {
+// Step Indicator Component (for Workshop A booking flow)
+function StepIndicator({ currentStep, workshopType }: { currentStep: number; workshopType: WorkshopType }) {
     const t = useTranslations("book")
 
-    const steps = [
-        { number: 1, label: t("steps.dateTime") },
-        { number: 2, label: t("steps.details") },
-    ]
+    const steps = workshopType === "A"
+        ? [
+            { number: 1, label: t("steps.workshop") },
+            { number: 2, label: t("steps.dateTime") },
+            { number: 3, label: t("steps.details") },
+        ]
+        : [
+            { number: 1, label: t("steps.workshop") },
+        ]
 
     return (
         <div className="flex items-center justify-center mb-10">
@@ -102,6 +123,74 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                     )}
                 </div>
             ))}
+        </div>
+    )
+}
+
+// Step 1: Workshop Selection
+function WorkshopSelection({
+    selected,
+    onSelect,
+}: {
+    selected: WorkshopType
+    onSelect: (type: WorkshopType) => void
+}) {
+    const t = useTranslations("book")
+
+    return (
+        <div>
+            <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
+                {t("step1.title")}
+            </h2>
+            <p className="text-muted-foreground mb-6">{t("step1.description")}</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Workshop A */}
+                <button
+                    onClick={() => onSelect("A")}
+                    className={`text-left p-6 rounded-lg border-2 transition-all ${selected === "A"
+                            ? "border-tea-brown bg-tea-brown/5"
+                            : "border-border bg-off-white hover:border-tea-brown/50"
+                        }`}
+                >
+                    <h3 className="font-serif text-lg font-semibold text-tea-brown mb-2">
+                        {t("step1.workshopA")}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        {t("step1.workshopADesc")}
+                    </p>
+                    <p className="text-xs font-medium text-tea-brown/70">
+                        {t("step1.workshopAStats")}
+                    </p>
+                </button>
+
+                {/* Workshop B */}
+                <button
+                    onClick={() => onSelect("B")}
+                    className={`text-left p-6 rounded-lg border-2 transition-all ${selected === "B"
+                            ? "border-tea-brown bg-tea-brown/5"
+                            : "border-border bg-off-white hover:border-tea-brown/50"
+                        }`}
+                >
+                    <h3 className="font-serif text-lg font-semibold text-tea-brown mb-2">
+                        {t("step1.workshopB")}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        {t("step1.workshopBDesc")}
+                    </p>
+                    <p className="text-xs font-medium text-tea-brown/70">
+                        {t("step1.workshopBStats")}
+                    </p>
+                </button>
+            </div>
+
+            {selected === "B" && (
+                <div className="mt-4 bg-cream rounded-lg p-4 border border-border">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                        {t("step1.workshopBNote")}
+                    </p>
+                </div>
+            )}
         </div>
     )
 }
@@ -226,7 +315,7 @@ function formatSlotLabel(startTime: string, endTime: string): string {
     return `${fmt(startTime)} - ${fmt(endTime)}`
 }
 
-// Step 1: Date & Time Selection
+// Step 2: Date & Time Selection
 function DateTimeSelection({
     selectedDate,
     selectedSlotId,
@@ -285,7 +374,7 @@ function DateTimeSelection({
                     )}
                 </div>
 
-                {/* Time Slots - only shown after a date is selected */}
+                {/* Time Slots */}
                 {selectedDate ? (
                     <div>
                         <h3 className="font-medium text-foreground mb-3">{t("step2.selectTime")}</h3>
@@ -393,7 +482,7 @@ function InputField({
     )
 }
 
-// Step 2: Personal Details
+// Step 3: Personal Details (Workshop A)
 function PersonalDetails({
     formData,
     onFieldChange,
@@ -513,38 +602,124 @@ function PersonalDetails({
                     )}
                 </div>
 
-                {/* Language Preference */}
+            </div>
+        </div>
+    )
+}
+
+// Workshop B Interest Form
+function InterestForm({
+    formData,
+    onFieldChange,
+    errors,
+}: {
+    formData: InterestFormData
+    onFieldChange: (field: keyof InterestFormData, value: string | number) => void
+    errors: FormErrors
+}) {
+    const t = useTranslations("book")
+
+    return (
+        <div>
+            <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-2">
+                {t("interest.title")}
+            </h2>
+            <p className="text-muted-foreground mb-6">{t("interest.description")}</p>
+
+            <div className="space-y-5">
+                <InputField
+                    label={t("interest.fullName")}
+                    value={formData.fullName}
+                    onChange={(value) => onFieldChange("fullName", value)}
+                    placeholder={t("interest.fullNamePlaceholder")}
+                    error={errors.fullName}
+                    required
+                    maxLength={30}
+                />
+
+                <InputField
+                    label={t("interest.email")}
+                    type="email"
+                    value={formData.email}
+                    onChange={(value) => onFieldChange("email", value)}
+                    placeholder={t("interest.emailPlaceholder")}
+                    error={errors.email}
+                    required
+                    maxLength={100}
+                />
+
+                <InputField
+                    label={t("interest.phone")}
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(value) => onFieldChange("phone", value)}
+                    placeholder={t("interest.phonePlaceholder")}
+                    error={errors.phone}
+                    required
+                    maxLength={20}
+                />
+
+                {/* Estimated Group Size */}
                 <div>
-                    <label className="block mb-3">
-                        <span className="font-medium text-foreground">{t("step3.language")}</span>
+                    <label className="block mb-2">
+                        <span className="font-medium text-foreground">{t("interest.guests")}</span>
                     </label>
-                    <div className="flex gap-3">
+                    <div className="flex items-center gap-4">
                         <button
-                            onClick={() => onFieldChange("preferredLanguage", "en")}
-                            className={`flex-1 py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${formData.preferredLanguage === "en"
-                                    ? "border-tea-brown bg-tea-brown text-primary-foreground"
-                                    : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
+                            type="button"
+                            onClick={() => {
+                                if (formData.guests > 1) onFieldChange("guests", formData.guests - 1)
+                            }}
+                            disabled={formData.guests <= 1}
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests <= 1
+                                    ? "border-border text-muted-foreground/40 cursor-not-allowed"
+                                    : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
                                 }`}
                         >
-                            English
+                            −
                         </button>
+                        <span className="w-12 text-center text-2xl font-semibold text-foreground tabular-nums">
+                            {formData.guests}
+                        </span>
                         <button
-                            onClick={() => onFieldChange("preferredLanguage", "zh")}
-                            className={`flex-1 py-3 px-4 rounded-lg border-2 font-medium text-sm transition-all ${formData.preferredLanguage === "zh"
-                                    ? "border-tea-brown bg-tea-brown text-primary-foreground"
-                                    : "border-border bg-off-white text-foreground hover:border-tea-brown/50"
+                            type="button"
+                            onClick={() => {
+                                if (formData.guests < 8) onFieldChange("guests", formData.guests + 1)
+                            }}
+                            disabled={formData.guests >= 8}
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 8
+                                    ? "border-border text-muted-foreground/40 cursor-not-allowed"
+                                    : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
                                 }`}
                         >
-                            中文
+                            +
                         </button>
                     </div>
+                </div>
+
+                {/* Message */}
+                <div>
+                    <label className="block mb-2">
+                        <span className="font-medium text-foreground">{t("interest.message")}</span>
+                    </label>
+                    <textarea
+                        value={formData.message}
+                        onChange={(e) => onFieldChange("message", e.target.value)}
+                        placeholder={t("interest.messagePlaceholder")}
+                        rows={4}
+                        maxLength={500}
+                        className={`w-full px-4 py-3 rounded-lg border-2 bg-off-white transition-colors focus:outline-none focus:ring-0 resize-none ${errors.message ? "border-red-400 focus:border-red-400" : "border-border focus:border-tea-brown"}`}
+                    />
+                    {errors.message && (
+                        <p className="mt-1.5 text-sm text-red-500">{errors.message}</p>
+                    )}
                 </div>
             </div>
         </div>
     )
 }
 
-// Booking Summary
+// Booking Summary (Workshop A only)
 function BookingSummary({ formData }: { formData: BookingFormData }) {
     const t = useTranslations("book")
 
@@ -558,7 +733,7 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
             <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                     <span className="text-muted-foreground">{t("summary.experience")}</span>
-                    <span className="font-medium text-foreground">{t("summary.workshopName")}</span>
+                    <span className="font-medium text-foreground">{t("summary.workshopA")}</span>
                 </div>
                 {formData.date && (
                     <div className="flex justify-between">
@@ -598,8 +773,9 @@ function BookingSummary({ formData }: { formData: BookingFormData }) {
 }
 
 // Success Message
-function SuccessMessage() {
+function SuccessMessage({ type }: { type: "booking" | "interest" }) {
     const t = useTranslations("book")
+    const key = type === "interest" ? "interestSuccess" : "success"
 
     return (
         <div className="text-center py-12">
@@ -609,16 +785,16 @@ function SuccessMessage() {
                 </svg>
             </div>
             <h2 className="font-serif text-2xl font-semibold text-tea-brown mb-3">
-                {t("success.title")}
+                {t(`${key}.title`)}
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto mb-8 leading-relaxed mt-4">
-                {t("success.description")}
+                {t(`${key}.description`)}
             </p>
             <Link
                 href="/"
                 className="inline-block bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
             >
-                {t("success.returnHome")}
+                {t(`${key}.returnHome`)}
             </Link>
         </div>
     )
@@ -662,15 +838,23 @@ function ErrorMessage({ errorMessage, onRetry }: { errorMessage: string; onRetry
     )
 }
 
-// Booking Form Component
-function BookingForm() {
+// Booking Form Component (handles both Workshop A booking and Workshop B interest)
+function BookingFormInner() {
     const t = useTranslations("book")
+    const searchParams = useSearchParams()
 
-    const [currentStep, setCurrentStep] = useState(1)
+    const workshopParam = searchParams.get("workshop")
+    const initialWorkshop: WorkshopType = workshopParam === "B" ? "B" : workshopParam === "A" ? "A" : ""
+
+    const [currentStep, setCurrentStep] = useState(initialWorkshop ? 1 : 1)
+    const [workshopType, setWorkshopType] = useState<WorkshopType>(initialWorkshop)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitError, setSubmitError] = useState("")
+
+    // Workshop A form data
     const [formData, setFormData] = useState<BookingFormData>({
+        workshop: initialWorkshop || "",
         date: "",
         timeSlotId: "",
         timeSlotLabel: "",
@@ -682,52 +866,74 @@ function BookingForm() {
         specialRequests: "",
         preferredLanguage: "en",
     })
+
+    // Workshop B interest form data
+    const [interestData, setInterestData] = useState<InterestFormData>({
+        fullName: "",
+        email: "",
+        phone: "",
+        guests: 1,
+        message: t("interest.defaultMessage"),
+    })
+
     const [errors, setErrors] = useState<FormErrors>({})
+
+    // Total steps depends on workshop type
+    const totalSteps = workshopType === "A" ? 3 : workshopType === "B" ? 2 : 1
 
     const validateStep = (step: number): boolean => {
         const newErrors: FormErrors = {}
 
         if (step === 1) {
-            if (!formData.date) {
-                newErrors.date = t("step2.errorDate")
-            }
-            if (!formData.timeSlotId) {
-                newErrors.timeSlot = t("step2.errorTime")
+            if (!workshopType) {
+                newErrors.workshop = "Please select a workshop"
             }
         }
 
-        if (step === 2) {
-            const trimmedName = formData.fullName.trim()
-            if (!trimmedName) {
-                newErrors.fullName = t("step3.errorName")
-            } else if (trimmedName.length < 2) {
-                newErrors.fullName = t("step3.errorNameShort")
-            } else if (trimmedName.length > 30) {
-                newErrors.fullName = t("step3.errorNameTooLong")
-            } else if (!/^[a-zA-Z\u4e00-\u9fff\s\-']+$/.test(trimmedName)) {
-                newErrors.fullName = t("step3.errorNameInvalid")
+        if (step === 2 && workshopType === "A") {
+            if (!formData.date) newErrors.date = t("step2.errorDate")
+            if (!formData.timeSlotId) newErrors.timeSlot = t("step2.errorTime")
+        }
+
+        if (step === 2 && workshopType === "B") {
+            // Validate interest form
+            const trimmedName = interestData.fullName.trim()
+            if (!trimmedName) newErrors.fullName = t("step3.errorName")
+            else if (trimmedName.length < 2) newErrors.fullName = t("step3.errorNameShort")
+            else if (trimmedName.length > 30) newErrors.fullName = t("step3.errorNameTooLong")
+
+            const trimmedEmail = interestData.email.trim()
+            if (!trimmedEmail) newErrors.email = t("step3.errorEmail")
+            else if (trimmedEmail.length > 100) newErrors.email = t("step3.errorEmailTooLong")
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) newErrors.email = t("step3.errorEmailInvalid")
+
+            const trimmedPhone = interestData.phone.trim()
+            if (!trimmedPhone) newErrors.phone = t("step3.errorPhone")
+            else if (trimmedPhone.length > 20) newErrors.phone = t("step3.errorPhoneTooLong")
+            else {
+                const digits = trimmedPhone.replace(/[\s\-().+]/g, '')
+                if (!/^\d{7,15}$/.test(digits)) newErrors.phone = t("step3.errorPhoneInvalid")
             }
+        }
+
+        if (step === 3 && workshopType === "A") {
+            const trimmedName = formData.fullName.trim()
+            if (!trimmedName) newErrors.fullName = t("step3.errorName")
+            else if (trimmedName.length < 2) newErrors.fullName = t("step3.errorNameShort")
+            else if (trimmedName.length > 30) newErrors.fullName = t("step3.errorNameTooLong")
+            else if (!/^[a-zA-Z\u4e00-\u9fff\s\-']+$/.test(trimmedName)) newErrors.fullName = t("step3.errorNameInvalid")
 
             const trimmedEmail = formData.email.trim()
-            if (!trimmedEmail) {
-                newErrors.email = t("step3.errorEmail")
-            } else if (trimmedEmail.length > 100) {
-                newErrors.email = t("step3.errorEmailTooLong")
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-                newErrors.email = t("step3.errorEmailInvalid")
-            }
+            if (!trimmedEmail) newErrors.email = t("step3.errorEmail")
+            else if (trimmedEmail.length > 100) newErrors.email = t("step3.errorEmailTooLong")
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) newErrors.email = t("step3.errorEmailInvalid")
 
             const trimmedPhone = formData.phone.trim()
-            if (!trimmedPhone) {
-                newErrors.phone = t("step3.errorPhone")
-            } else if (trimmedPhone.length > 20) {
-                newErrors.phone = t("step3.errorPhoneTooLong")
-            } else {
-                // Strip formatting characters, then check digit count (7–15 per E.164)
+            if (!trimmedPhone) newErrors.phone = t("step3.errorPhone")
+            else if (trimmedPhone.length > 20) newErrors.phone = t("step3.errorPhoneTooLong")
+            else {
                 const digits = trimmedPhone.replace(/[\s\-().+]/g, '')
-                if (!/^\d{7,15}$/.test(digits)) {
-                    newErrors.phone = t("step3.errorPhoneInvalid")
-                }
+                if (!/^\d{7,15}$/.test(digits)) newErrors.phone = t("step3.errorPhoneInvalid")
             }
 
             if (!Number.isInteger(formData.guests) || formData.guests < 1 || formData.guests > formData.maxGuests) {
@@ -754,8 +960,15 @@ function BookingForm() {
         setErrors({})
     }
 
-    const handleSubmit = async () => {
-        if (!validateStep(2)) return
+    const handleWorkshopSelect = (type: WorkshopType) => {
+        setWorkshopType(type)
+        setFormData((prev) => ({ ...prev, workshop: type }))
+        setErrors({})
+    }
+
+    // Submit Workshop A booking
+    const handleSubmitBooking = async () => {
+        if (!validateStep(3)) return
 
         setIsSubmitting(true)
         setSubmitError("")
@@ -791,36 +1004,87 @@ function BookingForm() {
         }
     }
 
+    // Submit Workshop B interest
+    const handleSubmitInterest = async () => {
+        if (!validateStep(2)) return
+
+        setIsSubmitting(true)
+        setSubmitError("")
+
+        try {
+            const res = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: interestData.fullName,
+                    email: interestData.email,
+                    phone: interestData.phone,
+                    message: `[Tea Making Experience Interest]\nEstimated group size: ${interestData.guests}\n\n${interestData.message || "No additional message."}`,
+                }),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok || !data.success) {
+                setSubmitError(data.error || t("error.unknown"))
+                return
+            }
+
+            setIsSubmitted(true)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        } catch {
+            setSubmitError(t("error.network"))
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
     const handleFieldChange = (field: keyof BookingFormData, value: string | number) => {
         setFormData((prev) => ({ ...prev, [field]: value }))
-        // Clear error when field is changed
+        if (errors[field as keyof FormErrors]) {
+            setErrors((prev) => ({ ...prev, [field]: undefined }))
+        }
+    }
+
+    const handleInterestFieldChange = (field: keyof InterestFormData, value: string | number) => {
+        setInterestData((prev) => ({ ...prev, [field]: value }))
         if (errors[field as keyof FormErrors]) {
             setErrors((prev) => ({ ...prev, [field]: undefined }))
         }
     }
 
     if (isSubmitted) {
-        return <SuccessMessage />
+        return <SuccessMessage type={workshopType === "B" ? "interest" : "booking"} />
     }
 
     if (submitError && !isSubmitting) {
         return <ErrorMessage errorMessage={submitError} onRetry={() => setSubmitError("")} />
     }
 
+    const showSidebar = workshopType === "A" && currentStep >= 2
+
     return (
         <div>
-            <StepIndicator currentStep={currentStep} />
+            {workshopType && <StepIndicator currentStep={currentStep} workshopType={workshopType} />}
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className={`grid ${showSidebar ? "lg:grid-cols-3" : ""} gap-8`}>
                 {/* Form */}
-                <div className="lg:col-span-2 bg-card rounded-lg border border-border p-6 md:p-8">
+                <div className={`${showSidebar ? "lg:col-span-2" : ""} bg-card rounded-lg border border-border p-6 md:p-8`}>
+                    {/* Step 1: Workshop Selection */}
                     {currentStep === 1 && (
+                        <WorkshopSelection
+                            selected={workshopType}
+                            onSelect={handleWorkshopSelect}
+                        />
+                    )}
+
+                    {/* Workshop A — Step 2: Date & Time */}
+                    {currentStep === 2 && workshopType === "A" && (
                         <DateTimeSelection
                             selectedDate={formData.date}
                             selectedSlotId={formData.timeSlotId}
                             onDateSelect={(date) => {
                                 handleFieldChange("date", date)
-                                // Reset time slot when date changes
                                 setFormData((prev) => ({ ...prev, date, timeSlotId: "", timeSlotLabel: "", maxGuests: 8 }))
                             }}
                             onSlotSelect={(slotId, label, remaining) => {
@@ -839,10 +1103,20 @@ function BookingForm() {
                         />
                     )}
 
-                    {currentStep === 2 && (
+                    {/* Workshop A — Step 3: Personal Details */}
+                    {currentStep === 3 && workshopType === "A" && (
                         <PersonalDetails
                             formData={formData}
                             onFieldChange={handleFieldChange}
+                            errors={errors}
+                        />
+                    )}
+
+                    {/* Workshop B — Step 2: Interest Form */}
+                    {currentStep === 2 && workshopType === "B" && (
+                        <InterestForm
+                            formData={interestData}
+                            onFieldChange={handleInterestFieldChange}
                             errors={errors}
                         />
                     )}
@@ -860,16 +1134,31 @@ function BookingForm() {
                             <div />
                         )}
 
-                        {currentStep < 2 ? (
+                        {!workshopType || currentStep < totalSteps ? (
                             <button
                                 onClick={handleNext}
-                                className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors"
+                                disabled={currentStep === 1 && !workshopType}
+                                className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 {t("continue")}
                             </button>
+                        ) : currentStep === totalSteps && workshopType === "B" ? (
+                            <button
+                                onClick={handleSubmitInterest}
+                                disabled={isSubmitting}
+                                className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {isSubmitting && (
+                                    <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                    </svg>
+                                )}
+                                {isSubmitting ? t("interest.submitting") : t("interest.submit")}
+                            </button>
                         ) : (
                             <button
-                                onClick={handleSubmit}
+                                onClick={handleSubmitBooking}
                                 disabled={isSubmitting}
                                 className="bg-tea-brown text-primary-foreground px-8 py-3 font-medium rounded hover:bg-tea-brown/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                             >
@@ -885,12 +1174,23 @@ function BookingForm() {
                     </div>
                 </div>
 
-                {/* Summary Sidebar - always visible */}
-                <div className="lg:col-span-1">
-                    <BookingSummary formData={formData} />
-                </div>
+                {/* Summary Sidebar — only for Workshop A step 2+ */}
+                {showSidebar && (
+                    <div className="lg:col-span-1">
+                        <BookingSummary formData={formData} />
+                    </div>
+                )}
             </div>
         </div>
+    )
+}
+
+// Wrap with Suspense for useSearchParams
+function BookingForm() {
+    return (
+        <Suspense fallback={<BookingFormSkeleton />}>
+            <BookingFormInner />
+        </Suspense>
     )
 }
 
@@ -950,10 +1250,10 @@ function BookingFormSkeleton() {
     return (
         <div className="animate-pulse">
             <div className="flex items-center justify-center mb-10 gap-4">
-                {[1, 2].map((i) => (
+                {[1, 2, 3].map((i) => (
                     <div key={i} className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-border rounded-full" />
-                        {i < 2 && <div className="w-12 sm:w-20 h-0.5 bg-border" />}
+                        {i < 3 && <div className="w-12 sm:w-20 h-0.5 bg-border" />}
                     </div>
                 ))}
             </div>
@@ -979,9 +1279,7 @@ export default function BookPage() {
 
             <section className="py-12 px-4 bg-off-white">
                 <div className="max-w-4xl mx-auto">
-                    <Suspense fallback={<BookingFormSkeleton />}>
-                        <BookingForm />
-                    </Suspense>
+                    <BookingForm />
                 </div>
             </section>
 

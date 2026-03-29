@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { logout } from '@/app/admin/_actions/auth'
 import { setAdminLocale } from '@/app/admin/_actions/locale'
-import type { Locale } from '@/i18n/routing'
+import type { AdminLocale } from '@/app/admin/_actions/locale'
 
 function DashboardIcon({ className }: { className?: string }) {
   return (
@@ -76,8 +76,8 @@ function SidebarContent({ pathname, onNavigate, t, locale, onSwitchLocale }: {
   pathname: string
   onNavigate?: () => void
   t: ReturnType<typeof useTranslations<'admin.sidebar'>>
-  locale: Locale
-  onSwitchLocale: (locale: Locale) => void
+  locale: AdminLocale
+  onSwitchLocale: (locale: AdminLocale) => void
 }) {
   const navItems = [
     { href: '/admin', label: t('dashboard'), Icon: DashboardIcon },
@@ -163,12 +163,12 @@ function SidebarContent({ pathname, onNavigate, t, locale, onSwitchLocale }: {
 export function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const locale = useLocale() as Locale
+  const locale = useLocale() as AdminLocale
   const t = useTranslations('admin.sidebar')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [, startTransition] = useTransition()
 
-  const handleSwitchLocale = (newLocale: Locale) => {
+  const handleSwitchLocale = (newLocale: AdminLocale) => {
     startTransition(async () => {
       await setAdminLocale(newLocale)
       router.refresh()

@@ -8,7 +8,7 @@
     "bookNow": "Book Now"
   },
   "footer": {
-    "description": "Bringing the ancient art of tea ceremony to Wellington. Experience tranquility, mindfulness, and the beauty of tea culture.",
+    "description": "Bringing the art of tea ceremony to Wellington. Experience tranquility, mindfulness, and the beauty of tea culture.",
     "navigation": "Navigation",
     "contact": "Contact",
     "address1": "69 Crowther Road",
@@ -29,33 +29,35 @@
     "hero": {
       "title": "Experience the Art of Tea",
       "titleZh": "體驗茶道之美",
-      "description": "Discover the ancient traditions of tea ceremony in Wellington, where every cup tells a story of mindfulness and connection.",
+      "description": "Discover the traditions of tea ceremony in Wellington, where every cup tells a story of mindfulness and connection.",
       "cta": "Book an Experience"
     },
     "intro": {
       "title": "Why Moso Tea",
-      "description": "We bring the ancient art of tea ceremony to New Zealand, creating moments of peace and connection in our carefully curated space.",
+      "description": "We bring the art of tea ceremony to New Zealand, creating moments of peace and connection in our carefully curated space.",
       "feature1Title": "Tea Culture",
       "feature1Description": "Rooted in centuries of tradition, we bring the art and philosophy of tea ceremony to life — one mindful cup at a time.",
       "feature2Title": "Tea Space",
-      "feature2Description": "Nestled in the hills of Wainuiomata, our farm studio is a place where time slows down and the outside world quietly falls away.",
+      "feature2Description": "Nestled in the hills of Wainuiomata, our workshop is a place where time slows down and the outside world quietly falls away.",
       "feature3Title": "Tea Experience",
-      "feature3Description": "From the first scent of leaves to the last sip, every session is crafted to be unhurried, intimate, and deeply personal."
+      "feature3Description": "From the first scent of leaves to the last sip, every session is crafted to be unhurried, and deeply personal."
     },
     "experiences": {
-      "title": "Our Experience",
-      "subtitle": "A single, unhurried journey through the world of tea — guided, hands-on, and deeply personal.",
-      "teaJourney": {
-        "title": "Tea Journey",
-        "description": "Learn the story of tea — its culture, its trees, and the art of brewing — guided by your host."
+      "title": "Our Workshops",
+      "subtitle": "Two unique experiences — discover the art of tea ceremony or craft your own tea from leaf to cup.",
+      "workshopA": {
+        "title": "Tea Ceremony Experience",
+        "description": "A guided 90-minute journey through tea culture — from our garden to the tea table. Learn the story of tea, explore our tea plants, and experience an authentic Taiwanese-style tea ceremony."
       },
-      "handsOn": {
-        "title": "Hands-on Experience",
-        "description": "Pick, process, brew, and share — experience the full journey of tea with your own hands."
+      "workshopB": {
+        "title": "Tea Making Experience",
+        "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea to take home."
       },
-      "stats": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "statsA": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "statsB": "2 hours  ·  NZD $85 / person  ·  Seasonal",
       "learnMore": "Learn More",
-      "bookNow": "Book Now"
+      "bookNow": "Book Now",
+      "registerInterest": "Register Interest"
     },
     "testimonials": {
       "title": "Guest Reflections",
@@ -94,10 +96,10 @@
     },
     "story": {
       "title": "A Journey of Tea",
-      "p1": "Moso Tea was born from a simple yet profound love for the art of tea ceremony. Founded in 2021, our studio has become a sanctuary for those seeking moments of stillness in Wainuiomata, Wellington.",
-      "p2": "The name \"Moso\" carries two quiet meanings. In Taiwanese, moso means slow — an invitation to pause, to breathe, and to be present. It is also the name of the moso bamboo, a plant we deeply admire not for its dramatic growth, but for its stillness and resilience. The bamboo stands quietly through all seasons, rooted and unhurried. Our tea trees came to us by chance, much like the bamboo — an unexpected gift that found its way into our lives and shaped everything that followed.",
+      "p1": "Moso Tea was born from a simple yet profound love for the art of tea ceremony. Founded in 2021, our workshop has become a sanctuary for those seeking moments of stillness in Wainuiomata, Wellington.",
+      "p2": "The name \"Moso\" carries two quiet meanings. In Taiwanese dialect, moso means slow — an invitation to pause, to breathe, and to be present. It is also the name of the moso bamboo, a plant we deeply admire not for its dramatic growth, but for its stillness and resilience. The bamboo stands quietly through all seasons and rooted and unhurried. Our tea trees came to us by chance, much like the bamboo — an unexpected gift that found its way into our lives and shaped everything that followed.",
       "p3": "What began as a small gathering of tea enthusiasts has grown into a beloved space where people from all walks of life come together to experience the meditative beauty of tea culture.",
-      "p4": "Our lifestyle farm studio in Wainuiomata offers a rare opportunity to step away from the pace of everyday life and immerse yourself in an ancient tradition — one that celebrates the simple, unhurried act of preparing and sharing tea."
+      "p4": "Our lifestyle block workshop in Wainuiomata offers a rare opportunity to step away from the pace of everyday life and immerse yourself in a tradition — one that celebrates the simple, unhurried act of preparing and sharing tea."
     },
     "philosophy": {
       "quote": "In the simple act of making tea, we find a path to presence. Each cup is an invitation to slow down, to breathe, and to connect with the moment.",
@@ -106,15 +108,15 @@
     "expect": {
       "title": "What to Expect",
       "titleZh": "體驗流程",
-      "item1Title": "Guided by an Expert",
+      "item1Title": "Guided by an host",
       "item1TitleZh": "專家引導",
-      "item1Description": "Our certified tea masters bring years of training and deep cultural knowledge to every session.",
+      "item1Description": "Our experienced tea masters guide you through a deep cultural knowledge to every session.",
       "item2Title": "Tranquil Setting",
       "item2TitleZh": "安靜環境",
-      "item2Description": "A quiet, peaceful space where you can slow down, focus on the moment, and enjoy an unhurried tea experience.",
+      "item2Description": "A quiet, peaceful space where you can slow down, focus on the moment, and enjoy a state of calm and balanced tea experience.",
       "item3Title": "All Materials Provided",
       "item3TitleZh": "提供所有材料",
-      "item3Description": "Premium teas, traditional utensils, and light refreshments are included in every experience.",
+      "item3Description": "Premium teas and traditional utensils are included in every experience.",
       "item4Title": "Unhurried Pace",
       "item4TitleZh": "從容不迫",
       "item4Description": "Our sessions are designed to give you time to fully absorb and appreciate each moment."
@@ -122,19 +124,19 @@
     "host": {
       "title": "The People Behind Moso Tea",
       "founder1": {
-        "name": "Joyce Peng",
+        "name": "Jenson",
         "role": "Co-Founder",
-        "description": "Joyce is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — her warmth and gentle guidance make every guest feel at home from the very first cup."
+        "description": "Jenson is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — her warmth and gentle guidance make every guest feel at home from the very first cup."
       },
       "founder2": {
-        "name": "Jenson Lin",
+        "name": "Joyce",
         "role": "Co-Founder",
-        "description": "Jenson tends to the tea garden and oversees the making of every leaf. His quiet dedication to the land and the craft is what gives Moso Tea its roots — quite literally."
+        "description": "Joyce tends to the tea garden and oversees the making of every leaf. His quiet dedication to the land and the craft is what gives Moso Tea its roots — quite literally."
       },
       "founder3": {
-        "name": "Liyin Lin",
+        "name": "Lynn",
         "role": "Co-Founder",
-        "description": "Liyin grew up surrounded by tea. Now she shares that world with guests in her own words, bridging cultures and making the art of tea feel accessible, engaging, and alive."
+        "description": "Lynn grew up surrounded by tea. Now she shares that world with guests in her own words, bridging cultures and making the art of tea feel accessible, engaging, and alive."
       }
     },
     "gallery": {
@@ -150,69 +152,68 @@
   },
   "experiences": {
     "hero": {
-      "title": "The Workshop",
-      "description": "One experience. Two parts. A complete journey through the world of tea."
+      "title": "Our Workshops",
+      "description": "Two unique experiences to discover the world of tea — choose the journey that speaks to you."
     },
-    "part01": "Part 01",
-    "part02": "Part 02",
-    "teaJourney": {
-      "title": "Tea Journey",
+    "workshopA": {
+      "label": "Workshop A",
+      "title": "Tea Ceremony Experience",
+      "subtitle": "90 minutes  ·  Max 8 guests  ·  NZD $75 per person",
+      "description": "A guided journey through tea culture — from our garden to the tea table. Experience an authentic Taiwanese-style tea ceremony in our peaceful space.",
       "items": {
-        "1": "The story and philosophy behind tea culture",
-        "2": "Understanding the tea tree — varieties, seasons, and terroir",
-        "3": "The art of brewing — water temperature, timing, and technique"
-      }
+        "1": "Welcome & introduction to the tea space",
+        "2": "Garden tour — explore our tea plants and learn about Camellia sinensis varieties",
+        "3": "Discover the story of tea: from ancient China to modern tea culture",
+        "4": "Experience the Taiwanese tea ceremony — warming teaware, brewing, and serving",
+        "5": "Learn to appreciate tea: observe the colour, smell the aroma, taste the flavour",
+        "6": "Tea culture stories and open Q&A",
+        "7": "Closing reflections and feedback"
+      },
+      "bookNow": "Book Now"
     },
-    "handsOn": {
-      "title": "Hands-on Experience",
+    "workshopB": {
+      "label": "Workshop B",
+      "title": "Tea Making Experience",
+      "subtitle": "2 hours  ·  NZD $85 / person  ·  Seasonal",
+      "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea. Due to the seasonal nature of tea growth, this experience is only available during harvest periods.",
       "items": {
-        "1": "Walk the tea garden and hand-pick your own leaves",
-        "2": "Learn the traditional process of making tea from scratch",
-        "3": "Brew and taste your own creation",
-        "4": "Share the experience with your group over a final tea ceremony"
-      }
-    },
-    "stats": "90 minutes  ·  Max 8 guests  ·  NZD $75 per person",
-    "bookNow": "Book Now",
-    "included": {
-      "title": "What's Included",
-      "item1Title": "Expert Guidance",
-      "item1Description": "Your host leads every step, sharing knowledge built over years of practice.",
-      "item2Title": "Tea Tree Experience",
-      "item2Description": "Step into our tea garden, learn to read the leaves, and pick them by hand.",
-      "item3Title": "Tea Making Journey",
-      "item3Description": "Transform your freshly picked leaves into finished tea, guided by tradition.",
-      "item4Title": "All Materials Provided",
-      "item4Description": "Everything you need for the ceremony is prepared and waiting for you."
+        "1": "Garden walk and introduction to tea plant varieties",
+        "2": "Hand-pick fresh tea leaves from our garden",
+        "3": "Learn traditional tea processing — withering, rolling, and oxidation",
+        "overnightNote": "The following steps require overnight processing and cannot be completed during the session. Your host will explain the process.",
+        "4": "Fire and dry the tea leaves using traditional techniques",
+        "5": "Brew and taste finished tea from our garden (we prepare a completed batch for you to taste)",
+        "6": "Receive your handmade tea by post once fully processed (NZ domestic only)"
+      },
+      "registerInterest": "Register Interest",
+      "seasonalNote": "This experience depends on tea leaf availability. Register your interest and we will contact you when sessions are available."
     },
     "faq": {
       "title": "Common Questions",
       "q1": "Do I need any prior experience with tea ceremonies?",
-      "a1": "Not at all! Our experience is designed for all levels, from complete beginners to seasoned tea enthusiasts. Your host will guide you through every step, ensuring you feel comfortable and engaged throughout the session.",
+      "a1": "Not at all! Our experiences are designed for all levels, from complete beginners to seasoned tea enthusiasts. Your host will guide you through every step, ensuring you feel comfortable and engaged throughout the session.",
       "q2": "What should I wear?",
-      "a2": "We recommend comfortable, modest clothing in muted colours. You'll be seated on cushions on the floor, so loose-fitting trousers or a long skirt work well. Please remove your shoes upon entering the tea room. Since our experience includes a walk through the tea garden, we also recommend wearing comfortable closed-toe shoes suitable for light outdoor walking.",
+      "a2": "We recommend comfortable, modest clothing in muted colours. You'll be seated on cushions on the floor, so loose-fitting trousers or a long skirt work well. Please remove your shoes upon entering the tea room. Since our experiences include a walk through the tea garden, we also recommend wearing comfortable closed-toe shoes suitable for light outdoor walking.",
       "q3": "Can I book for a special occasion or event?",
-      "a3": "Absolutely! Our workshop is perfect for birthdays, anniversaries, team gatherings, or any special celebration. Contact us to discuss customised arrangements.",
-      "q4": "Is the space wheelchair accessible?",
-      "a4": "Our main tea room is accessible via a ground-level entrance. We can also arrange seating accommodations for guests who may have difficulty sitting on the floor. Please let us know your requirements when booking.",
+      "a3": "Absolutely! Our workshops are perfect for birthdays, anniversaries, team gatherings, or any special celebration. Contact us to discuss customised arrangements.",
       "q5": "What is your cancellation policy?",
       "a5": "We offer full refunds for cancellations made at least 24 hours before your scheduled session. Cancellations within 24 hours may be rescheduled subject to availability. Please contact us if you have any concerns about your booking.",
       "q6": "Do I need to avoid wearing perfume or cologne?",
       "a6": "Yes, we kindly ask all guests to refrain from wearing perfume, cologne, or strongly scented products. The delicate aromas of tea are central to the experience, and strong fragrances can interfere with everyone's enjoyment."
     },
     "ctaTitle": "Ready to Begin Your Tea Journey?",
-    "ctaDescription": "Join us for an unforgettable workshop where tea culture comes alive. Book your session and discover the tranquility that awaits.",
+    "ctaDescription": "Join us for an unforgettable workshop where tea culture comes alive. Book your session or register your interest today.",
     "ctaButton": "Contact Us"
   },
   "contact": {
     "hero": {
       "title": "Get in Touch",
       "titleZh": "聯絡我們",
-      "description": "We would love to hear from you. Whether you have questions about our experiences, need help planning a special event, or simply want to say hello."
+      "description": "We would love to hear from you. Whether you have questions about our workshops, need help planning a special event, or simply want to say hello."
     },
     "info": {
       "title": "Contact Information",
-      "description": "Visit us in our peaceful garden studio or reach out through any of the channels below.",
+      "description": "Visit us in our peaceful garden workshop or reach out through any of the channels below.",
       "address": "Address",
       "email": "Email",
       "phone": "Phone",
@@ -250,11 +251,23 @@
   "book": {
     "hero": {
       "title": "Book an Experience",
-      "description": "One experience. Book your place and we'll take care of the rest."
+      "description": "Choose your workshop and book your place — we'll take care of the rest."
     },
     "steps": {
+      "workshop": "Workshop",
       "dateTime": "Date & Time",
       "details": "Your Details"
+    },
+    "step1": {
+      "title": "Choose a Workshop",
+      "description": "Select the experience you'd like to book.",
+      "workshopA": "Tea Ceremony Experience",
+      "workshopADesc": "A guided 90-minute journey through tea culture — garden tour, tea history, and an authentic Taiwanese tea ceremony.",
+      "workshopAStats": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "workshopB": "Tea Making Experience",
+      "workshopBDesc": "A hands-on seasonal workshop — pick fresh tea leaves and learn to process them into your own finished tea.",
+      "workshopBStats": "2 hours  ·  NZD $85 / person  ·  Seasonal",
+      "workshopBNote": "This experience depends on tea leaf availability. Submit your interest and we will contact you when sessions are scheduled."
     },
     "step2": {
       "title": "Choose Date & Time",
@@ -278,7 +291,6 @@
       "guestsMax": "(max {max})",
       "specialRequests": "Special Requests",
       "specialRequestsPlaceholder": "Any dietary requirements, accessibility needs, or special occasions...",
-      "language": "Preferred Language",
       "errorName": "Please enter your name",
       "errorNameShort": "Name must be at least 2 characters",
       "errorNameTooLong": "Name must be 30 characters or fewer",
@@ -295,7 +307,8 @@
     "summary": {
       "title": "Booking Summary",
       "experience": "Experience",
-      "workshopName": "The Workshop",
+      "workshopA": "Tea Ceremony Experience",
+      "workshopB": "Tea Making Experience",
       "date": "Date",
       "time": "Time",
       "guests": "Guests",
@@ -304,7 +317,7 @@
     },
     "back": "Back",
     "continue": "Continue",
-    "confirm": "Confirm Booking",
+    "confirm": "Submit Booking",
     "submitting": "Submitting...",
     "error": {
       "title": "Something Went Wrong",
@@ -318,6 +331,27 @@
       "title": "Booking Request Received",
       "description": "Thank you for your booking request. We will review your request and send a confirmation email within 24 hours.",
       "returnHome": "Return Home"
+    },
+    "interestSuccess": {
+      "title": "Interest Registered",
+      "description": "Thank you for your interest in our Tea Making Experience. We will contact you when sessions become available during the tea harvest season.",
+      "returnHome": "Return Home"
+    },
+    "interest": {
+      "title": "Register Your Interest",
+      "description": "Tell us about yourself and we'll contact you when the Tea Making Experience is available.",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+64 21 123 4567",
+      "guests": "Estimated Group Size",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your group or any questions you have...",
+      "defaultMessage": "Interested in Workshop B (Tea Making Experience)",
+      "submit": "Submit Interest",
+      "submitting": "Submitting..."
     },
     "whatNext": {
       "title": "What Happens Next",
@@ -530,6 +564,32 @@
       "prevMonth": "← Prev",
       "nextMonth": "Next →",
       "operationFailed": "Operation failed",
+      "disableRangeButton": "Batch Disable",
+      "disableRangeTitle": "Batch Disable Slots",
+      "disableRangeHint": "Disabled slots will not be available for booking",
+      "disableRangeFrom": "From",
+      "disableRangeTo": "To",
+      "disableRangeSessions": "Sessions",
+      "disableRangeMorning": "Morning (10:00–11:30)",
+      "disableRangeAfternoon": "Afternoon (14:00–15:30)",
+      "disableRangeConfirm": "Disable",
+      "disableRangeDisabling": "Disabling...",
+      "disableRangeCancel": "Cancel",
+      "disableRangeSuccess": "Disabled {disabled} slots",
+      "disableRangeSkipped": " ({skipped} skipped – have active bookings)",
+      "disableRangePreview": "{count, plural, =0 {No available slots in this range} one {1 slot will be disabled} other {# slots will be disabled}}",
+      "disableRangeNoneFound": "No available slots found in that range",
+      "disableRangeSelectSession": "Please select at least one session",
+      "enableRangeButton": "Batch Enable",
+      "enableRangeTitle": "Batch Enable Slots",
+      "enableRangeHint": "Re-enable disabled slots for booking",
+      "enableRangeConfirm": "Enable",
+      "enableRangeEnabling": "Enabling...",
+      "enableRangeEnabledCount": "Enabled {count} slots",
+      "enableRangeCreatedCount": "Created {count} new slots",
+      "enableRangeSeparator": ", ",
+      "enableRangePreview": "{count, plural, =0 {All slots in this range are already active} one {1 slot will be enabled/created} other {# slots will be enabled/created}}",
+      "enableRangeNoneFound": "All slots in that range are already active",
       "statusPending": "Pending",
       "statusConfirmed": "Confirmed",
       "weekdays": {
@@ -573,6 +633,15 @@
       "dragHint": "Use arrows to reorder — the order here controls the display order on the homepage",
       "moveUp": "Move up",
       "moveDown": "Move down",
+      "expiryLabel": "Validity Period",
+      "expiryNone": "No expiry",
+      "expiryDaysOption": "Valid for days",
+      "expiryDateOption": "Valid until date",
+      "expiryDaysUnit": "days",
+      "expiryDaysRequired": "Please enter the number of valid days",
+      "expiryDateRequired": "Please select an expiry date",
+      "expired": "Expired",
+      "expiresAt": "Expires: {date}",
       "toastActivated": "Announcement activated",
       "toastDeactivated": "Announcement deactivated",
       "toastDeleted": "Announcement deleted",
@@ -603,7 +672,18 @@
       "toastUploaded": "Image uploaded",
       "toastDeleted": "Image deleted",
       "toastCaptionUpdated": "Caption updated",
-      "toastError": "Operation failed"
+      "toastFeatured": "Added to homepage",
+      "toastUnfeatured": "Removed from homepage",
+      "toastError": "Operation failed",
+      "featuredTitle": "Homepage Images ({count}/6)",
+      "featuredEdit": "Edit",
+      "featuredHint": "Images displayed on the homepage. Click Edit to modify.",
+      "featuredEditHint": "Click ★ on images below to add/remove. Drag to reorder. Save when done.",
+      "featuredEmpty": "No homepage images selected — click Edit, then click ★ on images below to add",
+      "toastFeaturedSaved": "Homepage images updated",
+      "maxFeatured": "Maximum 6 homepage images — remove one first",
+      "featured": "Show on homepage",
+      "unfeatured": "Remove from homepage"
     }
   }
 }

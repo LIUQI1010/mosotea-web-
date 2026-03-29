@@ -34,7 +34,7 @@ function HeroSection() {
           {t("description")}
         </p>
         <Link
-          href="/book"
+          href="/book?workshop=A"
           className="inline-block bg-off-white text-tea-brown px-8 py-4 text-base font-medium rounded hover:bg-cream transition-colors"
         >
           {t("cta")}
@@ -185,65 +185,72 @@ function FeaturedExperiences() {
           </p>
         </div>
 
-        {/* Two Cards */}
+        {/* Two Workshop Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mb-10">
-          {/* Tea Journey */}
-          <div className="bg-off-white rounded-lg overflow-hidden border border-border">
+          {/* Workshop A — Tea Ceremony */}
+          <div className="bg-off-white rounded-lg overflow-hidden border border-border flex flex-col">
             <div className="aspect-[4/3] overflow-hidden">
               <img
                 src="/images/tea-journey.jpg"
-                alt="Tea Journey"
+                alt="Tea Ceremony Experience"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="p-8">
+            <div className="p-8 flex flex-col flex-1">
               <h3 className="font-serif text-xl font-semibold text-tea-brown mb-3">
-                {t("teaJourney.title")}
+                {t("workshopA.title")}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {t("teaJourney.description")}
+              <p className="text-muted-foreground leading-relaxed mb-4 flex-1">
+                {t("workshopA.description")}
               </p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide mb-4">
+                {t("statsA")}
+              </p>
+              <Link
+                href="/book?workshop=A"
+                className="inline-block text-center px-6 py-2.5 text-sm font-medium rounded bg-tea-brown text-primary-foreground hover:bg-tea-brown/90 transition-colors"
+              >
+                {t("bookNow")}
+              </Link>
             </div>
           </div>
 
-          {/* Hands-on Experience */}
-          <div className="bg-off-white rounded-lg overflow-hidden border border-border">
+          {/* Workshop B — Tea Making */}
+          <div className="bg-off-white rounded-lg overflow-hidden border border-border flex flex-col">
             <div className="aspect-[4/3] overflow-hidden">
               <img
                 src="/images/hands-on-experience.jpg"
-                alt="Hands-on Experience"
+                alt="Tea Making Experience"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="p-8">
+            <div className="p-8 flex flex-col flex-1">
               <h3 className="font-serif text-xl font-semibold text-tea-brown mb-3">
-                {t("handsOn.title")}
+                {t("workshopB.title")}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {t("handsOn.description")}
+              <p className="text-muted-foreground leading-relaxed mb-4 flex-1">
+                {t("workshopB.description")}
               </p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide mb-4">
+                {t("statsB")}
+              </p>
+              <Link
+                href="/book?workshop=B"
+                className="inline-block text-center px-6 py-2.5 text-sm font-medium rounded border-2 border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground transition-colors"
+              >
+                {t("registerInterest")}
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Stats */}
-        <p className="text-center text-sm font-medium text-muted-foreground tracking-wide mb-8">
-          {t("stats")}
-        </p>
-
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        {/* Learn More */}
+        <div className="flex justify-center">
           <Link
             href="/workshop"
             className="inline-block px-8 py-3 text-base font-medium rounded border-2 border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground transition-colors"
           >
             {t("learnMore")}
-          </Link>
-          <Link
-            href="/book"
-            className="inline-block px-8 py-3 text-base font-medium rounded bg-tea-brown text-primary-foreground hover:bg-tea-brown/90 transition-colors"
-          >
-            {t("bookNow")}
           </Link>
         </div>
       </div>
@@ -339,7 +346,8 @@ function GallerySection() {
     supabase
       .from('gallery')
       .select('id, url, caption')
-      .order('uploaded_at', { ascending: false })
+      .not('featured_order', 'is', null)
+      .order('featured_order', { ascending: true })
       .limit(6)
       .then(({ data }) => {
         if (data && data.length > 0) setImages(data)

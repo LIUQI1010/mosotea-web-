@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 import type { Announcement } from '@/types'
 
 export function AnnouncementBanner() {
-  const locale = useLocale()
   const t = useTranslations('announcement')
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -24,7 +23,14 @@ export function AnnouncementBanner() {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .then(({ data }) => {
-        if (data && data.length > 0) setAnnouncements(data)
+        if (data && data.length > 0) {
+          // Filter out expired announcements
+          const now = new Date().toISOString()
+          const active = data.filter(
+            (a: Announcement) => !a.expires_at || a.expires_at > now
+          )
+          if (active.length > 0) setAnnouncements(active)
+        }
       })
   }, [])
 
@@ -79,8 +85,8 @@ export function AnnouncementBanner() {
   if (dismissed || announcements.length === 0) return null
 
   const current = announcements[currentIndex]
-  const title = locale === 'zh-TW' ? current.title_zh : current.title_en
-  const content = locale === 'zh-TW' ? current.content_zh : current.content_en
+  const title = current.title_en
+  const content = current.content_en
   const hasMultiple = announcements.length > 1
 
   const handleTouchStart = (e: React.TouchEvent) => {
