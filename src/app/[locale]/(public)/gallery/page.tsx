@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslations } from "next-intl"
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
@@ -64,6 +64,38 @@ export default function GalleryPage() {
   }, [])
 
   const openLightbox = useCallback((index: number) => setLightbox(index), [])
+
+  // Lightbox keyboard navigation
+  useEffect(() => {
+    if (lightbox === null) return
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setLightbox((prev) => (prev! - 1 + images.length) % images.length)
+      } else if (e.key === 'ArrowRight') {
+        setLightbox((prev) => (prev! + 1) % images.length)
+      } else if (e.key === 'Escape') {
+        setLightbox(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeydown)
+    return () => window.removeEventListener('keydown', handleKeydown)
+  }, [lightbox, images.length])
+
+  // Lightbox touch swipe
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+  const handleLightboxTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }, [])
+  const handleLightboxTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current || images.length <= 1) return
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y
+    touchStartRef.current = null
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) setLightbox((prev) => (prev! + 1) % images.length)
+      else setLightbox((prev) => (prev! - 1 + images.length) % images.length)
+    }
+  }, [images.length])
 
   return (
     <main className="min-h-screen">
@@ -150,15 +182,17 @@ export default function GalleryPage() {
         <div
           role="dialog"
           aria-label={t("lightboxLabel")}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
           onClick={() => setLightbox(null)}
+          onTouchStart={handleLightboxTouchStart}
+          onTouchEnd={handleLightboxTouchEnd}
         >
           <button
             aria-label={t("close")}
-            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 text-white/70 hover:text-white transition-colors"
             onClick={() => setLightbox(null)}
           >
-            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -166,29 +200,29 @@ export default function GalleryPage() {
           {images.length > 1 && (
             <button
               aria-label={t("previous")}
-              className="absolute left-4 text-white/50 hover:text-white transition-colors"
+              className="absolute left-1 sm:left-4 p-2 text-white/50 hover:text-white transition-colors"
               onClick={(e) => {
                 e.stopPropagation()
                 setLightbox((lightbox - 1 + images.length) % images.length)
               }}
             >
-              <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <svg className="h-8 w-8 sm:h-10 sm:w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
               </svg>
             </button>
           )}
 
-          <div className="max-w-4xl max-h-[80vh] relative" onClick={(e) => e.stopPropagation()}>
+          <div className="max-w-4xl max-h-[75vh] sm:max-h-[80vh] relative" onClick={(e) => e.stopPropagation()}>
             <Image
               src={images[lightbox].url}
               alt={images[lightbox].caption ?? ''}
               width={1200}
               height={900}
-              className="max-h-[80vh] w-auto object-contain rounded-lg"
+              className="max-h-[75vh] sm:max-h-[80vh] w-auto object-contain rounded-lg"
             />
             {images[lightbox].caption && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-4 pt-10 rounded-b-lg">
-                <p className="text-center text-sm text-white">{images[lightbox].caption}</p>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 pb-3 pt-8 sm:px-4 sm:pb-4 sm:pt-10 rounded-b-lg">
+                <p className="text-center text-xs sm:text-sm text-white">{images[lightbox].caption}</p>
               </div>
             )}
           </div>
@@ -196,13 +230,13 @@ export default function GalleryPage() {
           {images.length > 1 && (
             <button
               aria-label={t("next")}
-              className="absolute right-4 text-white/50 hover:text-white transition-colors"
+              className="absolute right-1 sm:right-4 p-2 text-white/50 hover:text-white transition-colors"
               onClick={(e) => {
                 e.stopPropagation()
                 setLightbox((lightbox + 1) % images.length)
               }}
             >
-              <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <svg className="h-8 w-8 sm:h-10 sm:w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
               </svg>
             </button>

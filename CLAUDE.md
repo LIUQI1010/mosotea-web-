@@ -24,7 +24,7 @@ learn about the experiences offered and submit booking requests online.
 | Language | TypeScript | Strict mode, no `any` |
 | Styling | Tailwind CSS v4 | Uses CSS variables in globals.css, no tailwind.config.ts |
 | Database | Supabase (PostgreSQL) | Use `@supabase/ssr` for server components |
-| Auth | Supabase Auth | Admin dashboard only |
+| Auth | Env-based password + cookie token | Admin dashboard only, no Supabase Auth |
 | Email | Resend | Booking confirmations and notifications |
 | Deployment | Vercel | Auto-deploys from main branch |
 | Domain & CDN | Cloudflare | DNS management |
@@ -172,10 +172,14 @@ NEXT_PUBLIC_APP_URL=              # e.g. http://localhost:3000 or https://mosote
 
 # Security
 CANCELLATION_TOKEN_SECRET=        # Random 32-byte hex string for signing cancel tokens
+
+# Admin Auth
+ADMIN_PASSWORD=                   # Password for admin dashboard login
+ADMIN_SECRET_TOKEN=               # Random secret string used as admin session cookie value
 ```
 
-> ⚠️ `SUPABASE_SERVICE_ROLE_KEY` and `CANCELLATION_TOKEN_SECRET` must NEVER be used
-> in client components or exposed to the browser. Only use in API Routes and Server Components.
+> ⚠️ `SUPABASE_SERVICE_ROLE_KEY`, `CANCELLATION_TOKEN_SECRET`, `ADMIN_PASSWORD`, and `ADMIN_SECRET_TOKEN`
+> must NEVER be used in client components or exposed to the browser. Only use in API Routes and Server Components.
 
 ---
 
@@ -392,7 +396,7 @@ time_slots ──── bookings
 - `cancelled_by` records the source: `customer` or `admin`
 
 ### Admin Rules
-- Admin dashboard only accessible to authenticated users (Supabase Auth)
+- Admin dashboard protected by password-based auth (password checked against `ADMIN_PASSWORD` env var, session stored as `admin_token` cookie matching `ADMIN_SECRET_TOKEN`)
 - Unauthenticated users redirected to `/admin/login`
 - Admin dashboard supports bilingual switching (English / Traditional Chinese)
 - Admin locale is stored in a cookie (`admin_locale`), default: `zh-TW`
@@ -422,8 +426,8 @@ time_slots ──── bookings
 - **Standalone Gallery page** (`/gallery`) displays all images in a **CSS columns masonry layout** (1/2/3/4 columns responsive) with click-to-enlarge lightbox and left/right navigation
 - **Gallery page loading UX:** skeleton screen (12 varied-height pulse blocks) → hidden preload container loads all images → entire grid fades in at once (800ms transition). This avoids masonry reflow jitter that occurs with sequential image reveal in CSS columns layout.
 - **Homepage Gallery preview:** latest 6 images in standard grid with skeleton placeholders while loading, individual image fade-in on load
-- **Lightbox:** full-screen overlay with close/prev/next navigation, caption overlaid on image bottom with gradient background (`from-black/70`)
-- **Accessibility:** image buttons have `aria-label`, lightbox has `role="dialog"` and `aria-label`, close/prev/next buttons have `aria-label`, preload container has `aria-hidden="true"`
+- **Lightbox:** full-screen overlay with close/prev/next navigation, keyboard support (arrow keys to navigate, Escape to close), touch swipe to navigate on mobile, caption overlaid on image bottom with gradient background (`from-black/70`)
+- **Accessibility:** image buttons have `aria-label`, lightbox has `role="dialog"` and `aria-label`, close/prev/next buttons have `aria-label`, preload container has `aria-hidden="true"`, keyboard navigation (ArrowLeft/ArrowRight/Escape)
 - Gallery page is accessible via the **navigation bar** (between About and Contact)
 - About page does **not** display gallery images (removed)
 - Caption is single-language (not bilingual), overlaid on image bottom with gradient background
@@ -798,6 +802,6 @@ See `SPRINT.md` for the full Agile sprint plan.
 | Sprint 1 | Core information pages | ✅ Done |
 | Sprint 2 | Booking system + cancellation emails | ✅ Done |
 | Sprint 3 | Admin dashboard + self-cancellation | ✅ Done |
-| Sprint 4 | Testing, performance, launch | 🔄 In Progress |
-| Sprint 5 | Announcements + Gallery management | 🔄 In Progress |
+| Sprint 4 | Testing, performance, launch | ✅ Done |
+| Sprint 5 | Announcements + Gallery management | ✅ Done |
 | Sprint 6 | Email template management | ⏳ Planned |

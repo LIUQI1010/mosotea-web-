@@ -12,8 +12,8 @@ Built with Next.js, TypeScript, Tailwind CSS, Supabase, and Resend.
 - **Customer self-cancellation** — Secure HMAC-SHA256 token-based cancellation links with 24-hour cutoff
 - **Admin dashboard** — View/confirm/cancel bookings, manage time slots, calendar view, bilingual admin UI (EN/繁中), responsive design
 - **Time slot management** — Bulk generation (next 30 days), toggle availability, capacity tracking
-- **Announcement banner** — Admin-managed announcements with auto-rotation on the homepage
-- **Gallery** — Masonry layout with lightbox, admin image upload with client-side compression, Supabase Storage
+- **Announcement banner** — Admin-managed bilingual announcements with auto-rotation on the homepage
+- **Gallery** — Masonry layout with lightbox (keyboard + touch swipe navigation), admin image upload with client-side compression, Supabase Storage
 - **Input validation** — All forms have client-side `maxLength` and server-side Zod validation to prevent abuse
 - **SEO optimised** — Sitemap, robots.txt, meta tags for all pages
 - **Responsive design** — Mobile-first layout across all public and admin pages
@@ -26,7 +26,7 @@ Built with Next.js, TypeScript, Tailwind CSS, Supabase, and Resend.
 | Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS v4 |
 | Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth (admin only) |
+| Auth | Environment variable-based password (admin only) |
 | Email | Resend |
 | i18n | next-intl v4 |
 | Deployment | Vercel |
@@ -71,6 +71,8 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_APP_URL` | App URL, e.g. `http://localhost:3000` |
 | `CANCELLATION_TOKEN_SECRET` | Random 32-byte hex string for signing cancel tokens |
 | `OWNER_EMAIL` | Business owner email for booking notifications |
+| `ADMIN_PASSWORD` | Password for admin dashboard login |
+| `ADMIN_SECRET_TOKEN` | Random secret string used as admin session cookie value |
 
 > **Note:** `SUPABASE_SERVICE_ROLE_KEY` and `CANCELLATION_TOKEN_SECRET` must never be exposed to the browser.
 

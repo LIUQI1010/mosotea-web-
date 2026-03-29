@@ -115,12 +115,12 @@ export function AnnouncementBanner() {
       onTouchEnd={handleTouchEnd}
     >
       {/* Main content row */}
-      <div className="relative flex items-center justify-center px-12 py-2.5">
+      <div className="relative flex items-center justify-center px-8 sm:px-12 py-2.5">
         {/* Prev arrow */}
         {hasMultiple && (
           <button
             onClick={goPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 rounded p-1 text-white/50 hover:text-white transition-colors"
+            className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 rounded p-2 sm:p-1 text-white/50 hover:text-white transition-colors"
             aria-label={t('prev')}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -131,26 +131,26 @@ export function AnnouncementBanner() {
 
         {/* Content */}
         <div
-          className={`text-center transition-opacity duration-300 ${
+          className={`text-center transition-opacity duration-300 break-words ${
             fading ? 'opacity-0' : 'opacity-100'
           }`}
         >
-          <p className="text-sm font-medium">
+          <p className="text-xs sm:text-sm font-medium">
             <span className="font-semibold">{title}</span>
             {content && (
-              <span className="ml-2 font-normal opacity-90">{content}</span>
+              <span className="ml-1.5 sm:ml-2 font-normal opacity-90">{content}</span>
             )}
           </p>
 
           {/* Clickable dots */}
           {hasMultiple && (
-            <div className="mt-1 flex items-center justify-center gap-1.5">
+            <div className="mt-1 flex items-center justify-center gap-2">
               {announcements.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    i === currentIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'
+                  className={`h-2 rounded-full transition-all ${
+                    i === currentIndex ? 'w-4 bg-white' : 'w-2 bg-white/40 hover:bg-white/60'
                   }`}
                   aria-label={`${t('goTo')} ${i + 1}`}
                 />
@@ -163,7 +163,7 @@ export function AnnouncementBanner() {
         {hasMultiple && (
           <button
             onClick={goNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-white/50 hover:text-white transition-colors"
+            className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 rounded p-2 sm:p-1 text-white/50 hover:text-white transition-colors"
             aria-label={t('next')}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
