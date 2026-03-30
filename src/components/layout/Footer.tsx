@@ -68,7 +68,7 @@ export function Footer() {
 
                 {/* Credit */}
                 <p className="text-center text-xs text-primary-foreground/40 mt-6">
-                    Built with care by <a href="https://qi.lqtechgroup.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 underline underline-offset-2 hover:text-primary-foreground transition-colors">QI</a> & Qingyi
+                    Built with care by <a href="https://qi.lqtechgroup.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 underline underline-offset-2 hover:text-primary-foreground transition-colors">QI</a> & <a href="https://profile-weld-chi.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 underline underline-offset-2 hover:text-primary-foreground transition-colors">Qingyi</a>
                 </p>
             </div>
         </footer>
