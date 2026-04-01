@@ -390,10 +390,68 @@ function GallerySection() {
   )
 }
 
+// JSON-LD Structured Data
+function StructuredData() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Moso Tea',
+    alternateName: ['mosotea', 'Moso Tea Wellington'],
+    description:
+      'Moso Tea offers authentic tea ceremony workshops and hands-on tea making experiences in Wellington, New Zealand.',
+    url: 'https://mosotea.co.nz',
+    image: 'https://mosotea.co.nz/images/hero-tea-ceremony.jpg',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Wellington',
+      addressCountry: 'NZ',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: -41.2865,
+      longitude: 174.7762,
+    },
+    priceRange: 'NZ$75–NZ$85',
+    currenciesAccepted: 'NZD',
+    makesOffer: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Tea Ceremony Experience',
+          description:
+            'A 90-minute guided tea ceremony workshop for up to 8 guests.',
+        },
+        price: '75',
+        priceCurrency: 'NZD',
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Tea Making Experience',
+          description:
+            'A 2-hour hands-on tea making workshop (seasonal).',
+        },
+        price: '85',
+        priceCurrency: 'NZD',
+      },
+    ],
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  )
+}
+
 // Main Page
 export default function HomePage() {
   return (
     <main className="min-h-screen">
+      <StructuredData />
       <Navigation />
       <AnnouncementBanner />
       <HeroSection />
