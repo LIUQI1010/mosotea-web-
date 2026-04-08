@@ -219,7 +219,7 @@ function FeaturedExperiences() {
           <div className="bg-off-white rounded-lg overflow-hidden border border-border flex flex-col">
             <div className="aspect-[4/3] overflow-hidden">
               <img
-                src="/images/hands-on-experience.jpg"
+                src="/images/workshopB.jpg"
                 alt="Tea Making Experience"
                 className="w-full h-full object-cover"
               />

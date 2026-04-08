@@ -89,7 +89,7 @@ function WorkshopBSection() {
                 <div className="bg-card rounded-lg overflow-hidden border border-border">
                     <div className="aspect-[16/9] overflow-hidden">
                         <img
-                            src="/images/hands-on-experience.jpg"
+                            src="/images/workshopB.jpg"
                             alt="Tea Making Experience"
                             className="w-full h-full object-cover"
                         />
@@ -208,9 +208,9 @@ function FAQSection() {
     const faqs = [
         { question: t("faq.q1"), answer: t("faq.a1") },
         { question: t("faq.q2"), answer: t("faq.a2") },
-        { question: t("faq.q3"), answer: t("faq.a3") },
         { question: t("faq.q5"), answer: t("faq.a5") },
         { question: t("faq.q6"), answer: t("faq.a6") },
+        { question: t("faq.q7"), answer: t("faq.a7") },
     ]
 
     return (
