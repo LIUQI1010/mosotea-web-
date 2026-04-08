@@ -126,16 +126,16 @@
       "founder1": {
         "name": "Jenson",
         "role": "Co-Founder",
-        "description": "Jenson is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — her warmth and gentle guidance make every guest feel at home from the very first cup."
+        "description": "Jenson is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — his warmth and gentle guidance make every guest feel at home from the very first cup."
       },
       "founder2": {
         "name": "Joyce",
         "role": "Co-Founder",
-        "description": "Joyce tends to the tea garden and oversees the making of every leaf. His quiet dedication to the land and the craft is what gives Moso Tea its roots — quite literally."
+        "description": "Joyce tends to the tea garden and oversees the growing of every leaf. Her quiet dedication to the land and the craft is what gives Moso Tea its roots — quite literally."
       },
       "founder3": {
         "name": "Lynn",
-        "role": "Co-Founder",
+        "role": "Manager",
         "description": "Lynn grew up surrounded by tea. Now she shares that world with guests in her own words, bridging cultures and making the art of tea feel accessible, engaging, and alive."
       }
     },
@@ -161,13 +161,13 @@
       "subtitle": "90 minutes  ·  Max 8 guests  ·  NZD $75 per person",
       "description": "A guided journey through tea culture — from our garden to the tea table. Experience an authentic Taiwanese-style tea ceremony in our peaceful space.",
       "items": {
-        "1": "Welcome & introduction to the tea space",
-        "2": "Garden tour — explore our tea plants and learn about Camellia sinensis varieties",
+        "1": "Arrival & Welcome",
+        "2": "Tea garden tour — explore our tea plants and learn about Camellia sinensis varieties",
         "3": "Discover the story of tea: from ancient China to modern tea culture",
-        "4": "Experience the Taiwanese tea ceremony — warming teaware, brewing, and serving",
+        "4": "Demo the Taiwanese tea ceremony — brewing team, serving tea",
         "5": "Learn to appreciate tea: observe the colour, smell the aroma, taste the flavour",
-        "6": "Tea culture stories and open Q&A",
-        "7": "Closing reflections and feedback"
+        "6": "Hands on tea ceremony",
+        "7": "Q&A"
       },
       "bookNow": "Book Now"
     },
@@ -193,13 +193,13 @@
       "q1": "Do I need any prior experience with tea ceremonies?",
       "a1": "Not at all! Our experiences are designed for all levels, from complete beginners to seasoned tea enthusiasts. Your host will guide you through every step, ensuring you feel comfortable and engaged throughout the session.",
       "q2": "What should I wear?",
-      "a2": "We recommend comfortable, modest clothing in muted colours. You'll be seated on cushions on the floor, so loose-fitting trousers or a long skirt work well. Please remove your shoes upon entering the tea room. Since our experiences include a walk through the tea garden, we also recommend wearing comfortable closed-toe shoes suitable for light outdoor walking.",
-      "q3": "Can I book for a special occasion or event?",
-      "a3": "Absolutely! Our workshops are perfect for birthdays, anniversaries, team gatherings, or any special celebration. Contact us to discuss customised arrangements.",
+      "a2": "We recommend comfortable, modest clothing in muted colours. Please remove your shoes upon entering the tea room. Since our experiences include a walk through the tea garden, we also recommend wearing comfortable closed-toe shoes suitable for light outdoor walking.",
       "q5": "What is your cancellation policy?",
       "a5": "We offer full refunds for cancellations made at least 24 hours before your scheduled session. Cancellations within 24 hours may be rescheduled subject to availability. Please contact us if you have any concerns about your booking.",
       "q6": "Do I need to avoid wearing perfume or cologne?",
-      "a6": "Yes, we kindly ask all guests to refrain from wearing perfume, cologne, or strongly scented products. The delicate aromas of tea are central to the experience, and strong fragrances can interfere with everyone's enjoyment."
+      "a6": "Yes, we kindly ask all guests to refrain from wearing perfume, cologne, or strongly scented products. The delicate aromas of tea are central to the experience, and strong fragrances can interfere with everyone's enjoyment.",
+      "q7": "Will there be insects in the garden?",
+      "a7": "As our tea plants are grown in a natural outdoor environment, you may occasionally see small insects, just like in any garden."
     },
     "ctaTitle": "Ready to Begin Your Tea Journey?",
     "ctaDescription": "Join us for an unforgettable workshop where tea culture comes alive. Book your session or register your interest today.",

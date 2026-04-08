@@ -18,10 +18,10 @@ export async function generateMetadata({
 
   const title = isZh
     ? 'Moso Tea | 威靈頓傳統茶道體驗'
-    : 'Moso Tea | Traditional Tea Ceremony Experiences in Wellington'
+    : 'Moso Tea — Tea Ceremony & Workshop Experiences in Wellington NZ'
   const description = isZh
     ? '在 Moso Tea 體驗茶道藝術。在威靈頓私密花園中享受正宗茶道體驗。'
-    : 'Experience the art of tea at Moso Tea. Authentic tea ceremony experiences in an intimate Wellington garden setting.'
+    : 'Moso Tea offers authentic tea ceremony workshops and hands-on tea making experiences in Wellington, New Zealand. Book your intimate garden tea session today.'
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mosotea.co.nz'
 
@@ -47,6 +47,17 @@ export async function generateMetadata({
         },
       ],
     },
+    keywords: [
+      'Moso Tea',
+      'moso tea',
+      'mosotea',
+      'tea ceremony Wellington',
+      'tea workshop Wellington',
+      'tea experience NZ',
+      'Wellington tea tasting',
+      'New Zealand tea ceremony',
+      'hands-on tea making',
+    ],
     twitter: {
       card: 'summary_large_image',
       title,
