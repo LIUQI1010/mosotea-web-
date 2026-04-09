@@ -53,7 +53,7 @@
         "title": "Tea Making Experience",
         "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea to take home."
       },
-      "statsA": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "statsA": "90 min  ·  2–5 guests  ·  NZD $75 / person",
       "statsB": "2 hours  ·  NZD $85 / person  ·  Seasonal",
       "learnMore": "Learn More",
       "bookNow": "Book Now",
@@ -126,7 +126,7 @@
       "founder1": {
         "name": "Jenson",
         "role": "Co-Founder",
-        "description": "Jenson is the heart of every ceremony at Moso Tea. Originally from Taiwan, she brings a lifetime of tea culture into each session — his warmth and gentle guidance make every guest feel at home from the very first cup."
+        "description": "Jenson is the heart of every ceremony at Moso Tea. Originally from Taiwan, he brings a lifetime of tea culture into each session — his warmth and gentle guidance make every guest feel at home from the very first cup."
       },
       "founder2": {
         "name": "Joyce",
@@ -158,13 +158,13 @@
     "workshopA": {
       "label": "Workshop A",
       "title": "Tea Ceremony Experience",
-      "subtitle": "90 minutes  ·  Max 8 guests  ·  NZD $75 per person",
+      "subtitle": "90 minutes  ·  2–5 guests  ·  NZD $75 per person",
       "description": "A guided journey through tea culture — from our garden to the tea table. Experience an authentic Taiwanese-style tea ceremony in our peaceful space.",
       "items": {
         "1": "Arrival & Welcome",
         "2": "Tea garden tour — explore our tea plants and learn about Camellia sinensis varieties",
         "3": "Discover the story of tea: from ancient China to modern tea culture",
-        "4": "Demo the Taiwanese tea ceremony — brewing team, serving tea",
+        "4": "Demo the Taiwanese tea ceremony — brewing tea, serving tea",
         "5": "Learn to appreciate tea: observe the colour, smell the aroma, taste the flavour",
         "6": "Hands on tea ceremony",
         "7": "Q&A"
@@ -263,7 +263,7 @@
       "description": "Select the experience you'd like to book.",
       "workshopA": "Tea Ceremony Experience",
       "workshopADesc": "A guided 90-minute journey through tea culture — garden tour, tea history, and an authentic Taiwanese tea ceremony.",
-      "workshopAStats": "90 min  ·  Max 8 guests  ·  NZD $75 / person",
+      "workshopAStats": "90 min  ·  2–5 guests  ·  NZD $75 / person",
       "workshopB": "Tea Making Experience",
       "workshopBDesc": "A hands-on seasonal workshop — pick fresh tea leaves and learn to process them into your own finished tea.",
       "workshopBStats": "2 hours  ·  NZD $85 / person  ·  Seasonal",
