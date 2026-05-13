@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { Link, usePathname } from "@/i18n/navigation"
 
@@ -22,8 +23,16 @@ export function Navigation() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="font-serif text-2xl font-semibold text-tea-brown">
-                        Moso Tea
+                    <Link href="/" className="flex items-center gap-2 font-serif text-2xl font-semibold text-tea-brown">
+                        <Image
+                            src="/images/logo.png"
+                            alt="Moso Tea logo"
+                            width={435}
+                            height={435}
+                            className="h-12 w-auto"
+                            priority
+                        />
+                        <span>Moso Tea</span>
                     </Link>
 
                     {/* Desktop Navigation Links */}
