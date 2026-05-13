@@ -48,6 +48,14 @@ function GalleryIcon({ className }: { className?: string }) {
   )
 }
 
+function InterestIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.98l-7.5 4.143a2.25 2.25 0 01-2.134 0l-7.5-4.143A2.25 2.25 0 012.25 9.906V9m19.5 0V6.75A2.25 2.25 0 0019.5 4.5h-15A2.25 2.25 0 002.25 6.75V9m19.5 0-8.69 4.8a2.25 2.25 0 01-2.12 0L2.25 9" />
+    </svg>
+  )
+}
+
 function LogoutIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -83,6 +91,7 @@ function SidebarContent({ pathname, onNavigate, t, locale, onSwitchLocale }: {
     { href: '/admin', label: t('dashboard'), Icon: DashboardIcon },
     { href: '/admin/slots', label: t('slots'), Icon: CalendarIcon },
     { href: '/admin/bookings', label: t('bookings'), Icon: BookingsIcon },
+    { href: '/admin/workshop-interests', label: t('workshopInterests'), Icon: InterestIcon },
     { href: '/admin/announcements', label: t('announcements'), Icon: AnnouncementsIcon },
     { href: '/admin/gallery', label: t('gallery'), Icon: GalleryIcon },
   ]
