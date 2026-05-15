@@ -403,6 +403,7 @@
       "dashboard": "Dashboard",
       "slots": "Time Slots",
       "bookings": "Bookings",
+      "workshopInterests": "Workshop Interests",
       "announcements": "Announcements",
       "gallery": "Gallery",
       "logout": "Logout"
@@ -684,6 +685,31 @@
       "maxFeatured": "Maximum 6 homepage images — remove one first",
       "featured": "Show on homepage",
       "unfeatured": "Remove from homepage"
+    },
+    "workshopInterests": {
+      "management": "Interest Management",
+      "title": "Tea Making Experience Interests",
+      "selectedCount": "{count} selected",
+      "sendSelected": "Send Booking Email",
+      "sending": "Sending...",
+      "noRecords": "No interest records yet",
+      "selectAll": "Select all on this page",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "guests": "Guests",
+      "language": "Lang",
+      "message": "Message",
+      "registeredAt": "Registered At",
+      "notifiedAt": "Notified At",
+      "notified": "Notified",
+      "notNotified": "Not notified",
+      "notSent": "Not sent",
+      "pageInfo": "Page {page} / {totalPages}",
+      "prev": "← Prev",
+      "next": "Next →",
+      "toastSendSuccess": "Sent booking email to {count} recipients",
+      "toastSendError": "Failed to send emails"
     }
   }
 }

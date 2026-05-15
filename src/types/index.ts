@@ -53,3 +53,16 @@ export interface Announcement {
     expires_at: string | null
     created_at: string
 }
+
+export interface WorkshopInterestRegistration {
+    id: string
+    full_name: string
+    email: string
+    phone: string
+    guest_count: number
+    message: string | null
+    preferred_language: Language
+    availability_notified_at: string | null
+    created_at: string
+    updated_at: string
+}

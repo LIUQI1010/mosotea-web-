@@ -222,3 +222,126 @@ export async function sendCancellationNotice(booking: BookingWithTimeSlot) {
     `,
     })
 }
+
+export async function sendWorkshopAvailabilityEmail({
+    customerName,
+    email,
+}: {
+    customerName: string
+    email: string
+}) {
+    await getResendClient().emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject: 'Tea Making Experience — Bookings Now Open',
+        html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
+        <h1 style="color: #7C5C3E;">Tea Making Experience — Bookings Now Open</h1>
+        <p>Dear ${customerName},</p>
+        <p>The Tea Making Experience is now available for booking.</p>
+        <p>Please make your reservation on our website:</p>
+        <p>
+          <a href="https://www.mosotea.co.nz" style="color: #7C5C3E; text-decoration: underline;">
+            https://www.mosotea.co.nz
+          </a>
+        </p>
+        <p style="margin-top: 30px;">We look forward to welcoming you.</p>
+        <p>Moso Tea</p>
+      </div>
+    `,
+    })
+}
+
+export async function sendWorkshopInterestNotification({
+    customerName,
+    email,
+    phone,
+    guestCount,
+    preferredLanguage,
+    message,
+}: {
+    customerName: string
+    email: string
+    phone: string
+    guestCount: number
+    preferredLanguage: 'en' | 'zh-TW'
+    message: string
+}) {
+    await getResendClient().emails.send({
+        from: FROM_EMAIL,
+        to: OWNER_EMAIL,
+        replyTo: email,
+        subject: `Workshop Interest — ${customerName}`,
+        html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
+        <h1 style="color: #7C5C3E;">New Tea Making Experience Interest</h1>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Name</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${customerName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Email</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${email}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Phone</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${phone}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Guests</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${guestCount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;"><strong>Language</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #E8E0D8;">${preferredLanguage === 'zh-TW' ? '繁體中文' : 'English'}</td>
+          </tr>
+        </table>
+        <div style="padding: 16px; background: #FDF6F0; border-radius: 8px; margin-top: 16px;">
+          <p style="margin: 0; white-space: pre-wrap;">${message || 'No additional message.'}</p>
+        </div>
+      </div>
+    `,
+    })
+}
+
+export async function sendWorkshopInterestReceivedEmail({
+    customerName,
+    email,
+    preferredLanguage,
+}: {
+    customerName: string
+    email: string
+    preferredLanguage: 'en' | 'zh-TW'
+}) {
+    const isZh = preferredLanguage === 'zh-TW'
+
+    await getResendClient().emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject: isZh ? '我們已收到您的製茶體驗申請 — Moso Tea' : 'We’ve Received Your Tea Making Experience Request — Moso Tea',
+        html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #3D2B1F;">
+        <h1 style="color: #7C5C3E;">${isZh ? '我們已收到您的申請' : 'We’ve Received Your Request'}</h1>
+        <p>${isZh ? '親愛的' : 'Dear'} ${customerName},</p>
+        <p>
+          ${isZh
+            ? '感謝您對 Moso Tea 製茶體驗的興趣。我們已經收到您的申請。'
+            : 'Thank you for your interest in the Moso Tea Making Experience. We have successfully received your request.'}
+        </p>
+        <p>
+          ${isZh
+            ? '待茶園進入適合採茶的時節、體驗可開放預約時，我們會第一時間與您聯繫。'
+            : 'When the tea leaves reach the right harvest season and bookings become available, we will be in touch with you as soon as possible.'}
+        </p>
+        <p>
+          ${isZh
+            ? '期待在合適的時節與您相遇，一起分享茶葉從枝頭到杯中的旅程。'
+            : 'We look forward to meeting you at the right season and sharing the journey of tea from leaf to cup.'}
+        </p>
+        <p style="margin-top: 30px;">${isZh ? '誠摯問候，' : 'Warm regards,'}</p>
+        <p>Moso Tea</p>
+      </div>
+    `,
+    })
+}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
@@ -841,6 +841,7 @@ function ErrorMessage({ errorMessage, onRetry }: { errorMessage: string; onRetry
 // Booking Form Component (handles both Workshop A booking and Workshop B interest)
 function BookingFormInner() {
     const t = useTranslations("book")
+    const locale = useLocale()
     const searchParams = useSearchParams()
 
     const workshopParam = searchParams.get("workshop")
@@ -1012,14 +1013,16 @@ function BookingFormInner() {
         setSubmitError("")
 
         try {
-            const res = await fetch("/api/contact", {
+            const res = await fetch("/api/workshop-interest", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    name: interestData.fullName,
+                    fullName: interestData.fullName,
                     email: interestData.email,
                     phone: interestData.phone,
-                    message: `[Tea Making Experience Interest]\nEstimated group size: ${interestData.guests}\n\n${interestData.message || "No additional message."}`,
+                    guests: interestData.guests,
+                    message: interestData.message,
+                    preferredLanguage: locale === 'zh-TW' ? 'zh' : 'en',
                 }),
             })
 
