@@ -73,56 +73,97 @@ function XIcon({ className }: { className?: string }) {
 const MAX_SIZE = 2 * 1024 * 1024 // 2MB — matches Supabase Storage limit
 const MAX_DIMENSION = 2048
 
-function compressImage(file: File): Promise<File> {
+function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    // GIF cannot be compressed via canvas without losing animation
-    if (file.type === 'image/gif') {
-      if (file.size <= MAX_SIZE) return resolve(file)
-      return reject(new Error('GIF file too large'))
-    }
-
+    const url = URL.createObjectURL(file)
     const img = new window.Image()
     img.onload = () => {
-      let { width, height } = img
-
-      // Scale down if exceeds max dimension
-      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
-        width = Math.round(width * ratio)
-        height = Math.round(height * ratio)
-      }
-
-      const canvas = document.createElement('canvas')
-      canvas.width = width
-      canvas.height = height
-      const ctx = canvas.getContext('2d')!
-      ctx.drawImage(img, 0, 0, width, height)
-
-      // Try progressively lower quality until under 2MB
-      const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
-      let quality = 0.85
-
-      const tryCompress = () => {
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) return reject(new Error('Compression failed'))
-            if (blob.size <= MAX_SIZE || quality <= 0.3) {
-              const compressed = new File([blob], file.name, { type: outputType })
-              resolve(compressed)
-            } else {
-              quality -= 0.1
-              tryCompress()
-            }
-          },
-          outputType,
-          quality
-        )
-      }
-      tryCompress()
+      URL.revokeObjectURL(url)
+      resolve(img)
     }
-    img.onerror = () => reject(new Error('Failed to load image'))
-    img.src = URL.createObjectURL(file)
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('Failed to load image'))
+    }
+    img.src = url
   })
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error('Compression failed'))),
+      type,
+      quality
+    )
+  })
+}
+
+// Swap a filename's extension to match the output MIME type
+function renameExt(name: string, mime: string): string {
+  const ext = mime === 'image/png' ? 'png' : 'jpg'
+  return `${name.replace(/\.[^.]+$/, '')}.${ext}`
+}
+
+async function compressImage(file: File): Promise<File> {
+  // GIF cannot be compressed via canvas without losing animation
+  if (file.type === 'image/gif') {
+    if (file.size <= MAX_SIZE) return file
+    throw new Error('GIF file too large')
+  }
+
+  const img = await loadImage(file)
+
+  // Scale down if exceeds max dimension
+  let width = img.width
+  let height = img.height
+  if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+    const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height)
+    width = Math.round(width * ratio)
+    height = Math.round(height * ratio)
+  }
+
+  // Draw the (optionally resized) image onto a canvas. When targeting JPEG,
+  // paint a white background first so PNG transparency doesn't turn black.
+  const draw = (w: number, h: number, whiteBg: boolean) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d')!
+    if (whiteBg) {
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, w, h)
+    }
+    ctx.drawImage(img, 0, 0, w, h)
+    return canvas
+  }
+
+  // 1. PNG: try lossless first — keeps transparency if it fits under the limit.
+  //    (quality is ignored for PNG, so we can't shrink it by lowering quality.)
+  if (file.type === 'image/png') {
+    const pngBlob = await canvasToBlob(draw(width, height, false), 'image/png', 1)
+    if (pngBlob.size <= MAX_SIZE) {
+      return new File([pngBlob], renameExt(file.name, 'image/png'), { type: 'image/png' })
+    }
+    // Too big as PNG — fall through to lossy JPEG re-encoding below.
+  }
+
+  // 2. Encode as JPEG: lower quality first, then shrink dimensions, until it fits.
+  let w = width
+  let h = height
+  for (let pass = 0; pass < 6; pass++) {
+    for (let quality = 0.85; quality >= 0.3; quality -= 0.1) {
+      const blob = await canvasToBlob(draw(w, h, true), 'image/jpeg', quality)
+      if (blob.size <= MAX_SIZE) {
+        return new File([blob], renameExt(file.name, 'image/jpeg'), { type: 'image/jpeg' })
+      }
+    }
+    // Quality floor reached without fitting — shrink dimensions 20% and retry.
+    w = Math.round(w * 0.8)
+    h = Math.round(h * 0.8)
+  }
+
+  throw new Error('Unable to compress image below 2MB')
 }
 
 // Upload area component
