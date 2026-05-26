@@ -14,9 +14,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  icons: {
-    icon: { url: '/icon.svg', type: 'image/svg+xml' },
-  },
+  // Favicons are auto-detected from src/app/{favicon.ico, icon.png, apple-icon.png}
 }
 
 export default function RootLayout({
