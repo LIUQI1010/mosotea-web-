@@ -86,7 +86,7 @@ create table time_slots (
   id uuid primary key default gen_random_uuid(),
   start_time timestamptz not null,
   end_time timestamptz not null,
-  max_guests int not null default 8,
+  max_guests int not null default 6,
   booked_guests int not null default 0,
   is_available boolean default true,
   created_at timestamptz default now()

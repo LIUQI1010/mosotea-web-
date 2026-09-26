@@ -420,7 +420,7 @@ function StructuredData() {
           '@type': 'Service',
           name: 'Tea Ceremony Experience',
           description:
-            'A 90-minute guided tea ceremony workshop for up to 8 guests.',
+            'A 90-minute guided tea ceremony workshop for up to 6 guests.',
         },
         price: '75',
         priceCurrency: 'NZD',

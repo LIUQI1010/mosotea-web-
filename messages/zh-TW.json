@@ -53,7 +53,7 @@
         "title": "製茶體驗",
         "description": "一場依季節開放的手作工作坊，親手從茶園採摘新鮮茶葉，學習將其加工成屬於你自己的茶葉帶回家。"
       },
-      "statsA": "90 分鐘  ·  最多 8 位賓客  ·  NZD $75 / 人",
+      "statsA": "90 分鐘  ·  最多 6 位賓客  ·  NZD $75 / 人",
       "statsB": "2 小時  ·  NZD $85 / 人  ·  季節限定",
       "learnMore": "了解更多",
       "bookNow": "立即預約",
@@ -158,7 +158,7 @@
     "workshopA": {
       "label": "工作坊 A",
       "title": "茶道體驗",
-      "subtitle": "90 分鐘  ·  最多 8 位賓客  ·  NZD $75 / 人",
+      "subtitle": "90 分鐘  ·  最多 6 位賓客  ·  NZD $75 / 人",
       "description": "一段茶文化之旅——從我們的茶園到茶席。在寧靜的空間中體驗正宗的台灣茶道。",
       "items": {
         "1": "歡迎與茶空間介紹",
@@ -263,7 +263,7 @@
       "description": "選擇您想體驗的工作坊。",
       "workshopA": "茶道體驗",
       "workshopADesc": "一段 90 分鐘的茶文化之旅——茶園導覽、茶的歷史，以及正宗的台灣茶道。",
-      "workshopAStats": "90 分鐘  ·  最多 8 位賓客  ·  NZD $75 / 人",
+      "workshopAStats": "90 分鐘  ·  最多 6 位賓客  ·  NZD $75 / 人",
       "workshopB": "製茶體驗",
       "workshopBDesc": "一場依季節開放的手作工作坊——親手採摘新鮮茶葉，學習將其加工成屬於你自己的茶葉。",
       "workshopBStats": "2 小時  ·  NZD $85 / 人  ·  季節限定",
@@ -276,7 +276,9 @@
       "selectTime": "選擇時間",
       "errorDate": "請選擇日期",
       "errorTime": "請選擇時間",
-      "selectDateFirst": "請先選擇日期以查看可用時段"
+      "selectDateFirst": "請先選擇日期以查看可用時段",
+      "noSlots": "此日期暫無可預約時段",
+      "contactUs": "聯絡我們"
     },
     "step3": {
       "title": "填寫您的資料",
@@ -302,7 +304,7 @@
       "errorPhone": "請輸入您的電話號碼",
       "errorPhoneTooLong": "電話號碼不得超過 20 個字元",
       "errorPhoneInvalid": "請輸入有效的電話號碼",
-      "errorGuests": "請輸入 1-8 位賓客",
+      "errorGuests": "請輸入 1-6 位賓客",
       "errorSpecialRequestsTooLong": "特別要求不得超過 200 個字元"
     },
     "summary": {

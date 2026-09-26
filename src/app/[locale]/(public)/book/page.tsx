@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
+import { MAX_BOOKING_GUESTS } from "@/lib/booking-constants"
 
 // Fixed workshop price
 const PRICE_PER_PERSON = 75
@@ -406,10 +407,16 @@ function DateTimeSelection({
                                 })}
                             </div>
                         ) : (
-                            <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-border p-8">
-                                <p className="text-muted-foreground text-sm text-center">
-                                    No available time slots for this date
+                            <div className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-border p-8 text-center">
+                                <p className="text-muted-foreground text-sm">
+                                    {t("step2.noSlots")}
                                 </p>
+                                <Link
+                                    href="/contact"
+                                    className="inline-block rounded bg-tea-brown px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-tea-brown/90"
+                                >
+                                    {t("step2.contactUs")}
+                                </Link>
                             </div>
                         )}
                         {errors.timeSlot && (
@@ -563,7 +570,7 @@ function PersonalDetails({
                                 if (formData.guests < formData.maxGuests) onFieldChange("guests", formData.guests + 1)
                             }}
                             disabled={formData.guests >= formData.maxGuests}
-                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 8
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= formData.maxGuests
                                     ? "border-border text-muted-foreground/40 cursor-not-allowed"
                                     : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
                                 }`}
@@ -684,10 +691,10 @@ function InterestForm({
                         <button
                             type="button"
                             onClick={() => {
-                                if (formData.guests < 8) onFieldChange("guests", formData.guests + 1)
+                                if (formData.guests < MAX_BOOKING_GUESTS) onFieldChange("guests", formData.guests + 1)
                             }}
-                            disabled={formData.guests >= 8}
-                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= 8
+                            disabled={formData.guests >= MAX_BOOKING_GUESTS}
+                            className={`w-12 h-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold transition-colors ${formData.guests >= MAX_BOOKING_GUESTS
                                     ? "border-border text-muted-foreground/40 cursor-not-allowed"
                                     : "border-tea-brown text-tea-brown hover:bg-tea-brown hover:text-primary-foreground"
                                 }`}
@@ -859,7 +866,7 @@ function BookingFormInner() {
         date: "",
         timeSlotId: "",
         timeSlotLabel: "",
-        maxGuests: 8,
+        maxGuests: MAX_BOOKING_GUESTS,
         fullName: "",
         email: "",
         phone: "",
@@ -1088,14 +1095,14 @@ function BookingFormInner() {
                             selectedSlotId={formData.timeSlotId}
                             onDateSelect={(date) => {
                                 handleFieldChange("date", date)
-                                setFormData((prev) => ({ ...prev, date, timeSlotId: "", timeSlotLabel: "", maxGuests: 8 }))
+                                setFormData((prev) => ({ ...prev, date, timeSlotId: "", timeSlotLabel: "", maxGuests: MAX_BOOKING_GUESTS }))
                             }}
                             onSlotSelect={(slotId, label, remaining) => {
                                 setFormData((prev) => ({
                                     ...prev,
                                     timeSlotId: slotId,
                                     timeSlotLabel: label,
-                                    maxGuests: remaining,
+                                    maxGuests: Math.min(remaining, MAX_BOOKING_GUESTS),
                                     guests: Math.min(prev.guests, remaining),
                                 }))
                                 if (errors.timeSlot) {

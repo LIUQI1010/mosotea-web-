@@ -2,6 +2,7 @@ import { z } from 'zod/v4'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { generateCancellationToken } from '@/lib/token'
 import { sendBookingReceived, sendBookingNotification } from '@/lib/resend/emails'
+import { MAX_BOOKING_GUESTS } from '@/lib/booking-constants'
 import type { BookingWithTimeSlot } from '@/types'
 
 const bookingSchema = z.object({
@@ -18,7 +19,7 @@ const bookingSchema = z.object({
         },
         { message: 'Invalid phone number' }
     ),
-    guests: z.number().int().min(1).max(8, 'Maximum 8 guests'),
+    guests: z.number().int().min(1).max(MAX_BOOKING_GUESTS, `Maximum ${MAX_BOOKING_GUESTS} guests`),
     specialRequests: z.string().max(200, 'Special requests must be 200 characters or fewer').optional().default(''),
     preferredLanguage: z.enum(['en', 'zh']),
 })

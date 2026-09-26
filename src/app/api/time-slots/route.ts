@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { MAX_BOOKING_GUESTS } from '@/lib/booking-constants'
 
 // GET /api/time-slots?date=2026-03-25
 // Returns available time slots for a given date
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
             id: slot.id,
             start_time: slot.start_time,
             end_time: slot.end_time,
-            remaining: slot.max_guests - slot.booked_guests,
+            remaining: Math.min(slot.max_guests - slot.booked_guests, MAX_BOOKING_GUESTS),
         }))
 
         return Response.json({ success: true, data: available })
