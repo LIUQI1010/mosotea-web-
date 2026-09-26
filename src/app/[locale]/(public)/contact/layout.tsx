@@ -13,11 +13,13 @@ export async function generateMetadata({
     description: isZh
       ? '聯絡 Moso Tea。歡迎來訪我們位於威靈頓 Lower Hutt 的花園工作室，或發送訊息給我們。'
       : 'Get in touch with Moso Tea. Visit our garden studio in Lower Hutt, Wellington, or send us a message.',
+    alternates: { canonical: '/contact' },
     openGraph: {
       title: isZh ? '聯絡我們 | Moso Tea' : 'Contact Us | Moso Tea',
       description: isZh
         ? '聯絡 Moso Tea。歡迎來訪我們位於威靈頓 Lower Hutt 的花園工作室，或發送訊息給我們。'
         : 'Get in touch with Moso Tea. Visit our garden studio in Lower Hutt, Wellington, or send us a message.',
+      url: '/contact',
     },
   }
 }

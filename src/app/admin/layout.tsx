@@ -4,6 +4,11 @@ import { getAdminLocale } from './_actions/locale'
 
 export const metadata: Metadata = {
   title: 'Moso Tea Admin',
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+  },
 }
 
 export default async function AdminRootLayout({

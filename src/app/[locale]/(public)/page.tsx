@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Navigation } from "@/components/layout/Navigation"
 import { Footer } from "@/components/layout/Footer"
 import { AnnouncementBanner } from "@/components/AnnouncementBanner"
+import { SITE_URL } from '@/lib/seo'
 
 // Hero Section
 function HeroSection() {
@@ -394,47 +395,89 @@ function GallerySection() {
 function StructuredData() {
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: 'Moso Tea',
-    alternateName: ['mosotea', 'Moso Tea Wellington'],
-    description:
-      'Moso Tea offers authentic tea ceremony workshops and hands-on tea making experiences in Wellington, New Zealand.',
-    url: 'https://mosotea.co.nz',
-    image: 'https://mosotea.co.nz/images/hero-tea-ceremony.jpg',
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Wellington',
-      addressCountry: 'NZ',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: -41.2865,
-      longitude: 174.7762,
-    },
-    priceRange: 'NZ$75–NZ$85',
-    currenciesAccepted: 'NZD',
-    makesOffer: [
+    '@graph': [
       {
-        '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Tea Ceremony Experience',
-          description:
-            'A 90-minute guided tea ceremony workshop for up to 6 guests.',
+        '@type': 'LocalBusiness',
+        '@id': `${SITE_URL}/#business`,
+        name: 'Moso Tea',
+        alternateName: ['Moso Tea Wellington', 'mosotea'],
+        description:
+          'Moso Tea offers authentic Taiwanese-style tea ceremony workshops and seasonal hands-on tea making experiences in Wainuiomata, Wellington, New Zealand.',
+        url: SITE_URL,
+        logo: `${SITE_URL}/images/logo.png`,
+        image: [
+          `${SITE_URL}/images/hero-tea-ceremony.jpg`,
+          `${SITE_URL}/images/tea-journey.jpg`,
+          `${SITE_URL}/images/workshopB.jpg`,
+        ],
+        email: 'hello@mosotea.co.nz',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: '69 Crowther Road',
+          addressLocality: 'Wainuiomata',
+          addressRegion: 'Wellington',
+          postalCode: '5373',
+          addressCountry: 'NZ',
         },
-        price: '75',
-        priceCurrency: 'NZD',
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: -41.2094,
+          longitude: 174.9536,
+        },
+        hasMap:
+          'https://www.google.com/maps/search/?api=1&query=69%20Crowther%20Road%2C%20Wainuiomata%2C%20Lower%20Hutt%205373%2C%20New%20Zealand',
+        areaServed: {
+          '@type': 'City',
+          name: 'Wellington',
+        },
+        priceRange: 'NZ$75–NZ$85',
+        currenciesAccepted: 'NZD',
+        makesOffer: [
+          { '@id': `${SITE_URL}/#tea-ceremony-offer` },
+          { '@id': `${SITE_URL}/#tea-making-offer` },
+        ],
       },
       {
         '@type': 'Offer',
+        '@id': `${SITE_URL}/#tea-ceremony-offer`,
+        url: `${SITE_URL}/book?workshop=A`,
+        price: '75',
+        priceCurrency: 'NZD',
+        availability: 'https://schema.org/LimitedAvailability',
         itemOffered: {
           '@type': 'Service',
-          name: 'Tea Making Experience',
+          '@id': `${SITE_URL}/#tea-ceremony`,
+          name: 'Tea Ceremony Experience',
           description:
-            'A 2-hour hands-on tea making workshop (seasonal).',
+            'A guided 90-minute journey through tea culture, including a garden tour and an authentic Taiwanese-style tea ceremony for up to 6 guests.',
+          duration: 'PT90M',
+          provider: { '@id': `${SITE_URL}/#business` },
         },
+      },
+      {
+        '@type': 'Offer',
+        '@id': `${SITE_URL}/#tea-making-offer`,
+        url: `${SITE_URL}/book?workshop=B`,
         price: '85',
         priceCurrency: 'NZD',
+        availability: 'https://schema.org/LimitedAvailability',
+        itemOffered: {
+          '@type': 'Service',
+          '@id': `${SITE_URL}/#tea-making`,
+          name: 'Tea Making Experience',
+          description:
+            'A seasonal 2-hour hands-on workshop where guests pick fresh tea leaves and learn traditional tea processing.',
+          duration: 'PT2H',
+          provider: { '@id': `${SITE_URL}/#business` },
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: 'Moso Tea',
+        inLanguage: 'en-NZ',
+        publisher: { '@id': `${SITE_URL}/#business` },
       },
     ],
   }
@@ -442,7 +485,9 @@ function StructuredData() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+      }}
     />
   )
 }
