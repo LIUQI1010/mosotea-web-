@@ -16,9 +16,11 @@ export async function generateMetadata({
   return {
     title,
     description,
+    alternates: { canonical: '/privacy' },
     openGraph: {
       title: isZh ? `${title} | Moso Tea` : `${title} | Moso Tea`,
       description,
+      url: '/privacy',
     },
   }
 }

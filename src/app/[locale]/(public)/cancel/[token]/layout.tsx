@@ -13,6 +13,11 @@ export async function generateMetadata({
     description: isZh
       ? '取消您的 Moso Tea 茶道體驗預約。'
       : 'Cancel your Moso Tea tea ceremony booking.',
+    robots: {
+      index: false,
+      follow: false,
+      noarchive: true,
+    },
   }
 }
 
