@@ -204,7 +204,7 @@ create table time_slots (
   id uuid primary key default gen_random_uuid(),
   start_time timestamptz not null,
   end_time timestamptz not null,
-  max_guests int not null default 8,
+  max_guests int not null default 6,
   booked_guests int not null default 0,
   is_available boolean default true,
   created_at timestamptz default now()
@@ -343,7 +343,7 @@ create table email_templates (
 ```
 time_slots ──── bookings
   One slot        can have multiple bookings
-                  total guests cannot exceed max_guests (8)
+                  total guests cannot exceed max_guests (6)
 ```
 
 ### Database Triggers
@@ -375,10 +375,10 @@ time_slots ──── bookings
 
 ### Booking Rules
 - Two experiences offered:
-  - **Workshop A — Tea Ceremony Experience** (90 min, NZD $75/person, max 8 guests) — online booking with date/time selection
+  - **Workshop A — Tea Ceremony Experience** (90 min, NZD $75/person, max 6 guests) — online booking with date/time selection
   - **Workshop B — Tea Making Experience** (2 hours, NZD $85/person, seasonal) — expression of interest form only (submitted via contact API)
 - Two time slots per day: **10:00–11:30 AM** and **2:00–3:30 PM**
-- A time slot supports up to **8 guests total** across multiple bookings
+- A time slot supports up to **6 guests total** across multiple bookings
 - `booked_guests` is automatically updated via database trigger on insert
 - After submission, status is `pending` until admin confirms
 - Customer receives confirmation email immediately after submission
@@ -529,7 +529,7 @@ Submits a new booking request.
 - `fullName`: 2–30 chars, Chinese or English characters only
 - `email`: max 100 chars, valid email format
 - `phone`: max 20 chars, 7–15 digits (E.164 international)
-- `guests`: 1–8 integer
+- `guests`: 1–6 integer
 - `specialRequests`: max 200 chars
 
 **Flow:**

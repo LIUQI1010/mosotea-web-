@@ -15,7 +15,7 @@ const sections: Section[] = [
     heading: 'The experience',
     content: (
       <p>
-        Moso Tea offers The Workshop — a 90-minute guided tea ceremony experience for up to 8 guests
+        Moso Tea offers The Workshop — a 90-minute guided tea ceremony experience for up to 6 guests
         per session, priced at NZD $75 per person. Two sessions are available daily at 10:00–11:30
         and 14:00–15:30 NZDT.
       </p>
@@ -89,7 +89,7 @@ const sections: Section[] = [
     heading: 'Guest requirements',
     content: (
       <ul className="list-disc list-inside space-y-1.5 ml-1">
-        <li>Maximum 8 guests per session</li>
+        <li>Maximum 6 guests per session</li>
         <li>
           Guests are welcome to bring children; please notify us in advance so we can prepare
           appropriately

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { MAX_BOOKING_GUESTS } from '@/lib/booking-constants'
 
 const NZ_TZ = 'Pacific/Auckland'
 
@@ -85,7 +86,7 @@ export async function generateSlots(): Promise<{ created: number; error?: string
       slotsToInsert.push({
         start_time: toNZTime(currentDateStr, '10:00').toISOString(),
         end_time: toNZTime(currentDateStr, '11:30').toISOString(),
-        max_guests: 8,
+        max_guests: MAX_BOOKING_GUESTS,
         booked_guests: 0,
         is_available: true,
       })
@@ -93,7 +94,7 @@ export async function generateSlots(): Promise<{ created: number; error?: string
       slotsToInsert.push({
         start_time: toNZTime(currentDateStr, '14:00').toISOString(),
         end_time: toNZTime(currentDateStr, '15:30').toISOString(),
-        max_guests: 8,
+        max_guests: MAX_BOOKING_GUESTS,
         booked_guests: 0,
         is_available: true,
       })
@@ -230,7 +231,7 @@ export async function enableDateRange(
         toInsert.push({
           start_time: toNZTime(currentDateStr, startH).toISOString(),
           end_time: toNZTime(currentDateStr, endH).toISOString(),
-          max_guests: 8,
+          max_guests: MAX_BOOKING_GUESTS,
           booked_guests: 0,
           is_available: true,
         })
