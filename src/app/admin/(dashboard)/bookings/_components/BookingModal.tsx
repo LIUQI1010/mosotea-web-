@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { Modal } from './Modal'
 import type { AvailableSlot } from '../_actions'
+import { MAX_BOOKING_GUESTS } from '@/lib/booking-constants'
 
 const NZ_TZ = 'Pacific/Auckland'
 
@@ -87,11 +88,14 @@ export function BookingModal({
       ? booking?.time_slots
       : availableSlots.find((s) => s.id === timeSlotId)
 
-  const maxAllowed = selectedSlot
+  const slotCapacity = selectedSlot
     ? mode === 'edit' && booking
       ? selectedSlot.max_guests - selectedSlot.booked_guests + booking.guest_count
       : selectedSlot.max_guests - selectedSlot.booked_guests
-    : 8
+    : MAX_BOOKING_GUESTS
+  const maxAllowed = mode === 'edit' && booking
+    ? Math.max(booking.guest_count, Math.min(slotCapacity, MAX_BOOKING_GUESTS))
+    : Math.min(slotCapacity, MAX_BOOKING_GUESTS)
 
   const dateLocale = locale === 'zh-TW' ? 'zh-CN' : 'en-NZ'
 

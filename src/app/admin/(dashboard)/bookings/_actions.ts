@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { MAX_BOOKING_GUESTS } from '@/lib/booking-constants'
 import { generateCancellationToken } from '@/lib/token'
 import { sendBookingConfirmation, sendCancellationConfirmation } from '@/lib/resend/emails'
 import type { BookingWithTimeSlot } from '@/types'
@@ -162,6 +163,10 @@ export async function createBooking(
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = createAdminClient()
 
+  if (!Number.isInteger(data.guestCount) || data.guestCount < 1 || data.guestCount > MAX_BOOKING_GUESTS) {
+    return { success: false, error: `預約人數必須為 1–${MAX_BOOKING_GUESTS} 人` }
+  }
+
   // Check slot capacity
   const { data: slot, error: slotError } = await supabase
     .from('time_slots')
@@ -273,6 +278,10 @@ export async function updateBooking(
 
   if (fetchError || !current) {
     return { success: false, error: '預約不存在' }
+  }
+
+  if (!Number.isInteger(data.guestCount) || data.guestCount < 1 || (data.guestCount > MAX_BOOKING_GUESTS && data.guestCount !== current.guest_count)) {
+    return { success: false, error: `預約人數必須為 1–${MAX_BOOKING_GUESTS} 人` }
   }
 
   // If guest count increased, check capacity
@@ -402,7 +411,7 @@ export async function getAvailableSlots(): Promise<AvailableSlot[]> {
     .select('id, start_time, end_time, max_guests, booked_guests')
     .eq('is_available', true)
     .gt('start_time', now)
-    .lt('booked_guests', 8)
+    .lt('booked_guests', MAX_BOOKING_GUESTS)
     .order('start_time', { ascending: true })
 
   return (data ?? []) as AvailableSlot[]

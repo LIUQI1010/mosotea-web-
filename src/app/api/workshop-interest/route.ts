@@ -1,4 +1,5 @@
 import { z } from 'zod/v4'
+import { MAX_BOOKING_GUESTS } from '@/lib/booking-constants'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
   sendWorkshopInterestNotification,
@@ -29,7 +30,7 @@ const workshopInterestSchema = z.object({
       },
       { message: 'Invalid phone number' }
     ),
-  guests: z.number().int().min(1).max(8, 'Maximum 8 guests'),
+  guests: z.number().int().min(1).max(MAX_BOOKING_GUESTS, `Maximum ${MAX_BOOKING_GUESTS} guests`),
   message: z
     .string()
     .trim()
