@@ -212,6 +212,7 @@ function FAQSection() {
         { question: t("faq.q6"), answer: t("faq.a6") },
         { question: t("faq.q7"), answer: t("faq.a7") },
         { question: t("faq.q8"), answer: t("faq.a8") },
+        { question: t("faq.q9"), answer: t("faq.a9") },
     ]
 
     return (
