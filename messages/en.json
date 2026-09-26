@@ -51,7 +51,7 @@
       },
       "workshopB": {
         "title": "Tea Making Experience",
-        "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea to take home."
+        "description": "A hands-on seasonal workshop where you pick fresh tea leaves from our garden and learn to process them into your own finished tea."
       },
       "statsA": "90 min  ·  2–5 guests  ·  NZD $75 / person",
       "statsB": "2 hours  ·  NZD $85 / person  ·  Seasonal",
@@ -183,7 +183,7 @@
         "overnightNote": "The following steps require overnight processing and cannot be completed during the session. Your host will explain the process.",
         "4": "Fire and dry the tea leaves using traditional techniques",
         "5": "Brew and taste finished tea from our garden (we prepare a completed batch for you to taste)",
-        "6": "Receive your handmade tea by post once fully processed (NZ domestic only)"
+        "6": "Receive 10g of your own handmade tea, posted to you via NZ Post once fully processed (NZ addresses only)"
       },
       "registerInterest": "Register Interest",
       "seasonalNote": "This experience depends on tea leaf availability. Register your interest and we will contact you when sessions are available."
@@ -201,7 +201,9 @@
       "q7": "Will there be insects in the garden?",
       "a7": "As our tea plants are grown in a natural outdoor environment, you may occasionally see small insects, just like in any garden.",
       "q8": "Do you provide food?",
-      "a8": "We serve tea only. Our sessions do not include food of any kind, and we do not use dairy products such as milk or cream. We recommend having a light meal beforehand, as tea is best enjoyed on a settled stomach."
+      "a8": "We serve tea only. Our sessions do not include food of any kind, and we do not use dairy products such as milk or cream. We recommend having a light meal beforehand, as tea is best enjoyed on a settled stomach.",
+      "q9": "How much tea will I receive from the Tea Making Experience?",
+      "a9": "You will receive 10g of the tea you made yourself during the experience. Once it's fully processed, we'll post it to you via NZ Post (New Zealand addresses only)."
     },
     "ctaTitle": "Ready to Begin Your Tea Journey?",
     "ctaDescription": "Join us for an unforgettable workshop where tea culture comes alive. Book your session or register your interest today.",
