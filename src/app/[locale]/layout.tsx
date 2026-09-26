@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getMessages } from 'next-intl/server'
 import { NextIntlClientProvider } from 'next-intl'
 import { routing } from '@/i18n/routing'
+import { SITE_URL } from '@/lib/seo'
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
@@ -23,19 +24,23 @@ export async function generateMetadata({
     ? '在 Moso Tea 體驗茶道藝術。在威靈頓私密花園中享受正宗茶道體驗。'
     : 'Moso Tea offers authentic tea ceremony workshops and hands-on tea making experiences in Wellington, New Zealand. Book your intimate garden tea session today.'
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mosotea.co.nz'
-
   return {
     title: {
       default: title,
       template: '%s | Moso Tea',
     },
     description,
-    metadataBase: new URL(baseUrl),
+    metadataBase: new URL(SITE_URL),
+    applicationName: 'Moso Tea',
+    authors: [{ name: 'Moso Tea', url: SITE_URL }],
+    creator: 'Moso Tea',
+    publisher: 'Moso Tea',
+    category: 'Tea ceremony workshops',
     openGraph: {
       title,
       description,
       siteName: 'Moso Tea',
+      url: '/',
       locale: isZh ? 'zh_TW' : 'en_NZ',
       type: 'website',
       images: [
@@ -65,9 +70,9 @@ export async function generateMetadata({
       images: ['/images/hero-tea-ceremony.jpg'],
     },
     alternates: {
+      canonical: '/',
       languages: {
         en: '/',
-        'zh-TW': '/zh-TW',
       },
     },
   }

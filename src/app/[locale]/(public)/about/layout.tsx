@@ -12,12 +12,14 @@ export async function generateMetadata({
     title: isZh ? '關於我們' : 'About Us',
     description: isZh
       ? '了解 Moso Tea 的故事、茶藝師和我們在威靈頓的花園工作室。'
-      : 'Learn about Moso Tea, our tea master Mei Lin Chen, and our garden studio in Wellington.',
+      : 'Meet the people behind Moso Tea and discover our Taiwanese tea culture, garden, and workshop in Wainuiomata, Wellington.',
+    alternates: { canonical: '/about' },
     openGraph: {
       title: isZh ? '關於我們 | Moso Tea' : 'About Us | Moso Tea',
       description: isZh
         ? '了解 Moso Tea 的故事、茶藝師和我們在威靈頓的花園工作室。'
-        : 'Learn about Moso Tea, our tea master Mei Lin Chen, and our garden studio in Wellington.',
+        : 'Meet the people behind Moso Tea and discover our Taiwanese tea culture, garden, and workshop in Wainuiomata, Wellington.',
+      url: '/about',
     },
   }
 }
