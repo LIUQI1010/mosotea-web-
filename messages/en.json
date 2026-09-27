@@ -281,7 +281,7 @@
       "errorDate": "Please select a date",
       "errorTime": "Please select a time slot",
       "selectDateFirst": "Please select a date first to see available time slots",
-      "noSlots": "No available time slots for this date",
+      "noSlots": "Please contact us",
       "contactUs": "Contact us"
     },
     "step3": {
